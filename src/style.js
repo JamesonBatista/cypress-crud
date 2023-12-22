@@ -30,9 +30,10 @@ module.exports = function applyStyles() {
     let aliasWrite = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-writeFile > div > span > div > span.command-info`;
     let aliasRead = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-readFile > div > span > div > span.command-info`;
     let valid = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-runValidation > div > span > div > span.command-info`;
+    let env = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env > div > span > div > span.command-info`;
 
     style.innerHTML = `
-    ${alias} span.command-method > span, ${aliasWrite} span.command-method > span, ${aliasRead} span.command-method > span{
+    ${alias} span.command-method > span, ${aliasWrite} span.command-method > span, ${aliasRead} span.command-method > span, ${env} span.command-method > span{
         background-color: #ff6700eb;
         border-radius: 2px;
         padding: 0px 4px 1px 4px;

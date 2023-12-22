@@ -6,6 +6,19 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
   if (typeof payload === `object`) {
     if (payload && payload.endpoint && Cypress.env("environment")) {
       let env = Cypress.env(Cypress.env("environment"))[payload.endpoint];
+      const log = {
+        name: "env",
+        message: `${Cypress.env("environment")}`,
+        consoleProps: () => {
+          return {
+            env: Cypress.env(Cypress.env("environment"))[payload.endpoint],
+            path: payload.endpoint,
+            endpoint: Cypress.env(Cypress.env("environment"))[payload.endpoint],
+            framework: "cy.crud",
+          };
+        },
+      };
+      Cypress.log(log);
       payload.request.url = env;
     }
 
@@ -29,6 +42,19 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
   return cy.fixture(payload).then((crud) => {
     if (crud && crud.endpoint && Cypress.env("environment")) {
       let env = Cypress.env(Cypress.env("environment"))[crud.endpoint];
+      const log = {
+        name: "env",
+        message: `${Cypress.env("environment")}`,
+        consoleProps: () => {
+          return {
+            env: Cypress.env(Cypress.env("environment"))[crud.endpoint],
+            path: crud.endpoint,
+            endpoint: Cypress.env(Cypress.env("environment"))[crud.endpoint],
+            framework: "cy.crud",
+          };
+        },
+      };
+      Cypress.log(log);
       crud.request.url = env;
     }
     let data = { ...crud.request };

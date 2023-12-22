@@ -393,7 +393,7 @@ describe("template spec", () => {
 
  */
 
-    cy.crud({ payload: "examples/jsonEndpoint" });
+   // cy.crud({ payload: "examples/jsonEndpoint" });
   });
 });
 

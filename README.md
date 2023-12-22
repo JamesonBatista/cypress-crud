@@ -18,7 +18,7 @@
 **To install the package, run the following command in your Cypress project:**
 
 ```bash
-npm i cypress-action
+npm i cypress-crud
 ```
 
 ## Use Snippets in cy.action
@@ -82,7 +82,7 @@ import "cypress-plugin-api";
 
 🚩 **create a json in the fixtures folder, which can be inside a subfolder "fixtures/token/createToken.json"**
 
-```json
+```javascript
 {
   "request": {
     "method": "GET",
@@ -104,20 +104,20 @@ import "cypress-plugin-api";
 
 Or
 
-```json
+```javascript
 let obj = {
-  "request": {
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
-}
+  request: {
+    method: "GET",
+    url: "https://reqres.in/api/users/2",
+    body: null,
+    qs: null,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  },
+};
 
- cy.crud({ payload: obj })
+cy.crud({ payload: obj });
 ```
 
 # cy.crud whit endpoint param
@@ -186,7 +186,7 @@ let obj = {
 
 💻 **with validations you just need to inform the path and the value, regardless of which part of your JSON it is.**
 
-```json
+```javascript
 {
   "request": {
     "method": "GET",
@@ -213,7 +213,7 @@ assert expected Michael to exist
 
 💻 **If you don't want to use validations directly in JSON, you can use .bodyResponse to validate the return.**
 
-```json
+```javascript
 cy.crud({ payload: "token/createToken.json" })
 .bodyResponse({path: "name", value:"Jam Batista"})
 // .bodyResponse({path: "name""})
@@ -232,18 +232,17 @@ code hiden bodyResponse
 
 💻 **save will set aside a value entered to be used in the future when you request it.**
 
-```json
-cy.crud({ payload: "token/createToken.json" })
-.save({path:"name"}) // save name in crudStorage
+```javascript
+cy.crud({ payload: "token/createToken.json" }).save({ path: "name" }); // save name in crudStorage
 // .save({path:"name", alias: "user_id"}) // save name in crudStorage whit new alias
 
-console.log('storage', crudStorage.save.save)
+console.log("storage", crudStorage.save.save);
 // console.log('storage', crudStorage.save.user_id)
 ```
 
 ## get data in .save()
 
-```json
+```javascript
 
 // .save({path:"name"})
     cy.save({ log: false }).then((rescue) => {
@@ -268,22 +267,19 @@ OR
 
 💻 **Uses cy.writeFile requirements**
 
-```json
-cy.crud({ payload: "token/createToken.json" })
-.write({ path: "user/getUser" }); // create json response in cypress/fixtures/user
-
+```javascript
+cy.crud({ payload: "token/createToken.json" }).write({ path: "user/getUser" }); // create json response in cypress/fixtures/user
 ```
 
 # .read()
 
 💻 **Uses cy.writeFile requirements**
 
-```json
-cy.crud({ payload: "token/createToken.json" })
-.read({ path: "user/getUser" }); // read json response in cypress/fixtures/user
+```javascript
+cy.crud({ payload: "token/createToken.json" }).read({ path: "user/getUser" }); // read json response in cypress/fixtures/user
 
-cy.read({ path: "user/getUser" }).then((json)=>{
-    console.log(json)
+cy.read({ path: "user/getUser" }).then((json) => {
+  console.log(json);
 });
 ```
 
