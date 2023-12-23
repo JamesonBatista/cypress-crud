@@ -27,10 +27,24 @@ const projectRoot = findProjectRoot(__dirname);
 const supportFilePath = path.join(projectRoot, "cypress/support/e2e.js");
 
 const contentToAdd = `
-export { Scenario, Given, When, And, Then, Cenario, Dado, Quando, E, Entao, describes, its, crudStorage } from "cypress-crud/src/gherkin/bdd.js";
+export {
+  Scenario,
+  Given,
+  When,
+  And,
+  Then,
+  Cenario,
+  Dado,
+  Quando,
+  E,
+  Entao,
+  describes,
+  its,
+  crudStorage,
+} from "cypress-crud/src/gherkin/bdd.js";
 import "cypress-plugin-steps";
 export const faker = require("generate-datafaker");
-import "cypress-crud"
+import "cypress-crud";
 import "cypress-plugin-api";
 
 `;
@@ -212,6 +226,13 @@ const projectRootPathJSON = path.resolve(__dirname, "../../cypress/fixtures/");
 // Caminho para a pasta .vscode
 const vscodeFolderPathJSON = path.join(projectRootPathJSON, "examples");
 
+//schemas
+const vscodeFolderPathJSONSchema = path.join(projectRootPathJSON, "schemas");
+const snippetsFilePathJSONSchemas = path.join(
+  vscodeFolderPathJSONSchema,
+  "jsonSchema.json"
+);
+
 const snippetsFilePathJSON = path.join(vscodeFolderPathJSON, "jsonAlias.json");
 const jsonWithoutValidation = path.join(
   vscodeFolderPathJSON,
@@ -225,6 +246,25 @@ const snippetsFileEndpoint = path.join(
   vscodeFolderPathJSON,
   "jsonEndpoint.json"
 );
+
+const snippetsFileEndpointArray = path.join(
+  vscodeFolderPathJSON,
+  "jsonGetArray.json"
+);
+const contentEndpointArray = `
+{
+  "request": {
+    "method": "GET",
+    "url": "https://reqres.in/api/users?page=2",
+    "body": null,
+    "qs": null,
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
+`;
+
 const contentEndpoint = `
 {
   "endpoint": "getUser",
@@ -284,6 +324,62 @@ const contentWithoutValid = `
   }
 }
 `;
+
+const contentSchemas = `
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "first_name",
+        "last_name",
+        "avatar"
+      ]
+    },
+    "support": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "url",
+        "text"
+      ]
+    }
+  },
+  "required": [
+    "data",
+    "support"
+  ]
+}
+`;
+
 const generateFileExample = path.resolve(__dirname, "../../cypress/e2e/");
 const snipExample = path.join(generateFileExample, "cy-crud.cy.js");
 
@@ -292,10 +388,17 @@ const { crudStorage } = require("../support/e2e");
 
 describe("template spec", () => {
   it("Example simple requisition", () => {
-    cy.crud({ payload: "examples/jsonNotAlias" });
+    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" });
     // validation JSON path validations:[]
   });
-
+  it("Example simple requisition return array", () => {
+    cy.crud({ payload: "examples/jsonGetArray" }).then((response) => {
+      for (let items of response.body?.data) {
+        expect(items.id).to.exist;
+        if (items.id == 7) crudStorage.save.id_Seven = items.id;
+      }
+    });
+  });
   it("Example whit .bodyResponse", () => {
     cy.crud({ payload: "examples/jsonNotAlias" }).bodyResponse({
       path: "last_name",
@@ -319,19 +422,19 @@ describe("template spec", () => {
 
   it("Example use JSON whit alias, rescue save", () => {
     /** {
-  "request": {
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "path": "save",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "validations": [{ "path": "status", "value": 200 }, { "path": "first_name" }]
-}
- */
+    "request": {
+      "method": "GET",
+      "url": "https://reqres.in/api/users/2",
+      "path": "save",
+      "body": null,
+      "qs": null,
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    },
+    "validations": [{ "path": "status", "value": 200 }, { "path": "first_name" }]
+  }
+   */
     cy.crud({ payload: "examples/jsonAlias" });
   });
 
@@ -367,33 +470,102 @@ describe("template spec", () => {
   });
   it("Example change ENVIRONMENT QA DEV PROD etc", () => {
     /** USE in cypress.config.js
- * 
- * const { defineConfig } = require("cypress");
+   *
+   * const { defineConfig } = require("cypress");
 
-  module.exports = defineConfig({
-  e2e: {
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
+    module.exports = defineConfig({
+    e2e: {
+      setupNodeEvents(on, config) {
+        // implement node event listeners here
+      },
+      testIsolation: false,
+      env: {
+        environment: "QA", // chance environment
+        QA: {
+          getUser: "https://reqres.in/api/users/2",
+        },
+        DEV: {
+          getUser: "https://reqres.in/api/users/2",
+        },
+        PROD: {
+          getUser: "https://reqres.in/api/users/2",
+        },
+      },
     },
-    testIsolation: false,
-    env: {
-      environment: "QA", // chance environment
-      QA: {
-        getUser: "https://reqres.in/api/users/2",
-      },
-      DEV: {
-        getUser: "https://reqres.in/api/users/2",
-      },
-      PROD: {
-        getUser: "https://reqres.in/api/users/2",
-      },
-    },
-  },
-});
+  });
 
- */
+   */
+    // cy.crud({ payload: "examples/jsonEndpoint" });
+  });
 
-   // cy.crud({ payload: "examples/jsonEndpoint" });
+  it("Example without path endpoint, but path id_user/continueEndpoint", () => {
+    cy.crud({ payload: "examples/jsonWithParam" });
+  });
+
+  it("Example whit path endpoint, but path id_user/continueEndpoint", () => {
+    // Used whit JSON file
+
+    let obj = {
+      endpoint: "getUser", // configure env in cypress.config.js
+      request: {
+        method: "POST",
+        url: "https://reqres.in/api/users/2",
+        path: "save/continueWhitWndpoint",
+        body: null,
+        qs: null,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    };
+
+    cy.crud({ payload: obj });
+  });
+
+  it("Example without path endpoint, but path id_user/continueEndpoint", () => {
+    // Used in JSON file
+    let obj = {
+      request: {
+        method: "POST",
+        url: "https://reqres.in/api/users/2",
+        path: "save/continueWhitWndpoint",
+        body: null,
+        qs: null,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    };
+
+    cy.crud({ payload: obj });
+  });
+
+  it("Example without path endpoint, but path /continueEndpoint", () => {
+    // Used in JSON file
+
+    // endpoint:"alias defined"
+    let obj = {
+      request: {
+        method: "POST",
+        url: "https://reqres.in/api/users/2",
+        path: "/continueWhitWndpoint",
+        body: null,
+        qs: null,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    };
+
+    cy.crud({ payload: obj });
+  });
+
+  it("Example validate schema", () => {
+    cy.crud({ payload: "examples/jsonNotAlias" }).validateSchema({
+      schema: "jsonSchema",
+    });
+
+    cy.log("ID first requisition", crudStorage.save.id_Seven);
   });
 });
 
@@ -405,8 +577,19 @@ if (!fs.existsSync(vscodeFolderPathJSON)) {
   fs.mkdirSync(vscodeFolderPathJSON);
   console.log("Pasta .vscode criada com sucesso.");
 }
+
+if (!fs.existsSync(vscodeFolderPathJSONSchema)) {
+  fs.mkdirSync(vscodeFolderPathJSONSchema);
+  console.log("Pasta .vscode criada com sucesso.");
+}
 fs.writeFileSync(snippetsFilePathJSON, contentJSonAlias);
+//schemas
+fs.writeFileSync(snippetsFilePathJSONSchemas, contentSchemas);
+
 fs.writeFileSync(snippetsFileEndpoint, contentEndpoint);
 
+fs.writeFileSync(snippetsFileEndpointArray, contentEndpointArray);
+
 fs.writeFileSync(jsonWithoutValidation, contentWithoutValid);
+
 fs.writeFileSync(snippetsFilePathNotAlias, contentJSonAliasNot);

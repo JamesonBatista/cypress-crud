@@ -31,9 +31,10 @@ module.exports = function applyStyles() {
     let aliasRead = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-readFile > div > span > div > span.command-info`;
     let valid = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-runValidation > div > span > div > span.command-info`;
     let env = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env > div > span > div > span.command-info`;
+    let schemas = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas > div > span > div > span.command-info`;
 
     style.innerHTML = `
-    ${alias} span.command-method > span, ${aliasWrite} span.command-method > span, ${aliasRead} span.command-method > span, ${env} span.command-method > span{
+    ${alias} span.command-method > span, ${aliasWrite} span.command-method > span, ${aliasRead} span.command-method > span, ${env} span.command-method > span, ${schemas} span.command-method > span{
         background-color: #ff6700eb;
         border-radius: 2px;
         padding: 0px 4px 1px 4px;
@@ -114,17 +115,18 @@ module.exports = function applyStyles() {
     let subTitle = `#unified-reporter > div > div > div.runnable-header`;
     let colapse = `#unified-reporter > div > div > div.wrap > ul > li > div`;
     let colapseOPen = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul.runnables > li`;
-    let header = `#unified-reporter > div > header`;
+    let headers = `#unified-reporter > div > header`;
     let container = `#unified-reporter > div > div`;
     let barReport = `#unified-reporter > div`;
     let top = `#spec-runner-header > div`;
-
+    let header = `#spec-runner-header > div > div.border`;
+    let overflow = `body > div.inner-container > div#api-plugin-root > div#api-view`;
     style.innerHTML = `
     ${alias}{
         background-color: rgb(27 30 46 / 1);
     }
 
-    ${subTitle}, ${colapse}, ${colapseOPen}, ${header}, ${container}, ${top} {
+    ${subTitle}, ${colapse}, ${colapseOPen}, ${headers}, ${container}, ${top} {
          background-color: rgb(27 30 46 / 1);
     }
 
@@ -134,9 +136,68 @@ module.exports = function applyStyles() {
      ${barReport}:hover{
         border-right: 1px solid white;
     }
+
+     ${header}{display: none;}
+     ${overflow} {
+        overflow: hidden !important;
+    }
     `;
 
     style.setAttribute("data-hover-black-spec", "");
+    app.document.head.appendChild(style);
+  }
+
+  if (!app.document.head.querySelector("[data-hover-black-methods-info]")) {
+    // Criar e inserir o elemento de estilo
+
+    const style = app.document.createElement("style");
+    let get = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-GET`;
+    let post = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-POST`;
+    let put = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-PUT`;
+    let deletes = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-DELETE`;
+    let save = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-save`;
+    let env = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env`;
+    let schemas = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas`;
+
+    let header = `#spec-runner-header > div > div.border`;
+
+    let change = `div > span > div > span.command-info > span.command-message > span.command-message-text { color: white;}`;
+    style.innerHTML = `
+    ${get}:hover ${change}
+    ${post}:hover ${change}
+    ${put}:hover ${change}
+    ${deletes}:hover ${change}
+     ${save}:hover ${change}
+     ${env}:hover ${change}
+     ${schemas}:hover ${change}
+
+     ${header}{display: none;}
+
+
+     ${save}
+    `;
+
+    style.setAttribute("data-hover-black-methods-info", "");
+    app.document.head.appendChild(style);
+  }
+
+  if (!app.document.head.querySelector("[data-hover-black-delete-before]")) {
+    // Criar e inserir o elemento de estilo
+
+    const style = app.document.createElement("style");
+    let expectBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-assert`;
+    let envBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env`;
+    let schemasBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas`;
+
+    let div = `div > span > div > span.command-info > span.command-method::before {content: '';}`;
+    style.innerHTML = `
+   ${expectBefore} ${div}
+   ${envBefore} ${div}
+   ${schemasBefore} ${div}
+
+    `;
+
+    style.setAttribute("data-hover-black-delete-before", "");
     app.document.head.appendChild(style);
   }
 };

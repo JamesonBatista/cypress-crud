@@ -1,11 +1,33 @@
 const applyStyles = require("./style.js");
-
+import { validate } from "jsonschema";
 Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
   applyStyles();
 
+  if (!window.save) {
+    window.save = {};
+  }
+
+  if (!window.alias) {
+    window.alias = {};
+  }
   if (typeof payload === `object`) {
+    let separate = null;
+
     if (payload && payload.endpoint && Cypress.env("environment")) {
       let env = Cypress.env(Cypress.env("environment"))[payload.endpoint];
+
+      if (payload && payload.request.path) {
+        if (payload.request.path.startsWith("/")) {
+          payload.request.url = `${env}${payload.request.path}`;
+        } else {
+          if (payload.request.path.includes("/")) {
+            separate = payload.request.path.split("/");
+            payload.request.url = `${env}/${window.save[separate[0]]}/${
+              separate[1]
+            }`;
+          }
+        }
+      }
       const log = {
         name: "env",
         message: `${Cypress.env("environment")}`,
@@ -19,11 +41,29 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
         },
       };
       Cypress.log(log);
-      payload.request.url = env;
+      if (!separate) payload.request.url = env;
+    } else if (
+      payload &&
+      !payload.endpoint &&
+      payload.request.path &&
+      payload.request.path.includes("/")
+    ) {
+      if (payload && payload.request.path) {
+        if (payload.request.path.startsWith("/")) {
+          payload.request.url = `${payload.request.url}${payload.request.path}`;
+        } else {
+          if (payload.request.path.includes("/")) {
+            separate = payload.request.path.split("/");
+            payload.request.url = `${payload.request.url}/${
+              window.save[separate[0]]
+            }/${separate[1]}`;
+          }
+        }
+      }
     }
 
     let data = { ...payload.request };
-    if (data.path) {
+    if (data.path && !separate) {
       if (!window.save) window.save = {};
       data.url = `${data.url}/${window.save[data.path]}`;
     }
@@ -33,6 +73,7 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
       }
       window.alias[alias] = response;
       window.alias["bodyResponse"] = response;
+
       if (payload.validations) {
         runValidation(payload.validations);
       }
@@ -40,8 +81,22 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
     });
   }
   return cy.fixture(payload).then((crud) => {
+    let separate = null;
+
     if (crud && crud.endpoint && Cypress.env("environment")) {
       let env = Cypress.env(Cypress.env("environment"))[crud.endpoint];
+      if (crud && crud.request.path) {
+        if (crud.request.path.startsWith("/")) {
+          crud.request.url = `${env}${crud.request.path}`;
+        } else {
+          if (crud.request.path.includes("/")) {
+            separate = crud.request.path.split("/");
+            crud.request.url = `${env}/${window.save[separate[0]]}/${
+              separate[1]
+            }`;
+          }
+        }
+      }
       const log = {
         name: "env",
         message: `${Cypress.env("environment")}`,
@@ -55,10 +110,24 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
         },
       };
       Cypress.log(log);
-      crud.request.url = env;
+      if (!separate) crud.request.url = env;
+    } else if (crud && !crud.endpoint) {
+      if (crud && crud.request.path) {
+        if (crud.request.path.startsWith("/")) {
+          crud.request.url = `${crud.request.url}${crud.request.path}`;
+        } else {
+          if (crud.request.path.includes("/")) {
+            separate = crud.request.path.split("/");
+            crud.request.url = `${crud.request.url}/${
+              window.save[separate[0]]
+            }/${separate[1]}`;
+          }
+        }
+      }
     }
     let data = { ...crud.request };
-    if (data.path) {
+
+    if (data.path && !separate) {
       data.url = `${data.url}/${window.save[data.path]}`;
     }
     return cy.api(data).then((response) => {
@@ -229,6 +298,36 @@ Cypress.Commands.add("read", ({ path = null, log = true } = {}) => {
     });
 });
 
+Cypress.Commands.add("validateSchema", ({ schema = null }) => {
+  cy.fixture(`schemas/${schema}`)
+    .as("dataLoader")
+    .then((schema) => {
+      const validation = validate(window.alias.bodyResponse.body, schema, {
+        required: true,
+        nestedErrors: true,
+      });
+      let errors = "";
+      if (!validation.valid) {
+        errors += validation.errors.map((err) => {
+          return "\n" + err.toString();
+        });
+        throw new Error("SCHEMA VALIDATION ERROR: " + errors);
+      }
+      // cy.task("log", "Successful JSON Schema validation", validation.valid);
+      const log = {
+        name: "schemas",
+        message: `Successful JSON Schema validation ${validation.valid}`,
+        consoleProps: () => {
+          return {
+            path: `schemas/${schema}`,
+            body: window.alias.bodyResponse,
+            framework: "cy.crud",
+          };
+        },
+      };
+      Cypress.log(log);
+    });
+});
 function findInJson(obj, keyToFind, position = 1) {
   let result = null;
   let fullValue = null;

@@ -22,5 +22,9 @@ declare namespace Cypress {
 
     write(options: { path?: string | null; log?: boolean }): Chainable<any>;
     read(options: { path?: string | null; log?: boolean }): Chainable<any>;
+    validateSchema(options: {
+      schema?: string | null;
+      log?: boolean;
+    }): Chainable<any>;
   }
 }
