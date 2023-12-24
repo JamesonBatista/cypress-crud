@@ -188,13 +188,13 @@ module.exports = function applyStyles() {
     let expectBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-assert`;
     let envBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env`;
     let schemasBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas`;
-
+    let space = `#unified-runner`;
     let div = `div > span > div > span.command-info > span.command-method::before {content: '';}`;
     style.innerHTML = `
    ${expectBefore} ${div}
    ${envBefore} ${div}
    ${schemasBefore} ${div}
-
+   ${space}{height: 90% !important;}
     `;
 
     style.setAttribute("data-hover-black-delete-before", "");
