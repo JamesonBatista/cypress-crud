@@ -47,6 +47,24 @@ export const faker = require("generate-datafaker");
 import "cypress-crud";
 import "cypress-plugin-api";
 
+
+// USE IN cypress.config.js
+
+  // testIsolation: false,
+  // experimentalRunAllSpecs: true,
+  // env: {
+  //   environment: "QA", // change environment
+  //   QA: {
+  //     getUser: "https://reqres.in/api/users",
+  //   },
+  //   DEV: {
+  //     getUser: "https://reqres.in/api/users/2",
+  //   },
+  //   PROD: {
+  //     getUser: "https://reqres.in/api/users/2",
+  //   },
+  // },
+
 `;
 
 const appendToFile = (filePath, content) => {
@@ -234,6 +252,8 @@ const snippetsFilePathJSONSchemas = path.join(
 );
 
 const snippetsFilePathJSON = path.join(vscodeFolderPathJSON, "jsonAlias.json");
+const jsonWhitParam = path.join(vscodeFolderPathJSON, "jsonWithParam.json");
+
 const jsonWithoutValidation = path.join(
   vscodeFolderPathJSON,
   "jsonWithoutValidation.json"
@@ -256,6 +276,20 @@ const contentEndpointArray = `
   "request": {
     "method": "GET",
     "url": "https://reqres.in/api/users?page=2",
+    "body": null,
+    "qs": null,
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
+`;
+const jsonWithParamContent = `
+{
+  "request": {
+    "method": "GET",
+    "url": "https://reqres.in/api/users?page=2",
+    "path": "id_user/continueEndpoint",
     "body": null,
     "qs": null,
     "headers": {
@@ -495,7 +529,7 @@ describe("template spec", () => {
   });
 
    */
-    // cy.crud({ payload: "examples/jsonEndpoint" });
+     cy.crud({ payload: "examples/jsonEndpoint" });
   });
 
   it("Example without path endpoint, but path id_user/continueEndpoint", () => {
@@ -583,6 +617,8 @@ if (!fs.existsSync(vscodeFolderPathJSONSchema)) {
   console.log("Pasta .vscode criada com sucesso.");
 }
 fs.writeFileSync(snippetsFilePathJSON, contentJSonAlias);
+fs.writeFileSync(jsonWhitParam, jsonWithParamContent);
+
 //schemas
 fs.writeFileSync(snippetsFilePathJSONSchemas, contentSchemas);
 
@@ -593,3 +629,72 @@ fs.writeFileSync(snippetsFileEndpointArray, contentEndpointArray);
 fs.writeFileSync(jsonWithoutValidation, contentWithoutValid);
 
 fs.writeFileSync(snippetsFilePathNotAlias, contentJSonAliasNot);
+
+const configPath = path.resolve(__dirname, "../../");
+const jsconfigFilePath = path.join(configPath, "cypress.config.js");
+// Novo conteúdo para ser adicionado
+const newContent = `
+
+  // testIsolation: false,
+  // experimentalRunAllSpecs: true,
+  // env: {
+  //   environment: "QA", // change environment
+  //   QA: {
+  //     getUser: "https://reqres.in/api/users",
+  //   },
+  //   DEV: {
+  //     getUser: "https://reqres.in/api/users/2",
+  //   },
+  //   PROD: {
+  //     getUser: "https://reqres.in/api/users/2",
+  //   },
+  // },
+`;
+const contentLog = `
+  on('task', {
+      crudLog(message) {
+        console.log(message);
+        return null;
+      },
+    });
+`;
+
+fs.readFile(jsconfigFilePath, "utf8", (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  // Verifica se a setupNodeEvents já existe
+  if (data.includes("crudLog")) {
+    console.log("A função setupNodeEvents já existe no arquivo.");
+    return;
+  }
+
+  // Localiza onde inserir o novo conteúdo
+  const updatedData = data.replace(/(e2e: {)/, `$1${newContent}`);
+  const updateNode = data.replace(
+    /(setupNodeEvents\(on, config\) {\s*)/,
+    `$1${contentLog}`
+  );
+  fs.writeFile(jsconfigFilePath, updateNode, "utf8", (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log(
+      "A função setupNodeEvents foi adicionada com sucesso ao arquivo cypress.config.js"
+    );
+  });
+
+  // Escreve as alterações de volta no arquivo
+  // fs.writeFile(jsconfigFilePath, updatedData, "utf8", (err) => {
+  //   if (err) {
+  //     console.error(err);
+  //     return;
+  //   }
+  //   console.log(
+  //     "A função setupNodeEvents foi adicionada com sucesso ao arquivo cypress.config.js"
+  //   );
+  // });
+});

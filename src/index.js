@@ -2,7 +2,6 @@ const applyStyles = require("./style.js");
 import { validate } from "jsonschema";
 Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
   applyStyles();
-
   if (!window.save) {
     window.save = {};
   }
@@ -12,36 +11,48 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
   }
   if (typeof payload === `object`) {
     let separate = null;
-
-    if (payload && payload.endpoint && Cypress.env("environment")) {
-      let env = Cypress.env(Cypress.env("environment"))[payload.endpoint];
+    let env = null;
+    if (payload && payload.endpoint) {
+      if (Cypress.env("environment")) {
+        env = Cypress.env(Cypress.env("environment"))[payload.endpoint];
+      }
 
       if (payload && payload.request.path) {
         if (payload.request.path.startsWith("/")) {
-          payload.request.url = `${env}${payload.request.path}`;
+          payload.request.url = `${env || payload.request.url}${
+            payload.request.path
+          }`;
         } else {
           if (payload.request.path.includes("/")) {
             separate = payload.request.path.split("/");
-            payload.request.url = `${env}/${window.save[separate[0]]}/${
+            let serEnv = env || payload.request.url;
+            payload.request.url = `${serEnv}/${window.save[separate[0]]}/${
               separate[1]
             }`;
           }
         }
+      } else {
+        payload.request.url = `${env || payload.request.url}`;
       }
+      const envCy = Cypress.env(Cypress.env("environment"));
+      let cyEnv =
+        envCy && envCy[payload.endpoint]
+          ? envCy[payload.endpoint]
+          : `${payload.request.url}${payload.request.path || ""}`;
       const log = {
         name: "env",
-        message: `${Cypress.env("environment")}`,
+        message: `${Cypress.env("environment") || "environment not find"}`,
         consoleProps: () => {
           return {
-            env: Cypress.env(Cypress.env("environment"))[payload.endpoint],
+            env: Cypress.env("environment") || "environment not find",
             path: payload.endpoint,
-            endpoint: Cypress.env(Cypress.env("environment"))[payload.endpoint],
+            endpoint: cyEnv,
             framework: "cy.crud",
           };
         },
       };
       Cypress.log(log);
-      if (!separate) payload.request.url = env;
+      // if (!separate) payload.request.url = env;
     } else if (
       payload &&
       !payload.endpoint &&
@@ -63,54 +74,89 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
     }
 
     let data = { ...payload.request };
-    if (data.path && !separate) {
-      if (!window.save) window.save = {};
-      data.url = `${data.url}/${window.save[data.path]}`;
-    }
+    if (!window.save) window.save = {};
+
+    if (!Cypress.config("isInteractive") && Cypress.env("outputRequisition"))
+      cy.task(
+        "crudLog",
+        `\x1b[36m** request **\n\x1b[0m${JSON.stringify(payload, null, 2)}`
+      );
+    data["failOnStatusCode"] = Cypress.env("failOnStatusCode") || false;
     return cy.api(data).then((response) => {
       if (!window.alias) {
         window.alias = {};
       }
       window.alias[alias] = response;
       window.alias["bodyResponse"] = response;
-
-      if (payload.validations) {
-        runValidation(payload.validations);
+      if (
+        !Cypress.config("isInteractive") &&
+        Cypress.env("outputRequisition")
+      ) {
+        // Aqui, encadeamos o cy.task para garantir que ele seja executado de forma assíncrona.
+        return cy
+          .task(
+            "crudLog",
+            `\x1b[36m** response **\n\x1b[0m${JSON.stringify(
+              response.body,
+              null,
+              2
+            )}`
+          )
+          .then(() => {
+            if (payload.validations) {
+              runValidation(payload.validations);
+            }
+            // Retorna a response após a execução de todos os comandos anteriores.
+            return response;
+          });
+      } else {
+        if (payload.validations) {
+          runValidation(payload.validations);
+        }
+        // Retorna a response diretamente se estiver em modo interativo.
+        return response;
       }
-      return response;
     });
   }
   return cy.fixture(payload).then((crud) => {
     let separate = null;
-
-    if (crud && crud.endpoint && Cypress.env("environment")) {
-      let env = Cypress.env(Cypress.env("environment"))[crud.endpoint];
+    let env = null;
+    if (crud && crud.endpoint) {
+      if (Cypress.env("environment")) {
+        env = Cypress.env(Cypress.env("environment"))[crud.endpoint];
+      }
       if (crud && crud.request.path) {
         if (crud.request.path.startsWith("/")) {
-          crud.request.url = `${env}${crud.request.path}`;
+          crud.request.url = `${env || crud.request.url}${crud.request.path}`;
         } else {
           if (crud.request.path.includes("/")) {
             separate = crud.request.path.split("/");
-            crud.request.url = `${env}/${window.save[separate[0]]}/${
-              separate[1]
-            }`;
+            crud.request.url = `${env || crud.request.url}/${
+              window.save[separate[0]]
+            }/${separate[1]}`;
           }
         }
+      } else {
+        crud.request.url = `${env || crud.request.url}`;
       }
+      const envCy = Cypress.env(Cypress.env("environment"));
+      let cyEnv =
+        envCy && envCy[crud.endpoint]
+          ? envCy[crud.endpoint]
+          : `${crud.request.url}${crud.request.path || ""}`;
       const log = {
         name: "env",
-        message: `${Cypress.env("environment")}`,
+        message: `${Cypress.env("environment") || "environment not find"}`,
         consoleProps: () => {
           return {
-            env: Cypress.env(Cypress.env("environment"))[crud.endpoint],
+            env: Cypress.env("environment") || "environment not find",
             path: crud.endpoint,
-            endpoint: Cypress.env(Cypress.env("environment"))[crud.endpoint],
+            endpoint: cyEnv,
             framework: "cy.crud",
           };
         },
       };
       Cypress.log(log);
-      if (!separate) crud.request.url = env;
     } else if (crud && !crud.endpoint) {
       if (crud && crud.request.path) {
         if (crud.request.path.startsWith("/")) {
@@ -126,20 +172,49 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
       }
     }
     let data = { ...crud.request };
-
-    if (data.path && !separate) {
-      data.url = `${data.url}/${window.save[data.path]}`;
-    }
+    data["failOnStatusCode"] = Cypress.env("failOnStatusCode") || false;
+    // if (data.path && !separate) {
+    //   data.url = `${data.url}/${window.save[data.path]}`;
+    // }
+    if (!Cypress.config("isInteractive") && Cypress.env("outputRequisition"))
+      cy.task(
+        "crudLog",
+        `\x1b[36m** request **\n\x1b[0m${JSON.stringify(crud, null, 2)}`
+      );
     return cy.api(data).then((response) => {
       if (!window.alias) {
         window.alias = {};
       }
       window.alias[alias] = response;
       window.alias["bodyResponse"] = response;
-      if (crud.validations) {
-        runValidation(crud.validations);
+      if (
+        !Cypress.config("isInteractive") &&
+        Cypress.env("outputRequisition")
+      ) {
+        // Aqui, encadeamos o cy.task para garantir que ele seja executado de forma assíncrona.
+        return cy
+          .task(
+            "crudLog",
+            `\x1b[36m** response **\n\x1b[0m${JSON.stringify(
+              response.body,
+              null,
+              2
+            )}`
+          )
+          .then(() => {
+            if (crud.validations) {
+              runValidation(crud.validations);
+            }
+            // Retorna a response após a execução de todos os comandos anteriores.
+            return response;
+          });
+      } else {
+        if (crud.validations) {
+          runValidation(crud.validations);
+        }
+        // Retorna a response diretamente se estiver em modo interativo.
+        return response;
       }
-      return response;
     });
   });
 });
@@ -219,7 +294,7 @@ Cypress.Commands.add(
       if (log) {
         const log = {
           name: "save",
-          message: `${value}`,
+          message: `${alias !== "save" ? alias : ""} ${value}`,
           consoleProps: () => {
             return {
               save: path,
@@ -233,7 +308,7 @@ Cypress.Commands.add(
         if (!log) {
           const log = {
             name: "save",
-            message: `******`,
+            message: `${alias !== "save" ? alias : ""} ******`,
             consoleProps: () => {
               return {
                 alias: alias,
@@ -263,7 +338,7 @@ Cypress.Commands.add(
     } else {
       const log = {
         name: "save",
-        message: `${window.save[alias]}`,
+        message: `${alias !== "save" ? alias : ""} ${window.save[alias]}`,
         consoleProps: () => {
           return {
             alias: alias,
