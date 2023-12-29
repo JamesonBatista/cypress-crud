@@ -46,6 +46,7 @@ import "cypress-plugin-steps";
 export const faker = require("generate-datafaker");
 import "cypress-crud";
 import "cypress-plugin-api";
+import "cypress-mochawesome-reporter/register";
 
 
 // USE IN cypress.config.js
@@ -64,6 +65,32 @@ import "cypress-plugin-api";
   //     getUser: "https://reqres.in/api/users/2",
   //   },
   // },
+
+  // example use in crudScreenshot whit report
+  const { defineConfig } = require("cypress");
+
+// module.exports = defineConfig({
+//   reporter: "cypress-mochawesome-reporter",
+
+//   e2e: {
+//     setupNodeEvents(on, config) {
+//       require("cypress-mochawesome-reporter/plugin")(on);
+//       on("task", {
+//         crudLog(message) {
+//           console.log(message);
+//           return null;
+//         },
+//       });
+//       // implement node event listeners here
+//     },
+//     viewportHeight: 1000, // important
+//     viewportWidth: 1904, // important
+//   },
+//   env: {
+//     screenshot: true,
+//   },
+// });
+
 
 `;
 

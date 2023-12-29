@@ -36,6 +36,7 @@
     "cypress-plugin-steps": "^1.1.1",
     "generate-datafaker": "^1.0.2",
     "uuidv4": "^6.2.13",
-    "jsonschema": "^1.4.0"
+    "jsonschema": "^1.4.0",
+    "cypress-mochawesome-reporter": "^3.7.0"
   }
 }

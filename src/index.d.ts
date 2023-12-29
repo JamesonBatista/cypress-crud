@@ -19,6 +19,7 @@ declare namespace Cypress {
         log?: boolean;
       } = {}
     ): Chainable<any>;
+    crudScreenshot(type?: string | null): Chainable<any>;
 
     write(options: { path?: string | null; log?: boolean }): Chainable<any>;
     read(options: { path?: string | null; log?: boolean }): Chainable<any>;
