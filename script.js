@@ -228,7 +228,6 @@ const snippetContent = `{
 try {
   // Define o caminho da raiz do projeto
   const projectRootPathJsconfig = path.resolve(__dirname, "../../");
-  console.log(`Caminho da raiz do projeto: ${projectRootPath}`);
 
   // Define o caminho para o arquivo jsconfig.json na raiz do projeto
   const jsconfigFilePath = path.join(projectRootPathJsconfig, "jsconfig.json");

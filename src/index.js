@@ -576,7 +576,7 @@ function shots(
     style.innerHTML = `
   code, kbd, samp, pre{
    color: white;
-   font-size: 12px !important;
+  // font-size: 12px !important;
   }
 
   .requestdiv, .responsediv {
