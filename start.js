@@ -6,32 +6,44 @@ const jsconfigFilePath = path.join(
   configPath,
   "node_modules/mochawesome-report-generator/dist"
 );
+const pathPackage = path.join(
+  configPath,
+  "node_modules/cypress-crud/package.json"
+);
+let packageJson = require(pathPackage);
 
-function colorize(text, color) {
-  const colors = {
-    red: "\x1b[31m",
-    green: "\x1b[32m",
-    yellow: "\x1b[33m",
-    blue: "\x1b[34m",
-    magenta: "\x1b[35m",
-    cyan: "\x1b[36m",
-    reset: "\x1b[0m",
-  };
-  return `${colors[color]}${text}${colors.reset}`;
+function colorizeEachLetter(text) {
+  const colors = [
+    "\x1b[31m", // vermelho
+    "\x1b[32m", // verde
+    "\x1b[33m", // amarelo
+    "\x1b[34m", // azul
+    "\x1b[35m", // magenta
+    "\x1b[36m", // ciano
+  ];
+  const reset = "\x1b[0m";
+
+  let coloredText = "";
+  for (let i = 0; i < text.length; i++) {
+    coloredText += colors[i % colors.length] + text[i];
+  }
+  return coloredText + reset;
 }
 
-// Função para criar uma borda
-function borderedText(text) {
-  const topBottomBorder = "-".repeat(text.length);
+function borderedText(text, originalLength) {
+  const topBottomBorder = "-".repeat(originalLength + 8);
   return `${topBottomBorder}\n|    ${text}   |\n${topBottomBorder}`;
 }
 
-// Mensagem para o console
+const originalText =
+  "Starting config cypress-mochawesome-report cypress-crud...";
+
 const message = borderedText(
-  colorize("Starting  config report cypress-crud...", "blue")
+  colorizeEachLetter(originalText),
+  originalText.length
 );
 
-console.log(message);
+console.log("\n\n" + message + "\n\n");
 
 fs.readFile(`${jsconfigFilePath}/app.js`, "utf8", (err, data) => {
   if (err) {
@@ -39,7 +51,6 @@ fs.readFile(`${jsconfigFilePath}/app.js`, "utf8", (err, data) => {
     return;
   }
 
-  // Definir substituições como um array de objetos
   const substituicoes = [
     { procurar: "Adam Gruber", substituirPor: "Jam Batista" },
     {
@@ -52,20 +63,14 @@ fs.readFile(`${jsconfigFilePath}/app.js`, "utf8", (err, data) => {
     },
     {
       procurar: "6.2.0",
-      substituirPor: ` | QA | Tester |`,
-    },
-    {
-      procurar: '"v"',
-      substituirPor: "",
+      substituirPor: `${packageJson.version} - | QA | Tester |`,
     },
     {
       procurar: "Mochawesome",
       substituirPor: "cypress-crud",
     },
-    // Adicione mais substituições conforme necessário
   ];
 
-  // Aplicar todas as substituições
   let newData = data;
   substituicoes.forEach((subst) => {
     newData = newData.replace(
@@ -74,7 +79,6 @@ fs.readFile(`${jsconfigFilePath}/app.js`, "utf8", (err, data) => {
     );
   });
 
-  // Escrever o novo conteúdo no arquivo
   fs.writeFile(`${jsconfigFilePath}/app.js`, newData, "utf8", (err) => {
     if (err) {
       console.error("Erro ao escrever no arquivo:", err);

@@ -194,7 +194,7 @@ module.exports = function applyStyles() {
    ${expectBefore} ${div}
    ${envBefore} ${div}
    ${schemasBefore} ${div}
-   ${space}{height: 90% !important;}
+   ${space}{height: 100vh !important;}
     `;
 
     style.setAttribute("data-hover-black-delete-before", "");

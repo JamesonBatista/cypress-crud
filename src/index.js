@@ -1,8 +1,15 @@
 const applyStyles = require("./style.js");
 import { validate } from "jsonschema";
+const fs = require("fs");
+const path = require("path");
+
+const configPath = path.resolve(__dirname, "../../");
+const jsconfigFilePath = path.join(
+  configPath,
+  "node_modules/cypress-crud/src/index.html"
+);
+
 Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
-  if (Cypress.env("screenshot") && !Cypress.config("isInteractive"))
-    cy.visit("src/index.html");
   applyStyles();
   if (!window.save) {
     window.save = {};
@@ -57,7 +64,6 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
         },
       };
       Cypress.log(log);
-      // if (!separate) payload.request.url = env;
     } else if (
       payload &&
       !payload.endpoint &&
@@ -94,7 +100,6 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
       window.alias[alias] = response;
       window.alias["bodyResponse"] = response;
       if (!Cypress.config("isInteractive")) {
-        // Aqui, encadeamos o cy.task para garantir que ele seja executado de forma assíncrona.
         return cy
           .task(
             "crudLog",
@@ -108,17 +113,13 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             if (payload.validations) {
               runValidation(payload.validations);
             }
-            if (Cypress.env("screenshot")) {
-              shots();
-            }
-            // Retorna a response após a execução de todos os comandos anteriores.
+
             return response;
           });
       } else {
         if (payload.validations) {
           runValidation(payload.validations);
         }
-        // Retorna a response diretamente se estiver em modo interativo.
         return response;
       }
     });
@@ -198,7 +199,6 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
       window.alias[alias] = response;
       window.alias["bodyResponse"] = response;
       if (!Cypress.config("isInteractive")) {
-        // Aqui, encadeamos o cy.task para garantir que ele seja executado de forma assíncrona.
         return cy
           .task(
             "crudLog",
@@ -212,25 +212,18 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             if (crud.validations) {
               runValidation(crud.validations);
             }
-
-            if (Cypress.env("screenshot")) {
-              shots();
-            }
-
-            // Retorna a response após a execução de todos os comandos anteriores.
             return response;
           });
       } else {
         if (crud.validations) {
           runValidation(crud.validations);
         }
-        // Retorna a response diretamente se estiver em modo interativo.
+
         return response;
       }
     });
   });
 });
-
 function runValidation(validations) {
   if (validations) {
     let valid = validations;
@@ -465,130 +458,147 @@ function findInJson(obj, keyToFind, position = 1) {
     : console.error(`Path ** ${keyToFind} ** not found`);
 }
 
-Cypress.Commands.add("crudScreenshot", (type = "viewport") => {
-  if (!Cypress.config("isInteractive") && Cypress.env("screenshot")) {
-  }
-  return cy.screenshot({ capture: type });
-});
-
-function shots(
-  requestObj = window.alias.payloadReport,
-  responseObj = window.alias.bodyResponse.body
-) {
+Cypress.Commands.add("crudScreenshot", (type = "runner") => {
   const app = window.top;
+  if (Cypress.env("screenshot") && !Cypress.config("isInteractive")) {
+    // Verificar se o estilo já existe, senão adicionar
+    cy.get("head", { log: false }).then(($head) => {
+      if (!$head.find("[data-hover-style-jsons]").length) {
+        $head.append(`
+          <style data-hover-style-jsons>
+            code, kbd, samp, pre {
+              color: white;
+              font-size: 11px !important;
+            }
+            .requestdiv, .responsediv {
+              border-radius: 10px;
+              box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
+            }
+            .text-\\[14px\\] {
+              display: none;
+            }
+          </style>
+        `);
+      }
+    });
 
-  // Seleciona ou cria o elemento de destino no DOM
-  let targetElement = app.document.querySelector(".bg-gray-100");
-  if (!targetElement) {
-    targetElement = app.document.createElement("div");
-    targetElement.className = "bg-gray-100";
-    app.document.body.appendChild(targetElement);
-  }
+    // Gerar e inserir o HTML necessário
+    const htmlContent = createHTML(); // A função createHTML deve retornar o HTML necessário
+    cy.get("body", { log: false }).then(($body) => {
+      $body.empty().append(htmlContent);
+      $body.append(`
+          <style data-hover-style-jsons>
+            code, kbd, samp, pre {
+              color: white;
+              font-size: 11px !important;
+            }
+            .requestdiv, .responsediv {
+              border-radius: 10px;
+              box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
+            }
+            .text-\\[14px\\] {
+              display: none;
+            }
+          </style>
+        `);
+    });
+    if (!app.document.head.querySelector("[data-hover-style-jsons]")) {
+      const style = app.document.createElement("style");
 
-  const headerElement = app.document.getElementById("spec-runner-header");
-  if (headerElement) headerElement.style.display = "none";
-
-  // Cria a div principal (overlayDiv)
-  const overlayDiv = app.document.createElement("div");
-  overlayDiv.style.cssText = `
-    position: absolute;
-    z-index: 10;
-    background-color: #1b1e2e;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column; // Alinha os cards verticalmente
-    align-items: center;
-    justify-content: start;
-    padding: 20px;
-    overflow-y: auto; // Permite rolagem vertical se necessário
-  `;
-
-  // Função para aplicar estilo comum às divs
-  const aplicarEstiloDivComum = (div) => {
-    div.style.cssText = `
-    background-color: #282a36;
-    padding: 20px;
-    margin-bottom: 20px; // Espaço entre os cards
-    border-radius: 8px;
-    width: 80%; // Largura dos cards
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
-    color: #f8f8f2;
-    overflow-x: hidden; // Esconde a barra de rolagem horizontal
-    word-wrap: break-word; // Quebra palavras longas para evitar overflow horizontal
-  `;
-  };
-
-  // Função para adicionar título ao card
-  const adicionarTitulo = (div, titulo) => {
-    const header = app.document.createElement("div");
-    header.textContent = titulo;
-    header.style.cssText = `
-      background-color: #50fa7b;
-      color: #1b1e2e;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: bold;
-      text-align: center;
-      width: 100%;
-      margin-bottom: 10px;
-    `;
-    div.appendChild(header);
-  };
-
-  // Cria as divs para Request e Response
-  const requestDiv = app.document.createElement("div");
-  requestDiv.className = "requestdiv";
-  const responseDiv = app.document.createElement("div");
-  responseDiv.className = "responsediv";
-  aplicarEstiloDivComum(requestDiv);
-  aplicarEstiloDivComum(responseDiv);
-
-  // Adiciona títulos
-  adicionarTitulo(requestDiv, "Request");
-  adicionarTitulo(responseDiv, "Response");
-
-  // Função para formatar o conteúdo da div
-  const formatarDadosRequisicao = (dados) => {
-    // Transforma o objeto JSON em uma string formatada
-    const stringDados = JSON.stringify(dados);
-
-    // Retorna a string em um elemento <pre> com estilos para quebra de linha automática
-    // e removendo as aspas e a formatação JSON padrão
-    return `<pre><code style="white-space: pre-wrap; word-wrap: break-word;">${stringDados}</code></pre>`;
-  };
-  // Inserir Conteúdo formatado
-  requestDiv.innerHTML = formatarDadosRequisicao(requestObj);
-  responseDiv.innerHTML = formatarDadosRequisicao(responseObj);
-
-  // Adicionar as divs à overlayDiv
-  overlayDiv.appendChild(requestDiv);
-  overlayDiv.appendChild(responseDiv);
-
-  // Adicionar overlayDiv ao targetElement
-  targetElement.appendChild(overlayDiv);
-
-  if (!app.document.head.querySelector("[data-hover-style-jsons]")) {
-    // Criar e inserir o elemento de estilo
-
-    const style = app.document.createElement("style");
-
-    style.innerHTML = `
+      style.innerHTML = `
   code, kbd, samp, pre{
    color: white;
-  // font-size: 12px !important;
+  font-size: 11px !important;
   }
 
   .requestdiv, .responsediv {
     border-radius: 10px;
-     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+     box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
   }
-  .p-\\[16px\\] {
+ .text-\\[14px\\] {
     display: none;
   }
     `;
 
-    style.setAttribute("data-hover-styles-jsons", "");
-    app.document.head.appendChild(style);
+      style.setAttribute("data-hover-styles-jsons", "");
+      app.document.head.appendChild(style);
+    }
+    // Tirar a captura de tela
+    return cy.screenshot({ capture: type });
   }
+});
+function createHTML() {
+  const requestJson = JSON.stringify(window.alias.payloadReport, null, 2);
+  const responseJson = JSON.stringify(window.alias.bodyResponse.body, null, 2);
+
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request & Response</title>
+  <style>
+  #unified-runner{
+    height: 100vh !important;
+  }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background-color: rgb(27, 30, 46);
+    }
+    .container { 
+      display: flex; 
+      justify-content: space-around; 
+      align-items: flex-start; 
+      padding-top: 10px; /* Espaço no topo */
+      height: calc(100vh - 10px); /* Altura total menos o espaço no topo */
+       overflow: hidden;
+    }
+    .card { 
+      background-color: #33333357;
+      width: 48%; /* Ajuste para margem entre os cartões */
+      box-sizing: border-box;
+      border-radius: 8px;
+      box-shadow: 0 6px 10px rgba(0,0,0,0.25);
+      overflow: hidden; /* Garante que o conteúdo não ultrapasse os cantos arredondados */
+    }
+    .header {
+    background-color: #59c773;
+    color: white;
+    padding: 10px 10px;
+    text-align: center;
+    letter-spacing: 10px;
+    font-size: 16px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-bottom: 3px solid #a3d293;
+    border-bottom-radius: 5px;
+    border-radius: 10px;
+    }
+    pre { 
+      white-space: pre-wrap; 
+      word-wrap: break-word; 
+      color: white;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">Request</div>
+      <pre>${requestJson}</pre>
+    </div>
+    <div class="card">
+      <div class="header">Response</div>
+      <pre>${responseJson}</pre>
+    </div>
+  </div>
+</body>
+</html>
+
+  `;
+
+  return html;
 }

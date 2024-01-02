@@ -67,7 +67,7 @@ import "cypress-mochawesome-reporter/register";
   // },
 
   // example use in crudScreenshot whit report
-  const { defineConfig } = require("cypress");
+ // const { defineConfig } = require("cypress");
 
 // module.exports = defineConfig({
 //   reporter: "cypress-mochawesome-reporter",
@@ -83,11 +83,9 @@ import "cypress-mochawesome-reporter/register";
 //       });
 //       // implement node event listeners here
 //     },
-//     viewportHeight: 1000, // important
-//     viewportWidth: 1904, // important
 //   },
 //   env: {
-//     screenshot: true,
+//     screenshot: true, // required true, for active screenshot
 //   },
 // });
 
@@ -101,9 +99,6 @@ const appendToFile = (filePath, content) => {
     // Verificar se o conteúdo já existe no arquivo
     if (!existingContent.includes(content.trim())) {
       fs.appendFileSync(filePath, content, "utf8");
-      console.log(`add in path ${filePath}`);
-    } else {
-      console.log(`text exist in path ${filePath}`);
     }
   } else {
     console.error(`path not found: ${filePath}`);
@@ -251,14 +246,12 @@ try {
 
   // Escreve o conteúdo no arquivo jsconfig.json
   fs.writeFileSync(jsconfigFilePath, contentTsConfig);
-  console.log("Arquivo jsconfig.json criado com sucesso na raiz do projeto.");
 } catch (error) {
   console.error("Erro ao criar o arquivo jsconfig.json:", error);
 }
 
 if (!fs.existsSync(vscodeFolderPath)) {
   fs.mkdirSync(vscodeFolderPath);
-  console.log("Pasta .vscode criada com sucesso.");
 }
 
 fs.writeFileSync(snippetsFilePathSave, contentSave);
@@ -448,7 +441,8 @@ const { crudStorage } = require("../support/e2e");
 
 describe("template spec", () => {
   it("Example simple requisition", () => {
-    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" });
+    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" })
+    .crudScreenshot("viewport");
     // validation JSON path validations:[]
   });
   it("Example simple requisition return array", () => {
@@ -458,22 +452,26 @@ describe("template spec", () => {
         if (items.id == 7) crudStorage.save.id_Seven = items.id;
       }
     });
+    //.crudScreenshot() ;
   });
   it("Example whit .bodyResponse", () => {
     cy.crud({ payload: "examples/jsonNotAlias" }).bodyResponse({
       path: "last_name",
       eq: "Weaver",
     });
+    //.crudScreenshot()
   });
 
   it("Example whit  .save", () => {
-    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" }); // or save({path:'id', log: false}) // save id 7
+    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" })
+   // .crudScreenshot(); // or save({path:'id', log: false}) // save id 7
   });
 
   it("Example whit .save and .write, create JSON response in", () => {
     cy.crud({ payload: "examples/jsonNotAlias" })
       .save({ path: "id" }) // or save({path:'id', log: false})
-      .write({ path: "user/user" }); // save in fixtures/user/user.json .write() // save in fixtures/response.json
+      .write({ path: "user/user" })
+      //.crudScreenshot(); // save in fixtures/user/user.json .write() // save in fixtures/response.json
   });
 
   it("Example whit  .save", () => {
@@ -495,7 +493,8 @@ describe("template spec", () => {
     "validations": [{ "path": "status", "value": 200 }, { "path": "first_name" }]
   }
    */
-    cy.crud({ payload: "examples/jsonAlias" });
+    cy.crud({ payload: "examples/jsonAlias" })
+    // .crudScreenshot(); ;
   });
 
   it("Example crud change JSON before request", () => {
@@ -635,12 +634,10 @@ fs.writeFileSync(snipExample, contentExample);
 
 if (!fs.existsSync(vscodeFolderPathJSON)) {
   fs.mkdirSync(vscodeFolderPathJSON);
-  console.log("Pasta .vscode criada com sucesso.");
 }
 
 if (!fs.existsSync(vscodeFolderPathJSONSchema)) {
   fs.mkdirSync(vscodeFolderPathJSONSchema);
-  console.log("Pasta .vscode criada com sucesso.");
 }
 fs.writeFileSync(snippetsFilePathJSON, contentJSonAlias);
 fs.writeFileSync(jsonWhitParam, jsonWithParamContent);
@@ -677,12 +674,29 @@ const newContent = `
   // },
 `;
 const contentLog = `
+// reporter: "cypress-mochawesome-reporter",
+
+ require("cypress-mochawesome-reporter/plugin")(on);
   on('task', {
       crudLog(message) {
         console.log(message);
         return null;
       },
     });
+          on("before:browser:launch", (browser, launchOptions) => {
+        if (browser.family === "chromium" && browser.name !== "electron") {
+          launchOptions.args.push("--window-size=1280,720");
+        }
+        if (browser.name === "electron") {
+          launchOptions.preferences.width = 1920;
+          launchOptions.preferences.height = 1080;
+        }
+        if (browser.family === "firefox") {
+          launchOptions.args.push("--width=1280");
+          launchOptions.args.push("--height=720");
+        }
+        return launchOptions;
+      });
 `;
 
 fs.readFile(jsconfigFilePath, "utf8", (err, data) => {
@@ -693,7 +707,6 @@ fs.readFile(jsconfigFilePath, "utf8", (err, data) => {
 
   // Verifica se a setupNodeEvents já existe
   if (data.includes("crudLog")) {
-    console.log("A função setupNodeEvents já existe no arquivo.");
     return;
   }
 
@@ -708,9 +721,6 @@ fs.readFile(jsconfigFilePath, "utf8", (err, data) => {
       console.error(err);
       return;
     }
-    console.log(
-      "A função setupNodeEvents foi adicionada com sucesso ao arquivo cypress.config.js"
-    );
   });
 
   // Escreve as alterações de volta no arquivo

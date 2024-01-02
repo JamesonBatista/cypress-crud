@@ -501,6 +501,47 @@ describe("template spec", () => {
 });
 ```
 
+# crudScreenshot
+
+```javascript
+const { defineConfig } = require("cypress");
+
+module.exports = defineConfig({
+  reporter: "cypress-mochawesome-reporter",
+  e2e: {
+    setupNodeEvents(on, config) {
+      require("cypress-mochawesome-reporter/plugin")(on);
+      on("task", {
+        crudLog(message) {
+          console.log(message);
+          return null;
+        },
+      });
+      on("before:browser:launch", (browser, launchOptions) => {
+        if (browser.family === "chromium" && browser.name !== "electron") {
+          launchOptions.args.push("--window-size=1280,720");
+        }
+        if (browser.name === "electron") {
+          launchOptions.preferences.width = 1920;
+          launchOptions.preferences.height = 1080;
+        }
+        if (browser.family === "firefox") {
+          launchOptions.args.push("--width=1280");
+          launchOptions.args.push("--height=720");
+        }
+        return launchOptions;
+      });
+      // implement node event listeners here
+    },
+    testIsolation: false,
+    experimentalRunAllSpecs: true,
+  },
+  env: {
+    screenshot: true,
+  },
+});
+```
+
 ## Contributions
 
 Contributions are always welcome. Feel free to open issues or send pull requests.

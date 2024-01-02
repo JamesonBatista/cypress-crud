@@ -3,7 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cypress-crud</title>
+    <title>Whoopsie Daisy!</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        background-color: #ffefd5; /* Peach background */
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" opacity="0.05"%3E%3Ctext x="50%25" y="50%25" dy=".3em" text-anchor="middle" font-size="30" font-family="Comic Sans MS, cursive, sans-serif"%3Ecypres-crud%3C/text%3E%3C/svg%3E');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+      }
+      .error-container {
+        text-align: center;
+        padding: 20px;
+      }
+      .error-message {
+        font-size: 3em;
+        margin: 0;
+        color: #ff4500; /* Orangered */
+      }
+      .error-detail {
+        margin-top: 20px;
+        color: #888;
+        font-size: 1.5em;
+      }
+      .error-container img {
+        width: 150px;
+        height: auto;
+        margin-top: 20px;
+      }
+    </style>
   </head>
-  <body></body>
+  <body>
+    <div class="error-container">
+      <img
+        src="https://api.iconify.design/twemoji:face-with-monocle.svg?color=%23ff4500"
+        alt="Monocle Face"
+      />
+      <p class="error-message">It can't stay like this...!</p>
+    </div>
+  </body>
 </html>

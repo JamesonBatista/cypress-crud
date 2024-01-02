@@ -1,6 +1,6 @@
 {
   "name": "cypress-crud",
-  "version": "1.3.7",
+  "version": "1.5.0",
   "description": "cy.crud is a project that aims to have a new framework to make cy.api and cy.request easier",
   "main": "src",
   "peerDependencies": {
@@ -33,11 +33,15 @@
   },
   "homepage": "https://github.com/JamesonBatista/cypress-crud#readme",
   "dependencies": {
+    "cypress-mochawesome-reporter": "^3.7.0",
     "cypress-plugin-api": "^2.11.1",
     "cypress-plugin-steps": "^1.1.1",
     "generate-datafaker": "^1.0.2",
-    "uuidv4": "^6.2.13",
     "jsonschema": "^1.4.0",
-    "cypress-mochawesome-reporter": "^3.7.0"
+    "mocha": "^10.2.0",
+    "mochawesome": "^7.1.3",
+    "mochawesome-merge": "^4.3.0",
+    "mochawesome-report-generator": "^6.2.0",
+    "uuidv4": "^6.2.13"
   }
 }
