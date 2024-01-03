@@ -21,6 +21,7 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
   } else {
     window.alias.payloadReport = payload;
   }
+
   if (typeof payload === `object`) {
     let separate = null;
     let env = null;
@@ -59,7 +60,7 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             env: Cypress.env("environment") || "environment not find",
             path: payload.endpoint,
             endpoint: cyEnv,
-            framework: "cy.crud",
+            framework: "cypress-crud",
           };
         },
       };
@@ -93,6 +94,62 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
         `\x1b[36m** request **\n\x1b[0m${JSON.stringify(payload, null, 2)}`
       );
     data["failOnStatusCode"] = Cypress.env("failOnStatusCode") || false;
+
+    if (data && data.mock) {
+      window.mock = {};
+
+      return cy.fixture(data.mock).then((mocks) => {
+        const log = {
+          name: "mock",
+          message: ` Intercept ** ${data.mock} ** `,
+          consoleProps: () => {
+            return {
+              mock: payload.request.mock,
+              body: mocks,
+              framework: "cypress-crud",
+            };
+          },
+        };
+        Cypress.log(log);
+
+        return cy
+          .intercept(mocks.intercept, (req) => {
+            req.reply(mocks.response);
+          })
+          .then((requestMock) => {
+            if (!window.alias) {
+              window.alias = {};
+            }
+            window.alias[alias] = mocks;
+            window.alias["bodyResponse"] = mocks;
+            window.mock.active = true;
+
+            if (!Cypress.config("isInteractive")) {
+              return cy
+                .task(
+                  "crudLog",
+                  `\x1b[36m** mock response **\n\x1b[0m${JSON.stringify(
+                    mocks,
+                    null,
+                    2
+                  )}`
+                )
+                .then(() => {
+                  if (crud.validations) {
+                    runValidation(crud.validations);
+                  }
+                  return mocks;
+                });
+            } else {
+              if (crud.validations) {
+                runValidation(crud.validations);
+              }
+              return mocks;
+            }
+          });
+      });
+    }
+
     return cy.api(data).then((response) => {
       if (!window.alias) {
         window.alias = {};
@@ -164,7 +221,7 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             env: Cypress.env("environment") || "environment not find",
             path: crud.endpoint,
             endpoint: cyEnv,
-            framework: "cy.crud",
+            framework: "cypress-crud",
           };
         },
       };
@@ -190,6 +247,60 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
         "crudLog",
         `\x1b[36m** request **\n\x1b[0m${JSON.stringify(crud, null, 2)}`
       );
+    }
+
+    if (data && data.mock) {
+      window.mock = {};
+      return cy.fixture(data.mock).then((mocks) => {
+        const log = {
+          name: "mock",
+          message: ` Intercept ** ${data.mock} ** `,
+          consoleProps: () => {
+            return {
+              mock: data.mock,
+              body: mocks,
+              framework: "cypress-crud",
+            };
+          },
+        };
+        Cypress.log(log);
+
+        return cy
+          .intercept(mocks.intercept, (req) => {
+            req.reply(mocks.response);
+          })
+          .then((requestMock) => {
+            if (!window.alias) {
+              window.alias = {};
+            }
+            window.alias[alias] = mocks;
+            window.alias["bodyResponse"] = mocks;
+            window.mock.active = true;
+
+            if (!Cypress.config("isInteractive")) {
+              return cy
+                .task(
+                  "crudLog",
+                  `\x1b[36m** mock response **\n\x1b[0m${JSON.stringify(
+                    mocks,
+                    null,
+                    2
+                  )}`
+                )
+                .then(() => {
+                  if (crud.validations) {
+                    runValidation(crud.validations);
+                  }
+                  return mocks;
+                });
+            } else {
+              if (crud.validations) {
+                runValidation(crud.validations);
+              }
+              return mocks;
+            }
+          });
+      });
     }
 
     return cy.api(data).then((response) => {
@@ -408,7 +519,7 @@ Cypress.Commands.add("validateSchema", ({ schema = null }) => {
       Cypress.log(log);
     });
 });
-function findInJson(obj, keyToFind, position = 1) {
+function findInJson(obj = window.alias.bodyResponse, keyToFind, position = 1) {
   let result = null;
   let fullValue = null;
   let count = 0;
@@ -458,80 +569,35 @@ function findInJson(obj, keyToFind, position = 1) {
     : console.error(`Path ** ${keyToFind} ** not found`);
 }
 
+Cypress.Commands.add("findInJson", (obj, keyToFind, position = 1) => {
+  return findInJson(obj, keyToFind, position);
+});
+
 Cypress.Commands.add("crudScreenshot", (type = "runner") => {
-  const app = window.top;
   if (Cypress.env("screenshot") && !Cypress.config("isInteractive")) {
     // Verificar se o estilo já existe, senão adicionar
-    cy.get("head", { log: false }).then(($head) => {
-      if (!$head.find("[data-hover-style-jsons]").length) {
-        $head.append(`
-          <style data-hover-style-jsons>
-            code, kbd, samp, pre {
-              color: white;
-              font-size: 11px !important;
-            }
-            .requestdiv, .responsediv {
-              border-radius: 10px;
-              box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
-            }
-            .text-\\[14px\\] {
-              display: none;
-            }
-          </style>
-        `);
-      }
-    });
-
-    // Gerar e inserir o HTML necessário
-    const htmlContent = createHTML(); // A função createHTML deve retornar o HTML necessário
-    cy.get("body", { log: false }).then(($body) => {
-      $body.empty().append(htmlContent);
-      $body.append(`
-          <style data-hover-style-jsons>
-            code, kbd, samp, pre {
-              color: white;
-              font-size: 11px !important;
-            }
-            .requestdiv, .responsediv {
-              border-radius: 10px;
-              box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
-            }
-            .text-\\[14px\\] {
-              display: none;
-            }
-          </style>
-        `);
-    });
-    if (!app.document.head.querySelector("[data-hover-style-jsons]")) {
-      const style = app.document.createElement("style");
-
-      style.innerHTML = `
-  code, kbd, samp, pre{
-   color: white;
-  font-size: 11px !important;
-  }
-
-  .requestdiv, .responsediv {
-    border-radius: 10px;
-     box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
-  }
- .text-\\[14px\\] {
-    display: none;
-  }
-    `;
-
-      style.setAttribute("data-hover-styles-jsons", "");
-      app.document.head.appendChild(style);
-    }
+    createHTML();
     // Tirar a captura de tela
     return cy.screenshot({ capture: type });
+  } else {
+    if (window.mock && window.mock.active) {
+      createHTML();
+    }
   }
 });
 function createHTML() {
-  const requestJson = JSON.stringify(window.alias.payloadReport, null, 2);
-  const responseJson = JSON.stringify(window.alias.bodyResponse.body, null, 2);
+  const app = window.top;
 
-  const html = `
+  const requestJson = JSON.stringify(window.alias.payloadReport, null, 2);
+  const responseJson = JSON.stringify(
+    window.alias.bodyResponse.body || window.alias.bodyResponse,
+    null,
+    2
+  );
+  let responseText = window.alias.bodyResponse.body
+    ? "Response"
+    : "Mock Response";
+  const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -581,6 +647,7 @@ function createHTML() {
       word-wrap: break-word; 
       color: white;
       padding: 10px;
+      font-size: 14px !important;
     }
   </style>
 </head>
@@ -591,7 +658,8 @@ function createHTML() {
       <pre>${requestJson}</pre>
     </div>
     <div class="card">
-      <div class="header">Response</div>
+    
+      <div class="header">${responseText}</div>
       <pre>${responseJson}</pre>
     </div>
   </div>
@@ -600,5 +668,64 @@ function createHTML() {
 
   `;
 
-  return html;
+  cy.get("head", { log: false }).then(($head) => {
+    if (!$head.find("[data-hover-style-jsons]").length) {
+      $head.append(`
+          <style data-hover-style-jsons>
+            code, kbd, samp, pre {
+              color: white;
+              font-size: 14px !important;
+            }
+            .requestdiv, .responsediv {
+              border-radius: 10px;
+              box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
+            }
+            .text-\\[14px\\] {
+              display: none;
+            }
+          </style>
+        `);
+    }
+  });
+
+  // Gerar e inserir o HTML necessário
+  cy.get("body", { log: false }).then(($body) => {
+    $body.empty().append(htmlContent);
+    $body.append(`
+          <style data-hover-style-jsons>
+            code, kbd, samp, pre {
+              color: white;
+              font-size: 14px !important;
+            }
+            .requestdiv, .responsediv {
+              border-radius: 10px;
+              box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
+            }
+            .text-\\[14px\\] {
+              display: none;
+            }
+          </style>
+        `);
+  });
+  if (!app.document.head.querySelector("[data-hover-style-jsons]")) {
+    const style = app.document.createElement("style");
+
+    style.innerHTML = `
+  code, kbd, samp, pre{
+   color: white;
+  font-size: 14px !important;
+  }
+
+  .requestdiv, .responsediv {
+    border-radius: 10px;
+     box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
+  }
+ .text-\\[14px\\] {
+    display: none;
+  }
+    `;
+
+    style.setAttribute("data-hover-styles-jsons", "");
+    app.document.head.appendChild(style);
+  }
 }

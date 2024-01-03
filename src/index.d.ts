@@ -27,5 +27,10 @@ declare namespace Cypress {
       schema?: string | null;
       log?: boolean;
     }): Chainable<any>;
+    findInJson<T = any>(
+      obj: object,
+      keyToFind: string,
+      position?: number
+    ): Chainable<T>;
   }
 }

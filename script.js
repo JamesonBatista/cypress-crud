@@ -263,6 +263,44 @@ const projectRootPathJSON = path.resolve(__dirname, "../../cypress/fixtures/");
 // Caminho para a pasta .vscode
 const vscodeFolderPathJSON = path.join(projectRootPathJSON, "examples");
 
+//mocks folder
+const jsonExampleMock = path.join(projectRootPathJSON, "mocks");
+const mocksJson = path.join(jsonExampleMock, "jsonWithMock.json");
+
+const contentMock = `
+{
+  "intercept": {
+    "method": "POST",
+    "url": "/users/2"
+  },
+  "response": {
+    "status": 201,
+    "body": { "id": 7, "name": "mock response" },
+    "headers": { "Content-Type": "application/json" }
+  }
+}
+`;
+
+const mockRequestJson = path.join(vscodeFolderPathJSON, "jsonGETMock.json");
+
+const contentRequestMock = `
+{
+  "endpoint": "getUser",
+  "request": {
+    "method": "POST",
+    "url": "https://reqres.in/api/users/2",
+    "mock": "mocks/jsonWithMock.json",
+    "body": null,
+    "qs": null,
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  },
+  "validations": [{ "path": "status", "value": 201 }, { "path": "id" }]
+}
+
+`;
+
 //schemas
 const vscodeFolderPathJSONSchema = path.join(projectRootPathJSON, "schemas");
 const snippetsFilePathJSONSchemas = path.join(
@@ -440,10 +478,11 @@ const contentExample = `
 const { crudStorage } = require("../support/e2e");
 
 describe("template spec", () => {
+    afterEach(() => {
+    cy.crudScreenshot();
+  });
   it("Example simple requisition", () => {
     cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" })
-    .crudScreenshot("viewport");
-    // validation JSON path validations:[]
   });
   it("Example simple requisition return array", () => {
     cy.crud({ payload: "examples/jsonGetArray" }).then((response) => {
@@ -452,14 +491,12 @@ describe("template spec", () => {
         if (items.id == 7) crudStorage.save.id_Seven = items.id;
       }
     });
-    //.crudScreenshot() ;
   });
   it("Example whit .bodyResponse", () => {
     cy.crud({ payload: "examples/jsonNotAlias" }).bodyResponse({
       path: "last_name",
       eq: "Weaver",
     });
-    //.crudScreenshot()
   });
 
   it("Example whit  .save", () => {
@@ -626,6 +663,10 @@ describe("template spec", () => {
 
     cy.log("ID first requisition", crudStorage.save.id_Seven);
   });
+
+    it("Example simple requisition whit MOCK", () => {
+    cy.crud({ payload: "examples/jsonGETMock" });
+  });
 });
 
 `;
@@ -636,9 +677,19 @@ if (!fs.existsSync(vscodeFolderPathJSON)) {
   fs.mkdirSync(vscodeFolderPathJSON);
 }
 
+// request mock
+fs.writeFileSync(mockRequestJson, contentRequestMock);
+
 if (!fs.existsSync(vscodeFolderPathJSONSchema)) {
   fs.mkdirSync(vscodeFolderPathJSONSchema);
 }
+
+// mock
+if (!fs.existsSync(jsonExampleMock)) {
+  fs.mkdirSync(jsonExampleMock);
+}
+fs.writeFileSync(mocksJson, contentMock);
+
 fs.writeFileSync(snippetsFilePathJSON, contentJSonAlias);
 fs.writeFileSync(jsonWhitParam, jsonWithParamContent);
 
@@ -683,17 +734,18 @@ const contentLog = `
         return null;
       },
     });
+         // adjust to print size
           on("before:browser:launch", (browser, launchOptions) => {
         if (browser.family === "chromium" && browser.name !== "electron") {
-          launchOptions.args.push("--window-size=1280,720");
+          launchOptions.args.push("--window-size=1500,1200");
         }
         if (browser.name === "electron") {
-          launchOptions.preferences.width = 1920;
-          launchOptions.preferences.height = 1080;
+          launchOptions.preferences.width = 1500;
+          launchOptions.preferences.height = 1200;
         }
         if (browser.family === "firefox") {
-          launchOptions.args.push("--width=1280");
-          launchOptions.args.push("--height=720");
+          launchOptions.args.push("--width=1500");
+          launchOptions.args.push("--height=1200");
         }
         return launchOptions;
       });
@@ -722,15 +774,4 @@ fs.readFile(jsconfigFilePath, "utf8", (err, data) => {
       return;
     }
   });
-
-  // Escreve as alterações de volta no arquivo
-  // fs.writeFile(jsconfigFilePath, updatedData, "utf8", (err) => {
-  //   if (err) {
-  //     console.error(err);
-  //     return;
-  //   }
-  //   console.log(
-  //     "A função setupNodeEvents foi adicionada com sucesso ao arquivo cypress.config.js"
-  //   );
-  // });
 });

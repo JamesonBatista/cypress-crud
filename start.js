@@ -52,7 +52,7 @@ fs.readFile(`${jsconfigFilePath}/app.js`, "utf8", (err, data) => {
   }
 
   const substituicoes = [
-    { procurar: "Adam Gruber", substituirPor: "Jam Batista" },
+    { procurar: "Adam Gruber", substituirPor: "Jam Batista / Gabriel Lopes" },
     {
       procurar: "http://adamgruber.github.io/mochawesome",
       substituirPor: "https://github.com/JamesonBatista/cypress-crud",

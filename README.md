@@ -542,6 +542,132 @@ module.exports = defineConfig({
 });
 ```
 
+# Funcation findInJSON
+
+The findInJson function is designed to loop through a JSON object (or a data structure that resembles a JSON, like an array or object in JavaScript) and find a specific value associated with a key (keyToFind). The function also has the ability to deal with arrays and find an element at a specific position within that array. Here are all the scenarios this function covers:
+
+Recursive Search:
+
+The function recursively searches all properties and sub-properties of objects and arrays.
+Array Handling:
+
+When it finds an array, it iterates over each element of the array and applies recursive search.
+Object Handling:
+
+When it finds an object, it checks each key to see if it matches keyToFind.
+Finding Specific Keys in Arrays:
+
+If the desired key (keyToFind) is found and its associated value is an array, the function will attempt to return the element at the position specified by the position parameter.
+Finding Specific Keys in Objects:
+
+If the desired key is found and its value is not an array, the function will count how many times that key has been found so far. If the counter matches the specified position, it returns that value.
+Flow Control with Errors:
+
+The function uses the throw new Error("Found value") exception to stop execution as soon as it finds the desired value. This is a form of flow control to immediately exit deep recursion.
+Conditional Return:
+
+The function returns an object with two properties (object and value) if the value found is part of an array. If it is a simple value (not an array), it returns just the value.
+Error Handling:
+
+If an error is thrown other than the "Found value" flow control, the error will be propagated.
+Custom Error Messages:
+
+If the key is not found, the function logs a custom error to the console and returns undefined.
+Ignore Non-Object Values:
+
+If the function encounters types that are not arrays or objects (such as strings, numbers, or Boolean values), it ignores them and continues the search.
+Ignore Prototype Properties:
+The function checks whether the property belongs to the object itself (using obj.hasOwnProperty(key)) to avoid enumerating properties inherited from the prototype.
+Multiple Occurrence Scenario:
+If the desired key occurs multiple times, the function can find the specific occurrence based on the position parameter.
+
+```javascript
+// Teste 1: Objeto Simples
+const objSimple = { name: "Alice", age: 30 };
+console.log(cy.findInJson(objSimple, "name")); // Espera "Alice"
+
+// Teste 2: Array
+const objArray = {
+  users: [
+    { id: 1, name: "Bob" },
+    { id: 2, name: "Carol" },
+  ],
+};
+console.log(cy.findInJson(objArray, "name", 2)); // Espera "Carol"
+
+// Teste 3: Objeto Aninhado
+const objNested = { user: { id: 1, details: { name: "Dave", age: 40 } } };
+console.log(cy.findInJson(objNested, "name")); // Espera "Dave"
+
+// Teste 4: Chave Repetida
+const objRepeatedKey = {
+  user: { id: 1, name: "Eve" },
+  manager: { id: 2, name: "Frank" },
+};
+console.log(cy.findInJson(objRepeatedKey, "name", 2)); // Espera "Frank"
+
+// Teste 5: Teste de Falha
+const objFail = { user: { id: 1, name: "George" } };
+console.log(cy.findInJson(objFail, "city"));
+
+
+describe('Meu Teste', () => {
+  it('deve encontrar um valor em um JSON', () => {
+    const obj = { ... }; // Seu objeto JSON
+    cy.findInJson(obj, 'chave', 1).then(value => {
+      // Faça algo com o valor encontrado
+      expect(value).to.equal(...);
+    });
+  });
+})
+```
+
+# Mock in cypress-crud
+
+```json
+// fixtures/example/ jsonMock.json
+
+{
+  "endpoint": "getUser",
+  "request": {
+    "method": "POST",
+    "url": "https://reqres.in/api/users/2",
+    "mock": "mocks/jsonWithMock.json",
+    "body": null,
+    "qs": null,
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  },
+  "validations": [{ "path": "status", "value": 201 }, { "path": "id" }]
+}
+
+//in mock json fixtures/mocks
+
+{
+  "intercept": {
+    "method": "POST",
+    "url": "/users/2"
+  },
+  "response": {
+    "status": 201,
+    "body": { "id": 7, "name": "mock response" },
+    "headers": { "Content-Type": "application/json" }
+  }
+}
+
+
+
+```
+
+## in Tests
+
+```javascript
+it("Example simple requisition whit MOCK", () => {
+  cy.crud({ payload: "examples/jsonMock" });
+});
+```
+
 ## Contributions
 
 Contributions are always welcome. Feel free to open issues or send pull requests.
