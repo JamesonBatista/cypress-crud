@@ -12,6 +12,11 @@ declare namespace Cypress {
       eq?: any | null;
     }): Chainable<Response>;
 
+    expect(options: {
+      path?: string | null;
+      eq?: any | null;
+    }): Chainable<Response>;
+
     save(
       options: {
         path?: string | null;
@@ -19,14 +24,18 @@ declare namespace Cypress {
         log?: boolean;
       } = {}
     ): Chainable<any>;
+
     crudScreenshot(type?: string | null): Chainable<any>;
 
     write(options: { path?: string | null; log?: boolean }): Chainable<any>;
+
     read(options: { path?: string | null; log?: boolean }): Chainable<any>;
+
     validateSchema(options: {
       schema?: string | null;
       log?: boolean;
     }): Chainable<any>;
+
     findInJson<T = any>(
       obj: object,
       keyToFind: string,

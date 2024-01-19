@@ -23,8 +23,6 @@ module.exports = function applyStyles() {
   }
 
   if (!app.document.head.querySelector("[data-hover-black-crud]")) {
-    // Criar e inserir o elemento de estilo
-
     const style = app.document.createElement("style");
     let alias = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-save > div > span > div > span.command-info`;
     let aliasWrite = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-writeFile > div > span > div > span.command-info`;
@@ -64,8 +62,6 @@ module.exports = function applyStyles() {
   }
 
   if (!app.document.head.querySelector("[data-hover-black-descit]")) {
-    // Criar e inserir o elemento de estilo
-
     const style = app.document.createElement("style");
     let alias = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div > div > div > span > span`;
     let title = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-header-wrapper.runnable-wrapper > div > div`;
@@ -114,8 +110,6 @@ module.exports = function applyStyles() {
   }
 
   if (!app.document.head.querySelector("[data-hover-black-spec]")) {
-    // Criar e inserir o elemento de estilo
-
     const style = app.document.createElement("style");
     let alias = `#resizable-panels-root > div.grow.h-full.bg-gray-100.relative`;
     let subTitle = `#unified-reporter > div > div > div.runnable-header`;
@@ -154,8 +148,6 @@ module.exports = function applyStyles() {
   }
 
   if (!app.document.head.querySelector("[data-hover-black-methods-info]")) {
-    // Criar e inserir o elemento de estilo
-
     const style = app.document.createElement("style");
     let get = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-GET`;
     let post = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-POST`;
@@ -190,8 +182,6 @@ module.exports = function applyStyles() {
   }
 
   if (!app.document.head.querySelector("[data-hover-black-delete-before]")) {
-    // Criar e inserir o elemento de estilo
-
     const style = app.document.createElement("style");
     let expectBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-assert`;
     let envBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env`;

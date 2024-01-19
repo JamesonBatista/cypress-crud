@@ -67,7 +67,7 @@ fs.readFile(`${jsconfigFilePath}/app.js`, "utf8", (err, data) => {
     },
     {
       procurar: "Mochawesome",
-      substituirPor: "cypress-crud",
+      substituirPor: "🅲🆈🅿🆁🅴🆂🆂-🅲🆁🆄🅳",
     },
   ];
 

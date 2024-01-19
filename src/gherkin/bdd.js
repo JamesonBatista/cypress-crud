@@ -8,26 +8,21 @@ function createTestWrapper(testFunction) {
       "#unified-reporter > div > div > div.runnable-header > span"
     );
 
-    // Injetar a fonte do Google Fonts
     const fontLink = app.document.createElement("link");
     fontLink.href =
       "https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap";
     fontLink.rel = "stylesheet";
     app.document.head.appendChild(fontLink);
 
-    // Verifique se o elemento existe e se a variável de ambiente não está definida
     if (spanElement && !Cypress.env("subTitle")) {
       spanElement.innerText = text;
-
-      // Aplicar estilos ao elemento
 
       spanElement.style.color = "white";
       spanElement.style.borderRadius = "5px";
 
-      // Definir um atraso para garantir que a fonte seja carregada antes de aplicá-la
       setTimeout(() => {
         spanElement.style.fontFamily = "Roboto, sans-serif";
-      }, 500); // Ajuste o tempo conforme necessário
+      }, 500);
     }
     const { skip, only } = options;
     if (only) {
@@ -52,7 +47,6 @@ export function Given(text, callback, { skip = false, only = false } = {}) {
   return createTestWrapper(it)(`ɢɪᴠᴇɴ - ${text}`, callback, options);
 }
 
-// Repita para When, Then, etc.
 export function When(text, callback, { skip = false, only = false } = {}) {
   let options = { skip: skip, only: only };
   return createTestWrapper(it)(`ᴡʜᴇɴ - ${text}`, callback, options);
@@ -66,7 +60,6 @@ export function Then(text, callback, { skip = false, only = false } = {}) {
   return createTestWrapper(it)(`ᴛʜᴇɴ - ${text}`, callback, options);
 }
 
-// Variantes em Português
 export function Cenario(text, callback, { skip = false, only = false } = {}) {
   let options = { skip: skip, only: only };
   applyStyles();
@@ -100,12 +93,12 @@ export function describes(text, callback, { skip = false, only = false } = {}) {
   let options = { skip: skip, only: only };
   applyStyles();
 
-  return createTestWrapper(describe)(`ᴅᴇsᴄʀɪʙᴇs - ${text}`, callback, options);
+  return createTestWrapper(describe)(`ᴅᴇsᴄʀɪʙᴇ - ${text}`, callback, options);
 }
 
 export function its(text, callback, { skip = false, only = false } = {}) {
   let options = { skip: skip, only: only };
-  return createTestWrapper(it)(`ɪᴛs - ${text}`, callback, options);
+  return createTestWrapper(it)(`ɪᴛ - ${text}`, callback, options);
 }
 
 export const crudStorage = window;

@@ -6,24 +6,19 @@ function findProjectRoot(dir) {
   const isInNodeModules = dir.includes("node_modules");
 
   if (isPackageJsonPresent && !isInNodeModules) {
-    // Diretório raiz do projeto encontrado
     return dir;
   }
 
   const parentDir = path.dirname(dir);
   if (parentDir === dir) {
-    // Chegamos ao diretório raiz do sistema sem encontrar o diretório do projeto
     throw new Error("Não foi possível encontrar o diretório raiz do projeto.");
   }
 
-  // Recursivamente subir na hierarquia de diretórios
   return findProjectRoot(parentDir);
 }
 
-// Encontrar o diretório raiz do projeto a partir do diretório atual
 const projectRoot = findProjectRoot(__dirname);
 
-// Construir o caminho para o arquivo e2e.js
 const supportFilePath = path.join(projectRoot, "cypress/support/e2e.js");
 
 const contentToAdd = `
@@ -96,7 +91,6 @@ const appendToFile = (filePath, content) => {
   if (fs.existsSync(filePath)) {
     const existingContent = fs.readFileSync(filePath, "utf8");
 
-    // Verificar se o conteúdo já existe no arquivo
     if (!existingContent.includes(content.trim())) {
       fs.appendFileSync(filePath, content, "utf8");
     }
@@ -108,17 +102,13 @@ const appendToFile = (filePath, content) => {
 appendToFile(supportFilePath, contentToAdd);
 //
 
-// Caminho para a raiz do projeto
 const projectRootPath = path.resolve(__dirname, "../../");
-// Caminho para a pasta .vscode
 const vscodeFolderPath = path.join(projectRootPath, ".vscode");
 
-// Caminho para o arquivo action.action-snippets dentro da pasta .vscode
 const snippetsFilePath = path.join(vscodeFolderPath, "action.code-snippets");
 const snippetsFilePathSave = path.join(vscodeFolderPath, "settings.json");
 const contentSave = `{"editor.formatOnSave":true, "cSpell.words": ["Cenario", "datafaker", "Entao"]}`;
 
-// Texto que será adicionado ao arquivo action.action-snippets
 const snippetContent = `{ 
     "create cy.crud": {
     "scope": "javascript,typescript",
@@ -221,13 +211,10 @@ const snippetContent = `{
 }`;
 
 try {
-  // Define o caminho da raiz do projeto
   const projectRootPathJsconfig = path.resolve(__dirname, "../../");
 
-  // Define o caminho para o arquivo jsconfig.json na raiz do projeto
   const jsconfigFilePath = path.join(projectRootPathJsconfig, "jsconfig.json");
 
-  // Conteúdo para o arquivo jsconfig.json
   const contentTsConfig = `{
   "compilerOptions": {
     // "target": "ES6",
@@ -244,7 +231,6 @@ try {
 }
 `;
 
-  // Escreve o conteúdo no arquivo jsconfig.json
   fs.writeFileSync(jsconfigFilePath, contentTsConfig);
 } catch (error) {
   console.error("Erro ao criar o arquivo jsconfig.json:", error);
@@ -255,12 +241,10 @@ if (!fs.existsSync(vscodeFolderPath)) {
 }
 
 fs.writeFileSync(snippetsFilePathSave, contentSave);
-// Cria ou sobrescreve o arquivo action.action-snippets
 fs.writeFileSync(snippetsFilePath, snippetContent);
 
 // add json
 const projectRootPathJSON = path.resolve(__dirname, "../../cypress/fixtures/");
-// Caminho para a pasta .vscode
 const vscodeFolderPathJSON = path.join(projectRootPathJSON, "examples");
 
 //mocks folder
@@ -280,7 +264,25 @@ const contentMock = `
   }
 }
 `;
-
+const payloadWithReplace = path.join(
+  vscodeFolderPathJSON,
+  "jsonReplaceAlias.json"
+);
+const contentReplaceAlias = `
+{
+  "request": {
+    "method": "POST",
+    "url": "https://reqres.in/api/users/2",
+    "replace": "access_token",
+    "body": null,
+    "qs": null,
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer access_token"
+    }
+  }
+}
+`;
 const mockRequestJson = path.join(vscodeFolderPathJSON, "jsonGETMock.json");
 
 const contentRequestMock = `
@@ -667,6 +669,18 @@ describe("template spec", () => {
     it("Example simple requisition whit MOCK", () => {
     cy.crud({ payload: "examples/jsonGETMock" });
   });
+    it("Example simple requisition", () => {
+    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" , alias:"access_token"})
+  });
+    it("Example simple requisition with replace token, param, etc...", () => {
+    cy.crud({ payload: "examples/jsonReplaceAlias" }).save({
+      path: "Authorization",
+    });
+  });
+});
+after(() => {
+  console.log(crudStorage.request);
+  console.log(crudStorage.response);
 });
 
 `;
@@ -679,6 +693,9 @@ if (!fs.existsSync(vscodeFolderPathJSON)) {
 
 // request mock
 fs.writeFileSync(mockRequestJson, contentRequestMock);
+
+// replace
+fs.writeFileSync(payloadWithReplace, contentReplaceAlias);
 
 if (!fs.existsSync(vscodeFolderPathJSONSchema)) {
   fs.mkdirSync(vscodeFolderPathJSONSchema);
@@ -706,7 +723,6 @@ fs.writeFileSync(snippetsFilePathNotAlias, contentJSonAliasNot);
 
 const configPath = path.resolve(__dirname, "../../");
 const jsconfigFilePath = path.join(configPath, "cypress.config.js");
-// Novo conteúdo para ser adicionado
 const newContent = `
 
   // testIsolation: false,
@@ -757,12 +773,10 @@ fs.readFile(jsconfigFilePath, "utf8", (err, data) => {
     return;
   }
 
-  // Verifica se a setupNodeEvents já existe
   if (data.includes("crudLog")) {
     return;
   }
 
-  // Localiza onde inserir o novo conteúdo
   const updatedData = data.replace(/(e2e: {)/, `$1${newContent}`);
   const updateNode = data.replace(
     /(setupNodeEvents\(on, config\) {\s*)/,

@@ -1,14 +1,70 @@
 const applyStyles = require("./style.js");
 import { validate } from "jsonschema";
-const fs = require("fs");
-const path = require("path");
+import { crudStorage } from "./gherkin/bdd.js";
 
-const configPath = path.resolve(__dirname, "../../");
-const jsconfigFilePath = path.join(
-  configPath,
-  "node_modules/cypress-crud/src/index.html"
-);
+let counter = 0;
+let counterResponse = 0;
+let colorNum;
+let numberRequest = 0;
 
+function generateInt() {
+  const standardColors = [
+    "\x1b[30m",
+    "\x1b[31m",
+    "\x1b[32m",
+    "\x1b[33m",
+    "\x1b[34m",
+    "\x1b[35m",
+    "\x1b[36m",
+    "\x1b[37m",
+    "\x1b[1;30m",
+    "\x1b[1;31m",
+    "\x1b[1;32m",
+    "\x1b[1;33m",
+    "\x1b[1;34m",
+    "\x1b[1;35m",
+    "\x1b[1;36m",
+    "\x1b[1;37m",
+  ];
+
+  const extendedColors = new Array(256)
+    .fill(0)
+    .map((_, i) => `\x1b[38;5;${i}m`);
+
+  const allColors = standardColors.concat(extendedColors);
+
+  const randomIndex = Math.floor(Math.random() * allColors.length);
+  colorNum = allColors[randomIndex];
+  return allColors[randomIndex];
+}
+
+function textNpxRunCypress({
+  type = null,
+  payload = null,
+  mocks = null,
+  response = null,
+}) {
+  if (type === "request")
+    return `${generateInt()} \n\n** ----- 🅲 🆁 🆄 🅳    🆁 🅴 🆀 🆄 🅴 🆂 🆃 ----- ** [ ${(numberRequest += 1)} ]\n${JSON.stringify(
+      payload,
+      null,
+      2
+    )}\n${colorNum}     ----  🡇  -----\n`;
+
+  if (type === "mock")
+    return `${colorNum} \n** ----- 🅲 🆁 🆄 🅳     🅼 🅾  🅲 🅺     🆁 🅴 🆂 🅿  🅾 🅽 🆂 🅴  ----- ** [ ${numberRequest} ] \n${JSON.stringify(
+      mocks,
+      null,
+      2
+    )}\n${colorNum}     ----- 🅵 🅸 🅽 🅰  🅻  -----\n`;
+
+  if (type === "response")
+    return `${colorNum}\n** ----- 🅲 🆁 🆄 🅳     🆁 🅴 🆂 🅿  🅾  🅽 🆂 🅴 ----- ** [ ${numberRequest} ]\n${JSON.stringify(
+      response,
+      null,
+      2
+    )}\n${colorNum}     ----- 🅵 🅸 🅽 🅰  🅻  -----\n`;
+}
 Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
   applyStyles();
   if (!window.save) {
@@ -22,9 +78,17 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
     window.alias.payloadReport = payload;
   }
 
+  if (!crudStorage.request || !crudStorage.response) {
+    crudStorage.request = {};
+    crudStorage.response = {};
+  }
+
   if (typeof payload === `object`) {
     let separate = null;
     let env = null;
+    if (payload.request.replace) {
+      payload = replaceAllStrings(payload);
+    }
     if (payload && payload.endpoint) {
       if (Cypress.env("environment")) {
         env = Cypress.env(Cypress.env("environment"))[payload.endpoint];
@@ -54,10 +118,10 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
           : `${payload.request.url}${payload.request.path || ""}`;
       const log = {
         name: "env",
-        message: `${Cypress.env("environment") || "environment not find"}`,
+        message: `${Cypress.env("environment") || "environment not found"}`,
         consoleProps: () => {
           return {
-            env: Cypress.env("environment") || "environment not find",
+            env: Cypress.env("environment") || "environment not found",
             path: payload.endpoint,
             endpoint: cyEnv,
             framework: "cypress-crud",
@@ -91,9 +155,12 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
     if (!Cypress.config("isInteractive"))
       cy.task(
         "crudLog",
-        `\x1b[36m** request **\n\x1b[0m${JSON.stringify(payload, null, 2)}`
+        textNpxRunCypress({ type: "request", payload: payload })
       );
     data["failOnStatusCode"] = Cypress.env("failOnStatusCode") || false;
+
+    counter += 1;
+    window.request[`payload${counter}`] = data;
 
     if (data && data.mock) {
       window.mock = {};
@@ -123,16 +190,14 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             window.alias[alias] = mocks;
             window.alias["bodyResponse"] = mocks;
             window.mock.active = true;
+            counterResponse += 1;
+            crudStorage.response[`response${counterResponse}`] = mocks;
 
             if (!Cypress.config("isInteractive")) {
               return cy
                 .task(
                   "crudLog",
-                  `\x1b[36m** mock response **\n\x1b[0m${JSON.stringify(
-                    mocks,
-                    null,
-                    2
-                  )}`
+                  textNpxRunCypress({ type: "mock", mocks: mocks })
                 )
                 .then(() => {
                   if (crud.validations) {
@@ -156,15 +221,14 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
       }
       window.alias[alias] = response;
       window.alias["bodyResponse"] = response;
+      counterResponse += 1;
+      crudStorage.response[`response${counterResponse}`] = response;
+
       if (!Cypress.config("isInteractive")) {
         return cy
           .task(
             "crudLog",
-            `\x1b[36m** response **\n\x1b[0m${JSON.stringify(
-              response.body,
-              null,
-              2
-            )}`
+            textNpxRunCypress({ type: "response", response: response.body })
           )
           .then(() => {
             if (payload.validations) {
@@ -181,7 +245,14 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
       }
     });
   }
+
   return cy.fixture(payload).then((crud) => {
+    //replace
+    if (crud.request.replace) {
+      crud = replaceAllStrings(crud);
+    }
+    //replace
+
     if (!window.alias) {
       window.alias = {};
       window.alias.payloadReport = crud;
@@ -243,12 +314,13 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
     let data = { ...crud.request };
     data["failOnStatusCode"] = Cypress.env("failOnStatusCode") || false;
     if (!Cypress.config("isInteractive")) {
-      cy.task(
-        "crudLog",
-        `\x1b[36m** request **\n\x1b[0m${JSON.stringify(crud, null, 2)}`
-      );
+      console.log("TASKKK", generateInt());
+      cy.task("crudLog", textNpxRunCypress({ type: "request", payload: crud }));
     }
 
+    counter += 1;
+    crudStorage.request[`payload${counter}`] = data;
+    //mock
     if (data && data.mock) {
       window.mock = {};
       return cy.fixture(data.mock).then((mocks) => {
@@ -275,17 +347,14 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             }
             window.alias[alias] = mocks;
             window.alias["bodyResponse"] = mocks;
+            counterResponse += 1;
+            crudStorage.response[`response${counterResponse}`] = mocks;
             window.mock.active = true;
-
             if (!Cypress.config("isInteractive")) {
               return cy
                 .task(
                   "crudLog",
-                  `\x1b[36m** mock response **\n\x1b[0m${JSON.stringify(
-                    mocks,
-                    null,
-                    2
-                  )}`
+                  textNpxRunCypress({ type: "mock", mocks: mocks })
                 )
                 .then(() => {
                   if (crud.validations) {
@@ -302,22 +371,21 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
           });
       });
     }
-
+    //mock
     return cy.api(data).then((response) => {
       if (!window.alias) {
         window.alias = {};
       }
       window.alias[alias] = response;
       window.alias["bodyResponse"] = response;
+      counterResponse += 1;
+      crudStorage.response[`response${counterResponse}`] = response;
+
       if (!Cypress.config("isInteractive")) {
         return cy
           .task(
             "crudLog",
-            `\x1b[36m** response **\n\x1b[0m${JSON.stringify(
-              response.body,
-              null,
-              2
-            )}`
+            textNpxRunCypress({ type: "response", response: response.body })
           )
           .then(() => {
             if (crud.validations) {
@@ -329,7 +397,6 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
         if (crud.validations) {
           runValidation(crud.validations);
         }
-
         return response;
       }
     });
@@ -398,13 +465,21 @@ Cypress.Commands.add("bodyResponse", ({ path = null, eq = null }) => {
   }
   return expect(search);
 });
+Cypress.Commands.add("expects", ({ path = null, eq = null }) => {
+  let search = findInJson(window.alias.bodyResponse, path);
+
+  expect(search).to.exist;
+  if (eq) {
+    expect(search).to.eql(eq);
+  }
+  return expect(search);
+});
 Cypress.Commands.add(
   "save",
   ({ path = null, alias = "save", log = true } = {}) => {
     if (!window.save) {
       window.save = {};
     }
-
     if (path) {
       let value = findInJson(window.alias.bodyResponse, path);
       if (log) {
@@ -728,4 +803,28 @@ function createHTML() {
     style.setAttribute("data-hover-styles-jsons", "");
     app.document.head.appendChild(style);
   }
+}
+function replaceAllStrings(obj) {
+  if (!obj.request.replace || typeof obj.request.replace !== "string") {
+    return obj;
+  }
+
+  const replaceParams = obj.request.replace.split(", ");
+
+  const subs = replaceParams.map((param) => {
+    return {
+      search: param,
+      subsFor: window.save[param],
+    };
+  });
+
+  let data = JSON.stringify(obj);
+
+  subs.forEach((subst) => {
+    data = data.replace(new RegExp(subst.search, "g"), subst.subsFor);
+  });
+
+  const newObj = JSON.parse(data);
+  delete newObj.request.replace;
+  return newObj;
 }

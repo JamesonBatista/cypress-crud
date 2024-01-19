@@ -668,6 +668,62 @@ it("Example simple requisition whit MOCK", () => {
 });
 ```
 
+# Replace alias for value
+
+```javascript
+it("Example simple requisition", () => {
+  cy.crud({ payload: "examples/jsonNotAlias" }).save({
+    path: "id",
+    alias: "access_token", // save value ..... token, param, etc.
+  });
+});
+```
+
+```json
+// JSON get param access_token
+{
+  "request": {
+    "method": "POST",
+    "url": "https://reqres.in/api/users/2",
+    "replace": "access_token", // replace
+    "body": null,
+    "qs": null,
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer access_token"
+    }
+  }
+}
+```
+
+```javascript
+it("Example simple requisition with replace token, param, etc...", () => {
+  cy.crud({ payload: "examples/jsonReplaceAlias" }).save({
+    path: "Authorization",
+  });
+});
+```
+
+```json
+// previous jsons used save()
+// save({path: "name", alias:"nameUser"})
+// save({path: "access_token", alias:"token"})
+
+{
+  "request": {
+    "method": "POST",
+    "url": "https://reqres.in/api/users/2",
+    "replace": "access_token, nameUser",
+    "body": null,
+    "qs": { "name": "nameUser" },
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer token"
+    }
+  }
+}
+```
+
 ## Contributions
 
 Contributions are always welcome. Feel free to open issues or send pull requests.

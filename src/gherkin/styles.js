@@ -2,8 +2,6 @@ module.exports = function gherkinStyles() {
   const app = window.top;
   let colorBDD = Cypress.env("styles") ? Cypress.env("styles") : "#7fff0065";
   if (!app.document.head.querySelector("[data-hover-black-cucumber]")) {
-    // Criar e inserir o elemento de estilo
-
     const style = app.document.createElement("style");
     let scenarioSelector = `#unified-reporter > div > div > div.wrap > ul > li > div > div > div > div.collapsible-header-inner`;
     let bdd = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div > div > div.collapsible-header-inner`;
