@@ -1,6 +1,6 @@
 # cypress-crud
 
-![cypress](https://img.shields.io/badge/cypress.crud-1.0.0-brightgreen)
+![cypress](https://img.shields.io/badge/cypress.crud-1.8.1-brightgreen)
 ![cypress](https://img.shields.io/badge/cypress-13.6.0-brightgreen)
 ![generate-datafaker](https://img.shields.io/badge/datafaker-1.0.2-yellow)
 
@@ -10,8 +10,10 @@
 
 ### Required
 
-| NodeJs
-| Cypress version 10 >
+```bash
+ NodeJs
+ Cypress version 10 >
+```
 
 ## Installation
 
@@ -23,31 +25,19 @@ npm i cypress-crud
 
 ## Use Snippets in cy.action
 
-test_bdd<br>
-
-> test_action<br>
->
-> test_bdd_BR<br>
->
-> scenario<br>
->
-> given<br>
->
-> when<br>
->
-> and<br>
->
-> then<br>
->
-> cenario<br>
->
-> dado<br>
->
-> quando<br>
->
-> e<br>
->
-> entao<br>
+1. test_bdd<br>
+1. test_action<br>
+1. test_bdd_BR<br>
+1. scenario<br>
+1. given<br>
+1. when<br>
+1. and<br>
+1. then<br>
+1. cenario<br>
+1. dado<br>
+1. quando<br>
+1. e<br>
+1. entao<br>
 
 <br>
 
@@ -76,6 +66,7 @@ import "cypress-plugin-steps";
 export const faker = require("generate-datafaker");
 import "cypress-crud";
 import "cypress-plugin-api";
+import "cypress-mochawesome-reporter/register";
 ```
 
 # Use
@@ -95,11 +86,8 @@ import "cypress-plugin-api";
   }
 }
 
-
  cy.crud({ payload: "requests/createToken.json" }) // save response in crudStorage.alias.bodyResponse
-
  cy.crud({ payload: "requests/createToken.json", alias:"body" }) // save response in crudStorage.alias.body
-
 ```
 
 Or
@@ -123,9 +111,6 @@ cy.crud({ payload: obj });
 # cy.crud whit endpoint param
 
 ```javascript
-
->   JSON
-
 {
   "request": {
     "method": "GET",
@@ -138,13 +123,6 @@ cy.crud({ payload: obj });
     }
   }
 }
-
-
-
-
-    it('Generate id ', ()=>{
-        cy.crud({ payload: "token/createToken.json" })
-    })
 ```
 
 # Use in different environments
@@ -186,7 +164,7 @@ cy.crud({ payload: obj });
 
 💻 **with validations you just need to inform the path and the value, regardless of which part of your JSON it is.**
 
-```javascript
+```json
 {
   "request": {
     "method": "GET",
@@ -199,14 +177,20 @@ cy.crud({ payload: obj });
   },
   "validation": [{ "path": "status", "value": 200 }, { "path": "first_name" }, ...]
 }
+OR
 
-cy.crud({ payload: "token/createToken.json" })
-
-assert expected 200 to exist
-
-assert expected 200 to deeply equal 200
-
-assert expected Michael to exist
+{
+  "request": {
+    "method": "GET",
+    "url": "https://reqres.in/api/users/2",
+    "body": null,
+    "qs": null,
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  },
+  "expects": [{ "path": "status", "value": 200 }, { "path": "first_name" }, ...]
+}
 ```
 
 # .bodyResponse()
@@ -215,14 +199,14 @@ assert expected Michael to exist
 
 ```javascript
 cy.crud({ payload: "token/createToken.json" })
-.bodyResponse({path: "name", value:"Jam Batista"})
+.bodyResponse({path: "name", eq:"Jam Batista"})
 // .bodyResponse({path: "name""})
 
 code hiden bodyResponse
 
   expect(search).to.exist;
   if (equal) {
-    expect(search).to.eql(equal);
+    expect(search).to.eql(eq);
   }
   return expect(search);
 
@@ -508,8 +492,11 @@ const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
   reporter: "cypress-mochawesome-reporter",
+
   e2e: {
     setupNodeEvents(on, config) {
+      // reporter: "cypress-mochawesome-reporter",
+
       require("cypress-mochawesome-reporter/plugin")(on);
       on("task", {
         crudLog(message) {
@@ -517,27 +504,39 @@ module.exports = defineConfig({
           return null;
         },
       });
+      // adjust to print size
       on("before:browser:launch", (browser, launchOptions) => {
         if (browser.family === "chromium" && browser.name !== "electron") {
-          launchOptions.args.push("--window-size=1280,720");
+          launchOptions.args.push("--window-size=1500,1200");
         }
         if (browser.name === "electron") {
-          launchOptions.preferences.width = 1920;
-          launchOptions.preferences.height = 1080;
+          launchOptions.preferences.width = 1500;
+          launchOptions.preferences.height = 1200;
         }
         if (browser.family === "firefox") {
-          launchOptions.args.push("--width=1280");
-          launchOptions.args.push("--height=720");
+          launchOptions.args.push("--width=1500");
+          launchOptions.args.push("--height=1200");
         }
         return launchOptions;
       });
-      // implement node event listeners here
     },
-    testIsolation: false,
-    experimentalRunAllSpecs: true,
-  },
-  env: {
-    screenshot: true,
+    testIsolation: false, //  in e2e:{}
+    experimentalRunAllSpecs: true, // in e2e:{}
+    env: {
+      // in e2e:{}
+      screenshot: true, // required true, for active screenshot
+      visualPayloads: false,
+      //   environment: "QA", // change environment
+      //   QA: {
+      //     getUser: "https://reqres.in/api/users",
+      //   },
+      //   DEV: {
+      //     getUser: "https://reqres.in/api/users/2",
+      //   },
+      //   PROD: {
+      //     getUser: "https://reqres.in/api/users/2",
+      //   },
+    },
   },
 });
 ```
@@ -584,7 +583,7 @@ If the desired key occurs multiple times, the function can find the specific occ
 ```javascript
 // Teste 1: Objeto Simples
 const objSimple = { name: "Alice", age: 30 };
-console.log(cy.findInJson(objSimple, "name")); // Espera "Alice"
+console.log(cy.findInJson(objSimple, "name"));
 
 // Teste 2: Array
 const objArray = {
@@ -593,29 +592,25 @@ const objArray = {
     { id: 2, name: "Carol" },
   ],
 };
-console.log(cy.findInJson(objArray, "name", 2)); // Espera "Carol"
+console.log(cy.findInJson(objArray, "name"));
 
-// Teste 3: Objeto Aninhado
 const objNested = { user: { id: 1, details: { name: "Dave", age: 40 } } };
-console.log(cy.findInJson(objNested, "name")); // Espera "Dave"
+console.log(cy.findInJson(objNested, "name"));
 
-// Teste 4: Chave Repetida
 const objRepeatedKey = {
   user: { id: 1, name: "Eve" },
   manager: { id: 2, name: "Frank" },
 };
-console.log(cy.findInJson(objRepeatedKey, "name", 2)); // Espera "Frank"
+console.log(cy.findInJson(objRepeatedKey, "name"));
 
-// Teste 5: Teste de Falha
 const objFail = { user: { id: 1, name: "George" } };
 console.log(cy.findInJson(objFail, "city"));
 
 
 describe('Meu Teste', () => {
   it('deve encontrar um valor em um JSON', () => {
-    const obj = { ... }; // Seu objeto JSON
-    cy.findInJson(obj, 'chave', 1).then(value => {
-      // Faça algo com o valor encontrado
+    const obj = { ... };
+    cy.findInJson(obj, 'chave').then(value => {
       expect(value).to.equal(...);
     });
   });

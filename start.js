@@ -79,11 +79,7 @@ fs.readFile(`${jsconfigFilePath}/app.js`, "utf8", (err, data) => {
     );
   });
 
-  fs.writeFile(`${jsconfigFilePath}/app.js`, newData, "utf8", (err) => {
-    if (err) {
-      console.error("Erro ao escrever no arquivo:", err);
-    }
-  });
+  fs.writeFile(`${jsconfigFilePath}/app.js`, newData, "utf8", (err) => {});
   let css = `html, main, .test--code-snippet---3H5Xj.hljs, .test--context-item---R1NNU, .test--context---1YYgX {
     background: black;
   }
@@ -105,9 +101,6 @@ h4{
 }
   `;
 
-  fs.appendFile(`${jsconfigFilePath}/app.css`, css, "utf8", (err) => {
-    if (err) {
-      console.error("Erro ao adicionar texto no arquivo:", err);
-    }
-  });
+  fs.appendFile(`${jsconfigFilePath}/app.css`, css, "utf8", (err) => {});
+  fs.appendFile(`${jsconfigFilePath}/app.inline.css`, css, "utf8", (err) => {});
 });

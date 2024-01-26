@@ -31,7 +31,7 @@ module.exports = function applyStyles() {
     let env = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env > div > span > div > span.command-info`;
     let schemas = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas > div > span > div > span.command-info`;
     let mock = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-mock > div > span > div > span.command-info`;
-
+    let valueColor = `span.command-message > span > strong {color: white;}`;
     style.innerHTML = `
     ${alias} span.command-method > span,
     ${aliasWrite} span.command-method > span,
@@ -55,6 +55,13 @@ module.exports = function applyStyles() {
     ${valid} span.command-method > span{
       color: white;
     }
+
+    .reporter .command-name-assert .command-state-passed .command-message strong {
+    color: #fb8d04;
+}
+
+
+#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li > div > span > div > span.command-info:hover ${valueColor}
     `;
 
     style.setAttribute("data-hover-black-crud", "");
@@ -123,11 +130,11 @@ module.exports = function applyStyles() {
     let overflow = `body > div.inner-container > div#api-plugin-root > div#api-view`;
     style.innerHTML = `
     ${alias}{
-        background-color: rgb(27 30 46 / 1);
+        background-color: black;
     }
 
     ${subTitle}, ${colapse}, ${colapseOPen}, ${headers}, ${container}, ${top} {
-         background-color: rgb(27 30 46 / 1);
+         background-color: black;
     }
 
     ${barReport}{
@@ -141,6 +148,10 @@ module.exports = function applyStyles() {
      ${overflow} {
         overflow: hidden !important;
     }
+.bg-gray-1000 {
+    background-color: black;
+}
+   
     `;
 
     style.setAttribute("data-hover-black-spec", "");
