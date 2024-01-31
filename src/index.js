@@ -85,6 +85,12 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
   }
 
   if (typeof payload === `object`) {
+    if (payload && payload.request.mock) {
+      delete payload.request.path;
+    }
+    if (payload.request.url.endsWith("/")) {
+      payload.request.url = payload.request.url.slice(0, -1);
+    }
     let separate = null;
     let env = null;
     if (payload.request.replace) {
@@ -106,6 +112,10 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             let serEnv = env || payload.request.url;
             payload.request.url = `${serEnv}/${window.save[separate[0]]}/${
               separate[1]
+            }`;
+          } else {
+            payload.request.url = `${payload.request.url}/${
+              window.save[payload.request.path]
             }`;
           }
         }
@@ -130,12 +140,7 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
         },
       };
       Cypress.log(log);
-    } else if (
-      payload &&
-      !payload.endpoint &&
-      payload.request.path &&
-      payload.request.path.includes("/")
-    ) {
+    } else if (payload && !payload.endpoint && payload.request.path) {
       if (payload && payload.request.path) {
         if (payload.request.path.startsWith("/")) {
           payload.request.url = `${payload.request.url}${payload.request.path}`;
@@ -145,6 +150,10 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             payload.request.url = `${payload.request.url}/${
               window.save[separate[0]]
             }/${separate[1]}`;
+          } else {
+            payload.request.url = `${payload.request.url}/${
+              window.save[payload.request.path]
+            }`;
           }
         }
       }
@@ -184,7 +193,7 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
           .intercept(mocks.intercept, (req) => {
             req.reply(mocks.response);
           })
-          .then((requestMock) => {
+          .then(() => {
             if (!window.alias) {
               window.alias = {};
             }
@@ -240,6 +249,12 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
   }
 
   return cy.fixture(payload).then((crud) => {
+    if (crud && crud.request.mock) {
+      delete crud.request.path;
+    }
+    if (crud.request.url.endsWith("/")) {
+      crud.request.url = crud.request.url.slice(0, -1);
+    }
     //replace
     if (crud.request.replace) {
       crud = replaceAllStrings(crud);
@@ -267,6 +282,10 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             crud.request.url = `${env || crud.request.url}/${
               window.save[separate[0]]
             }/${separate[1]}`;
+          } else {
+            crud.request.url = `${crud.request.url}/${
+              window.save[crud.request.path]
+            }`;
           }
         }
       } else {
@@ -300,6 +319,10 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response" }) => {
             crud.request.url = `${crud.request.url}/${
               window.save[separate[0]]
             }/${separate[1]}`;
+          } else {
+            crud.request.url = `${crud.request.url}/${
+              window.save[crud.request.path]
+            }`;
           }
         }
       }

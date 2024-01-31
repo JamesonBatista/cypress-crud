@@ -73,6 +73,12 @@ const snippetContent = `{
     "body": ["cy.crud({payload:'$1'})", "$2"],
     "description": "create cy.crud"
   },
+    "create cy.save": {
+    "scope": "javascript,typescript",
+    "prefix": ".save",
+    "body": [".save({path:'$1'})"],
+    "description": "create cy.crud"
+  },
   "generate scenario": {
     "scope": "javascript,typescript",
     "prefix": "scenario",
@@ -769,7 +775,6 @@ const contentMock1 = `
   "request": {
     "method": "GET",
     "url": "https://demo8370198.mockable.io/",
-    "path": "save",
     "body": null,
     "qs": null,
     "headers": {
@@ -792,7 +797,6 @@ const contentMock2 = `
   "request": {
     "method": "GET",
     "url": "https://demo8168190.mockable.io/",
-    "path": "save",
     "body": null,
     "qs": null,
     "headers": {
@@ -814,7 +818,6 @@ const contentMock3 = `
   "request": {
     "method": "GET",
     "url": "https://demo0065046.mockable.io/",
-    "path": "save",
     "body": null,
     "qs": null,
     "headers": {
