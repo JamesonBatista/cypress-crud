@@ -21,6 +21,7 @@ declare namespace Cypress {
       options: {
         path?: string | null;
         alias?: string | null;
+        eq?: any | null;
         log?: boolean;
       } = {}
     ): Chainable<any>;

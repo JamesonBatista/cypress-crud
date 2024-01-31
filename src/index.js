@@ -566,15 +566,25 @@ Cypress.Commands.add("expects", ({ path = null, eq = null }) => {
 });
 Cypress.Commands.add(
   "save",
-  ({ path = null, alias = "save", log = true } = {}) => {
+  ({ path = null, alias = "save", log = true, eq = null } = {}) => {
     window.save[alias] = null;
     if (!window.save) {
       window.save = {};
     }
+    let value = findInJson(window.alias.bodyResponse, path);
+    if (eq)
+      if (Array.isArray(value)) {
+        for (let i = 0; i < value.length; i++) {
+          if (value[i] === eq) {
+            value = value[i];
+            break;
+          }
+        }
+      }
+    let valueDefined = (value) => (Array.isArray(value) ? value[0] : value);
+
     if (path) {
-      let value = findInJson(window.alias.bodyResponse, path);
       if (log) {
-        let valueDefined = (value) => (Array.isArray(value) ? value[0] : value);
         const log = {
           name: "save",
           message: `${alias !== "save" ? alias : ""} ${valueDefined(value)}`,
