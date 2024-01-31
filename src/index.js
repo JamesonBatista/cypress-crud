@@ -419,17 +419,21 @@ function runValidation(validations) {
       let shouldCheckEquality = initValid.hasOwnProperty("eq");
 
       if (Array.isArray(path)) {
-        let valueFound = false;
-        path.forEach((p) => {
-          if (initValid.path && !shouldCheckEquality) {
-            expect(p, `path ${initValid.path}`).to.exist;
-          }
+        let valueFound = path.some((p) => {
           if (shouldCheckEquality && p === initValid.eq) {
-            expect(p, `path ${initValid.path}`).to.exist;
-
-            expect(p, `:::path ${initValid.path}::`).to.eql(initValid.eq);
-            valueFound = true;
+            // Verificação consolidada para existência e igualdade
+            expect(
+              p,
+              `${randonItens()}  ${initValid.path.toUpperCase()}::`
+            ).to.eql(initValid.eq);
+            return true;
+          } else if (!shouldCheckEquality) {
+            // Verificação de existência quando a igualdade não precisa ser verificada
+            expect(p, `${randonItens()}  ${initValid.path.toUpperCase()}::`).to
+              .exist;
+            return false; // Continue procurando no array
           }
+          return false;
         });
 
         if (shouldCheckEquality && !valueFound) {
@@ -451,11 +455,14 @@ function runValidation(validations) {
           ).to.be.true;
         }
       } else {
-        if (!initValid.eq) {
-          expect(path, `path ${initValid.path}`).to.exist;
-        }
         if (shouldCheckEquality) {
-          expect(path, `:::path ${initValid.path}::`).to.eql(initValid.eq);
+          expect(
+            path,
+            `${randonItens()}  ${initValid.path.toUpperCase()}::`
+          ).to.eql(initValid.eq);
+        } else {
+          expect(path, `${randonItens()}  ${initValid.path.toUpperCase()}::`).to
+            .exist;
         }
       }
     }
@@ -486,11 +493,11 @@ Cypress.Commands.add("bodyResponse", ({ path = null, eq = null }) => {
     let valueFound = false;
     paths.forEach((p) => {
       if (path && !eq) {
-        expect(p, `path ${path}`).to.exist;
+        expect(p, `${randonItens()}  ${path.toUpperCase()}::`).to.exist;
       }
       if (eq && p === eq) {
-        expect(p, `path ${path}`).to.exist;
-        expect(p, `:::path ${path}::`).to.eql(eq);
+        expect(p, `${randonItens()}  ${path.toUpperCase()}::`).to.exist;
+        expect(p, `${randonItens()}  ${path.toUpperCase()}::`).to.eql(eq);
         valueFound = true;
       }
     });
@@ -515,10 +522,10 @@ Cypress.Commands.add("bodyResponse", ({ path = null, eq = null }) => {
     }
   } else {
     if (!eq) {
-      expect(paths, `path ${path}`).to.exist;
+      expect(paths, `${randonItens()}  ${path.toUpperCase()}::`).to.exist;
     }
     if (eq) {
-      expect(paths, `:::path ${path}::`).to.eql(eq);
+      expect(paths, `${randonItens()}  ${path.toUpperCase()}::`).to.eql(eq);
     }
   }
 });
@@ -529,10 +536,10 @@ Cypress.Commands.add("expects", ({ path = null, eq = null }) => {
     let valueFound = false;
     paths.forEach((p) => {
       if (path && !eq) {
-        expect(p, `path ${path}`).to.exist;
+        expect(p, `${randonItens()}  ${path.toUpperCase()}::`).to.exist;
       }
       if (eq && p === eq) {
-        expect(p, `:::path ${path}::`).to.eql(eq);
+        expect(p, `${randonItens()}  ${path.toUpperCase()}::`).to.eql(eq);
         valueFound = true;
       }
     });
@@ -557,10 +564,10 @@ Cypress.Commands.add("expects", ({ path = null, eq = null }) => {
     }
   } else {
     if (!eq) {
-      expect(paths, `path ${path}`).to.exist;
+      expect(paths, `${randonItens()}  ${path.toUpperCase()}::`).to.exist;
     }
     if (eq) {
-      expect(paths, `:::path ${path}::`).to.eql(eq);
+      expect(paths, `${randonItens()}  ${path.toUpperCase()}::`).to.eql(eq);
     }
   }
 });
@@ -925,4 +932,12 @@ function expectValidations(obj) {
   if (validProperty) {
     runValidation(validProperty);
   }
+}
+
+function randonItens() {
+  const computerItemEmojis = ["🔎"];
+
+  const randomIndex = Math.floor(Math.random() * computerItemEmojis.length);
+
+  return computerItemEmojis[randomIndex];
 }

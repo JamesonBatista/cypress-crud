@@ -32,6 +32,11 @@ module.exports = function applyStyles() {
     let schemas = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas > div > span > div > span.command-info`;
     let mock = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-mock > div > span > div > span.command-info`;
     let valueColor = `span.command-message > span > strong {color: white;}`;
+    let put = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-PUT > div > span > div > span.command-info > span.command-method`;
+    let post = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-POST > div > span > div > span.command-info > span.command-method`;
+    let deletes = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-DELETE > div > span > div > span.command-info > span.command-method`;
+    let patch = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-PATCH > div > span > div > span.command-info > span.command-method`;
+
     style.innerHTML = `
     ${alias} span.command-method > span,
     ${aliasWrite} span.command-method > span,
@@ -65,7 +70,11 @@ module.exports = function applyStyles() {
 .reporter .command-name-assert .command-state-passed .command-method span {
     background-color: #1fa971;
     color: white;
-}    
+}   
+
+${put}, ${post}, ${deletes}, ${patch} {
+  background-color: rgb(100 112 243 / 1);
+} 
 
 `;
 
@@ -175,6 +184,7 @@ module.exports = function applyStyles() {
     let mock = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-mock`;
 
     let header = `#spec-runner-header > div > div.border`;
+    let color = `div > span > div > span.command-info {background-color: rgb(100 112 243 / 1)}`;
 
     let change = `div > span > div > span.command-info > span.command-message > span.command-message-text { color: white;}`;
     style.innerHTML = `
@@ -191,6 +201,10 @@ module.exports = function applyStyles() {
 
 
      ${save}
+
+
+     ${put} ${color}
+
     `;
 
     style.setAttribute("data-hover-black-methods-info", "");
