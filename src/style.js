@@ -62,7 +62,12 @@ module.exports = function applyStyles() {
 
 
 #unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li > div > span > div > span.command-info:hover ${valueColor}
-    `;
+.reporter .command-name-assert .command-state-passed .command-method span {
+    background-color: #1fa971;
+    color: white;
+}    
+
+`;
 
     style.setAttribute("data-hover-black-crud", "");
     app.document.head.appendChild(style);

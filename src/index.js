@@ -398,10 +398,12 @@ function runValidation(validations) {
       if (Array.isArray(path)) {
         let valueFound = false;
         path.forEach((p) => {
-          if (initValid.path) {
+          if (initValid.path && !shouldCheckEquality) {
             expect(p, `path ${initValid.path}`).to.exist;
           }
           if (shouldCheckEquality && p === initValid.eq) {
+            expect(p, `path ${initValid.path}`).to.exist;
+
             expect(p, `:::path ${initValid.path}::`).to.eql(initValid.eq);
             valueFound = true;
           }
@@ -460,10 +462,11 @@ Cypress.Commands.add("bodyResponse", ({ path = null, eq = null }) => {
   if (Array.isArray(paths)) {
     let valueFound = false;
     paths.forEach((p) => {
-      if (path) {
+      if (path && !eq) {
         expect(p, `path ${path}`).to.exist;
       }
       if (eq && p === eq) {
+        expect(p, `path ${path}`).to.exist;
         expect(p, `:::path ${path}::`).to.eql(eq);
         valueFound = true;
       }
@@ -502,7 +505,7 @@ Cypress.Commands.add("expects", ({ path = null, eq = null }) => {
   if (Array.isArray(paths)) {
     let valueFound = false;
     paths.forEach((p) => {
-      if (path) {
+      if (path && !eq) {
         expect(p, `path ${path}`).to.exist;
       }
       if (eq && p === eq) {
