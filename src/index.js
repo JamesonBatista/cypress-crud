@@ -800,7 +800,7 @@ function createHTML() {
       box-sizing: border-box;
       border-radius: 8px;
       box-shadow: 0 6px 10px rgba(0,0,0,0.25);
-      overflow: hidden; 
+      overflow: auto; 
     }
     .header {
     background-color: #59c773;

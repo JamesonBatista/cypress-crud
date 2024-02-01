@@ -75,6 +75,10 @@ module.exports = function applyStyles() {
 ${put}, ${post}, ${deletes}, ${patch} {
   background-color: rgb(100 112 243 / 1);
 } 
+${deletes} {
+  background-color: rgb(100 112 243 / 1);
+} 
+
 
 `;
 
