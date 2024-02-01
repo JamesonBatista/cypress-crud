@@ -594,7 +594,9 @@ Cypress.Commands.add(
       if (log) {
         const log = {
           name: "save",
-          message: `${alias !== "save" ? alias : ""} ${valueDefined(value)}`,
+          message: `${
+            alias !== "save" ? `[ ${alias} ] = ` : `[ ${path} ] = `
+          } ${valueDefined(value)}`,
           consoleProps: () => {
             return {
               save: path,
@@ -608,7 +610,7 @@ Cypress.Commands.add(
         if (!log) {
           const log = {
             name: "save",
-            message: `${alias !== "save" ? alias : ""} ******`,
+            message: `${alias !== "save" ? `[ ${alias} ] = ` : ""} ******`,
             consoleProps: () => {
               return {
                 alias: alias,
@@ -638,7 +640,9 @@ Cypress.Commands.add(
     } else {
       const log = {
         name: "save",
-        message: `${alias !== "save" ? alias : ""} ${window.save[alias]}`,
+        message: `${alias !== "save" ? `[ ${alias} ] = ` : `[ ${path} ] = `} ${
+          window.save[alias]
+        }`,
         consoleProps: () => {
           return {
             alias: alias,
@@ -792,7 +796,7 @@ function createHTML() {
       align-items: flex-start; 
       padding-top: 5px; /* Espaço no topo */
       height: calc(100vh - 10px); /* Altura total menos o espaço no topo */
-       overflow: hidden;
+       overflow: auto;
     }
     .card { 
       background-color: #33333357;
@@ -800,7 +804,7 @@ function createHTML() {
       box-sizing: border-box;
       border-radius: 8px;
       box-shadow: 0 6px 10px rgba(0,0,0,0.25);
-      overflow: auto; 
+      overflow: hidden; 
     }
     .header {
     background-color: #59c773;
