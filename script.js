@@ -42,6 +42,12 @@ export const faker = require("generate-datafaker");
 import "cypress-crud";
 import "cypress-plugin-api";
 import "cypress-mochawesome-reporter/register";
+
+// close json file in variable
+import _ from 'lodash';
+export function clone(json){
+  return _.cloneDeep(json)
+}
 `;
 
 const appendToFile = (filePath, content) => {
@@ -66,112 +72,151 @@ const snippetsFilePath = path.join(vscodeFolderPath, "action.code-snippets");
 const snippetsFilePathSave = path.join(vscodeFolderPath, "settings.json");
 const contentSave = `{"editor.formatOnSave":true, "cSpell.words": ["Cenario", "datafaker", "Entao"]}`;
 
-const snippetContent = `{ 
-    "create cy.crud": {
-    "scope": "javascript,typescript",
-    "prefix": "crud",
-    "body": ["cy.crud({payload:'$1'})", "$2"],
-    "description": "create cy.crud"
-  },
-    "create cy.save": {
-    "scope": "javascript,typescript",
-    "prefix": ".save",
-    "body": [".save({path:'$1'})"],
-    "description": "create cy.crud"
-  },
-  "generate scenario": {
-    "scope": "javascript,typescript",
-    "prefix": "scenario",
-    "body": ["Scenario('$1', function()  {}, {});", "$2"],
-    "description": "generate scenario"
-  },
-  "generate given": {
-    "scope": "javascript,typescript",
-    "prefix": "given",
-    "body": ["Given('$1', function()  {}, {});", "$2"],
-    "description": "generate given"
-  },
-  "generate when": {
-    "scope": "javascript,typescript",
-    "prefix": "when",
-    "body": ["when('$1', function()  {}, {});", "$2"],
-    "description": "generate when"
-  },
-  "generate And": {
-    "scope": "javascript,typescript",
-    "prefix": "and",
-    "body": ["And('$1', function()  {}, {});", "$2"],
-    "description": "generate And"
-  },
-  "generate Then": {
-    "scope": "javascript,typescript",
-    "prefix": "then",
-    "body": ["Then('$1', function()  {}, {});", "$2"],
-    "description": "generate Then"
-  },
-  "generate cenario": {
-    "scope": "javascript,typescript",
-    "prefix": "cenario",
-    "body": ["Cenario('$1', function()  {}, {});", "$2"],
-    "description": "generate Cenario"
-  },
-  "generate Dado": {
-    "scope": "javascript,typescript",
-    "prefix": "dado",
-    "body": ["Dado('$1', function()  {}, {});", "$2"],
-    "description": "generate Dado"
-  },
-  "generate Quando": {
-    "scope": "javascript,typescript",
-    "prefix": "quando",
-    "body": ["Quando('$1', function()  {}, {});", "$2"],
-    "description": "generate Quando"
-  },
-  "generate E": {
-    "scope": "javascript,typescript",
-    "prefix": "e",
-    "body": ["E('$1', function()  {}, {});", "$2"],
-    "description": "generate E"
-  },
-  "generate Entao": {
-    "scope": "javascript,typescript",
-    "prefix": "entao",
-    "body": ["Entao('$1', function()  {}, {});", "$2"],
-    "description": "generate Entao"
-  },
-   "generate test bdd": {
-    "scope": "javascript,typescript",
-    "prefix": "test_bdd",
-    "body": ["import {Given, Scenario,faker, When,And, Then} from '../support/e2e'; ",
-    "Scenario('', function () {",
-     "before(() => {cy.visit(''); });",
-     "Given('', function () {}, {});});"],
-    "description": "generate full test"
-  },
-   "generate test describes its": {
-    "scope": "javascript,typescript",
-    "prefix": "test_des_its",
-    "body": ["import {faker} from '../support/e2e'; ",
-    "describe('', function () {",
-     "it('', function () {});});"],
-    "description": "generate full test describes its"
-  },
-   "generate test": {
-    "scope": "javascript,typescript",
-    "prefix": "test_bdd_BR",
-    "body": ["import {Dado, Cenario, faker, Quando,E, Entao} from '../support/e2e'; ",
-     "Cenario('$1', function () {",
-     "before(() => {cy.visit(''); })",
-    "Dado('$2', function () {}, {});",
-    "Quando('$3', function () {}, {});",
-    "E('$4', function () {}, {});",
-    "Entao('$5', function () {}, {});",
-    "});"
-    ],
-    "description": "generate full test"
-  }
+const snippetContent = `
+{ 
+  "create cy.crud": {
+  "scope": "javascript,typescript",
+  "prefix": "crud",
+  "body": ["cy.crud({payload:'$1'})", "$2"],
+  "description": "create cy.crud"
+},
+  "create cy.save": {
+  "scope": "javascript,typescript",
+  "prefix": ".save",
+  "body": [".save({path:'$1'})"],
+  "description": "create cy.save"
+},
+"create cy.response": {
+  "scope": "javascript,typescript",
+  "prefix": ".bodyResponse",
+  "body": [".bodyResponse({path:'$1'})"],
+  "description": "create cy.response"
+},
+"create cy.bodyResponse": {
+  "scope": "javascript,typescript",
+  "prefix": ".resp",
+  "body": [".response({path:'$1'})"],
+  "description": "create cy.crud"
+},
+"create cy.res": {
+  "scope": "javascript,typescript",
+  "prefix": ".res",
+  "body": [".res({path:'$1'})"],
+  "description": "create cy.crud"
+},
+"create cy.expects": {
+  "scope": "javascript,typescript",
+  "prefix": ".expects",
+  "body": [".expects({path:'$1'})"],
+  "description": "create cy.expects"
+},
+"create cy.schema": {
+  "scope": "javascript,typescript",
+  "prefix": ".schema",
+  "body": [".schema({schema:'$1'})"],
+  "description": "create cy.expects"
+},
+"generate scenario": {
+  "scope": "javascript,typescript",
+  "prefix": "scenario",
+  "body": ["Scenario('$1', function()  {}, {});", "$2"],
+  "description": "generate scenario"
+},
+"generate given": {
+  "scope": "javascript,typescript",
+  "prefix": "given",
+  "body": ["Given('$1', function()  {}, {});", "$2"],
+  "description": "generate given"
+},
+"generate when": {
+  "scope": "javascript,typescript",
+  "prefix": "when",
+  "body": ["when('$1', function()  {}, {});", "$2"],
+  "description": "generate when"
+},
+"generate And": {
+  "scope": "javascript,typescript",
+  "prefix": "and",
+  "body": ["And('$1', function()  {}, {});", "$2"],
+  "description": "generate And"
+},
+"generate Then": {
+  "scope": "javascript,typescript",
+  "prefix": "then",
+  "body": ["Then('$1', function()  {}, {});", "$2"],
+  "description": "generate Then"
+},
+"generate cenario": {
+  "scope": "javascript,typescript",
+  "prefix": "cenario",
+  "body": ["Cenario('$1', function()  {}, {});", "$2"],
+  "description": "generate Cenario"
+},
+"generate Dado": {
+  "scope": "javascript,typescript",
+  "prefix": "dado",
+  "body": ["Dado('$1', function()  {}, {});", "$2"],
+  "description": "generate Dado"
+},
+"generate Quando": {
+  "scope": "javascript,typescript",
+  "prefix": "quando",
+  "body": ["Quando('$1', function()  {}, {});", "$2"],
+  "description": "generate Quando"
+},
+"generate E": {
+  "scope": "javascript,typescript",
+  "prefix": "e",
+  "body": ["E('$1', function()  {}, {});", "$2"],
+  "description": "generate E"
+},
+"generate Entao": {
+  "scope": "javascript,typescript",
+  "prefix": "entao",
+  "body": ["Entao('$1', function()  {}, {});", "$2"],
+  "description": "generate Entao"
+},
+ "generate test bdd": {
+  "scope": "javascript,typescript",
+  "prefix": "test_bdd",
+  "body": ["import {Given, Scenario,faker, When,And, Then} from '../support/e2e'; ",
+  "Scenario('', function () {",
+   "before(() => {cy.visit(''); });",
+   "Given('', function () {}, {});});"],
+  "description": "generate full test"
+},
+"generate test describes its": {
+  "scope": "javascript,typescript",
+  "prefix": "test_des_its",
+  "body": ["import {faker, clone, crudStorage} from '../support/e2e'; ",
+  "describe('', function () {",
+   "it('', function () {});});",
+   "function rescue_save(params) {",
+   " if (params) {",
+      "return crudStorage.save[params];",
+   " }",
+    "return crudStorage.save;",
+"  }",
+   ],
+  "description": "generate full test describes its"
+},
+ "generate test": {
+  "scope": "javascript,typescript",
+  "prefix": "test_bdd_BR",
+  "body": ["import {Dado, Cenario, faker, Quando,E, Entao} from '../support/e2e'; ",
+   "Cenario('$1', function () {",
+   "before(() => {cy.visit(''); })",
+  "Dado('$2', function () {}, {});",
+  "Quando('$3', function () {}, {});",
+  "E('$4', function () {}, {});",
+  "Entao('$5', function () {}, {});",
+  "});"
+  ],
+  "description": "generate full test"
+}
 
-}`;
+}
+`;
 
 try {
   const projectRootPathJsconfig = path.resolve(__dirname, "../../");
@@ -288,6 +333,14 @@ const snippetsFileEndpoint = path.join(
   vscodeFolderPathJSON,
   "jsonEndpoint.json"
 );
+const jsonBigData = path.join(
+  vscodeFolderPathJSON,
+  "big_data.json"
+);
+const jsonUsers = path.join(
+  vscodeFolderPathJSON,
+  "users.json"
+);
 
 const snippetsFileEndpointArray = path.join(
   vscodeFolderPathJSON,
@@ -334,6 +387,40 @@ const contentEndpoint = `
     }
   }
 }
+`;
+
+const contentBigData = `
+{
+  "request": {
+    "method": "GET",
+    "url": "http://demo7018197.mockable.io/",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  },
+  "expects": [
+    { "path": "status", "eq": 200 },
+    { "path": "team", "eq": "John Doe" },
+    { "path": "features", "eq": "Premium Interior" },
+    { "path": "number", "eq": "123-456-7890" }
+  ]
+}
+
+`;
+const contentUsers = `
+{
+  "request": {
+    "method": "GET",
+    "url": "https://fakerestapi.azurewebsites.net/api/v1/Users",
+    "body": null,
+    "qs": null,
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  },
+  "expects": [{ "path": "status", "eq": 200 }]
+}
+
 `;
 
 const contentJSonAlias = `
@@ -437,10 +524,12 @@ const contentSchemas = `
 `;
 
 const generateFileExample = path.resolve(__dirname, "../../cypress/e2e/");
-const snipExample = path.join(generateFileExample, "cy-crud.cy.js");
+const snipExample = path.join(generateFileExample, "crud.cy.js");
 
 const contentExample = `
-const { crudStorage } = require("../support/e2e");
+import { clone, crudStorage, faker } from "../support/e2e";
+import json from "../fixtures/examples/big_data";
+import users from "../fixtures/examples/users";
 
 describe("template spec", () => {
     afterEach(() => {
@@ -638,7 +727,8 @@ describe("template spec", () => {
     it("Example simple requisition with replace token, param, etc...", () => {
     cy.crud({ payload: "examples/jsonReplaceAlias" }).save({
       path: "Authorization",
-    });
+    })
+    .save({ path: "Authorization", position: 1 });
   });
 
    it("JSON 1", function () {
@@ -661,7 +751,68 @@ describe("template spec", () => {
   it("JSON 6", function () {
     cy.crud({ payload: "mockable/json6" });
   });
+  it("Big data testing", function () {
+    cy.crud({ payload: json })
+      .expects({
+        path: "team",
+        eq: "Maria Smith",
+      })
+      .save({ path: "team", eq: "Maria Smith" })
+      .save({ path: "age", eq: 30, alias: "year" })
+      .save({ path: "type", eq: "residential", alias: "address" })
+      .save({ path: "name", eq: "Maria Smith", alias: "user" })
+      .save({ path: "features", alias: "features" })
+      .save({ path: "features", alias: "features", position: 3 })
+      .save({ path: "vehicle", alias: "veh" })
+      .save({ path: "name", alias: "username" })
+      .save({ path: "name", alias: "username", position: 2 });
+  });
+
+  it("POST data testing", function () {
+    let data = clone(json);
+    data.request.method = "POST";
+    data.request.url = "https://reqres.in/api/users/2";
+    data.request.replace = "save, year, address, user, features, veh";
+    data.request.body = {
+      name: "year address user",
+      city: "address",
+      lastName: "user",
+      vacation: "features",
+      professional: "veh",
+    };
+    data.expects = [
+      { path: "status", eq: 201 },
+      { path: "model", eq: "Model S" },
+      { path: "make", eq: "Tesla" },
+    ];
+    cy.crud({ payload: data });
+    console.log(rescue_save());
+  });
+  it("Test in api save value id", () => {
+    cy.crud({ payload: users }).save({
+      path: "id",
+      eq: 5,
+      alias: "save_id_users",
+    });
+  });
+  it("Test rescue save_id_users", () => {
+    let data = clone(users);
+    data.request.url += '/'+ rescue_save("save_id_users");
+    // data.request.path = 'save_id_users'
+    data.expects = [{ path: "userName", eq: "User 5" }, { path: "status" }];
+    cy.crud({ payload: data });
+  });
+  it("Rescue data save in alias", function () {
+    console.log(rescue_save()); // save, token, access_token, etc.
+    cy.log(rescue_save());
+  });
 });
+function rescue_save(params) {
+  if (params) {
+    return crudStorage.save[params];
+  }
+  return SON.stringify(crudStorage.save);
+}
 after(() => {
   console.log(crudStorage.request);
   console.log(crudStorage.response);
@@ -698,6 +849,8 @@ fs.writeFileSync(jsonWhitParam, jsonWithParamContent);
 fs.writeFileSync(snippetsFilePathJSONSchemas, contentSchemas);
 
 fs.writeFileSync(snippetsFileEndpoint, contentEndpoint);
+fs.writeFileSync(jsonBigData, contentBigData);
+fs.writeFileSync(jsonUsers, contentUsers);
 
 fs.writeFileSync(snippetsFileEndpointArray, contentEndpointArray);
 
@@ -746,6 +899,7 @@ module.exports = defineConfig({
       // in e2e:{}
       screenshot: false, // required true, for active screenshot
       visualPayloads: false,
+      crudStyles: true // active styles crud designer
   //   environment: "QA", // change environment
   //   QA: {
   //     getUser: "https://reqres.in/api/users",

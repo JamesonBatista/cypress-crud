@@ -91,9 +91,10 @@ ${deletes} {
     let alias = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div > div > div > span > span`;
     let title = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-header-wrapper.runnable-wrapper > div > div`;
     let bar = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div`;
+    let backgroundStep = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li > div`
     style.innerHTML = `
     ${alias} {
-      border-bottom: 0.5px solid gray;
+      border-bottom: 0.5px solid #80808036;
     border-radius: 5px;
     margin: 2px;
     padding: 5px; 
@@ -127,7 +128,8 @@ ${deletes} {
      ${bar}:hover{
       border-left: 4px solid #2500ff;
      }
-
+     ${backgroundStep} { background-color: #000000}
+     ${backgroundStep}:hover {background-color: #140baa00}
     `;
 
     style.setAttribute("data-hover-black-desit", "");

@@ -232,14 +232,12 @@ console.log("storage", crudStorage.save.save);
     cy.save({ log: false }).then((rescue) => {
       expect(rescue).to.eql("Weaver");
     });
-  });
 
 
   // .save({path:"name", alias:"name"})
     cy.save({ log: false , alias:"name"}).then((rescue) => {
       expect(rescue).to.eql("Weaver");
     });
-  });
 
 
 OR
