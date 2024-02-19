@@ -223,6 +223,8 @@ ${deletes} {
     let envBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env`;
     let schemasBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas`;
     let mockBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-mock`;
+    let save = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-save`;
+
 
     let space = `#unified-runner`;
     let div = `div > span > div > span.command-info > span.command-method::before {content: '';}`;
@@ -231,6 +233,7 @@ ${deletes} {
    ${envBefore} ${div}
    ${schemasBefore} ${div}
     ${mockBefore} ${div}
+    ${save} ${div}
    ${space}{height: 100vh !important;}
     `;
 

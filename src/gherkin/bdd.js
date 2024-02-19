@@ -1,5 +1,13 @@
-const styles = require("./styles");
 const applyStyles = require("../style");
+
+export const crudStorage = window;
+if(!crudStorage.save){
+  crudStorage.save = {}
+  crudStorage.counter = {}
+crudStorage.counter.int = 0;
+
+}
+
 
 function createTestWrapper(testFunction) {
   return function (text, callback, options = {}) {
@@ -100,5 +108,32 @@ export function its(text, callback, { skip = false, only = false } = {}) {
   let options = { skip: skip, only: only };
   return createTestWrapper(it)(`ɪᴛ - ${text}`, callback, options);
 }
+export function Requests(text, callback, { skip = false, only = false } = {}) {
+  let options = { skip: skip, only: only };
+  applyStyles();
+  crudStorage.counter.int =+ crudStorage.counter.int+1
+  let int = crudStorage.counter.int;
+  return createTestWrapper(describe)(`Rᥱqᥙᥱ᥉t ${int < 9? `0${int}`: {int} } ⮕ ${text}`, callback, options);
+}
+export function POST(text, callback, { skip = false, only = false } = {}) {
+  let options = { skip: skip, only: only };
+  return createTestWrapper(it)(`𝐏𝐎𝐒𝐓 ⮕ ${text}`, callback, options);
+}
+export function GET(text, callback, { skip = false, only = false } = {}) {
+  let options = { skip: skip, only: only };
+  return createTestWrapper(it)(`𝐆𝐄𝐓 ⮕ ${text}`, callback, options);
+}
+export function PUT(text, callback, { skip = false, only = false } = {}) {
+  let options = { skip: skip, only: only };
+  return createTestWrapper(it)(`𝐏𝐔𝐓 ⮕ ${text}`, callback, options);
+}
+export function DELETE(text, callback, { skip = false, only = false } = {}) {
+  let options = { skip: skip, only: only };
+  return createTestWrapper(it)(`𝐃𝐄𝐋𝐄𝐓𝐄 ⮕ ${text}`, callback, options);
+}
 
-export const crudStorage = window;
+export function PATH(text, callback, { skip = false, only = false } = {}) {
+  let options = { skip: skip, only: only };
+  return createTestWrapper(it)(`𝐏𝐀𝐓𝐇 ⮕ ${text}`, callback, options);
+}
+

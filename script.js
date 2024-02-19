@@ -36,17 +36,25 @@ export {
   describes,
   its,
   crudStorage,
+  POST,
+  GET,
+  DELETE,
+  PUT,
+  PATH,
+  Requests,
 } from "cypress-crud/src/gherkin/bdd.js";
 import "cypress-plugin-steps";
 export const faker = require("generate-datafaker");
 import "cypress-crud";
 import "cypress-plugin-api";
 import "cypress-mochawesome-reporter/register";
+import spok from "cy-spok";
+// export default spok;
 
 // close json file in variable
-import _ from 'lodash';
-export function clone(json){
-  return _.cloneDeep(json)
+import _ from "lodash";
+export function clone(json) {
+  return _.cloneDeep(json);
 }
 `;
 
@@ -73,11 +81,36 @@ const snippetsFilePathSave = path.join(vscodeFolderPath, "settings.json");
 const contentSave = `{"editor.formatOnSave":true, "cSpell.words": ["Cenario", "datafaker", "Entao"]}`;
 
 const snippetContent = `
+
 { 
   "create cy.crud": {
   "scope": "javascript,typescript",
   "prefix": "crud",
   "body": ["cy.crud({payload:'$1'})", "$2"],
+  "description": "create cy.crud"
+},
+"create snippet for path": {
+  "scope": "javascript,typescript",
+  "prefix": ".p",
+  "body": ["{path:'$1'}", "$2"],
+  "description": "create cy.crud"
+},
+"create snippet for requests": {
+  "scope": "javascript,typescript",
+  "prefix": "requests",
+  "body": ["Requests('$1', function () {});", "$2"],
+  "description": "create cy.crud"
+},
+"create snippet for path eq": {
+  "scope": "javascript,typescript",
+  "prefix": ".pe",
+  "body": ["{path:'$1', eq: ''}", "$2"],
+  "description": "create cy.crud"
+},
+"create snippet for path expects": {
+  "scope": "javascript,typescript",
+  "prefix": "ex",
+  "body": ["expects:[{path: ''}]", "$2"],
   "description": "create cy.crud"
 },
   "create cy.save": {
@@ -190,15 +223,67 @@ const snippetContent = `
   "prefix": "test_des_its",
   "body": ["import {faker, clone, crudStorage} from '../support/e2e'; ",
   "describe('', function () {",
+  "",
    "it('', function () {});});",
+   "",
+   "",
    "function rescue_save(params) {",
    " if (params) {",
       "return crudStorage.save[params];",
    " }",
-    "return crudStorage.save;",
+    "return JSON.stringify(crudStorage.save);",
 "  }",
    ],
   "description": "generate full test describes its"
+},
+"generate test crud": {
+  "scope": "javascript,typescript",
+  "prefix": "test_crud_generate",
+  "body": [
+  "import { faker, clone, crudStorage, POST, GET, Request } from '../support/e2e';",
+  "Request('', function () {",
+  "",
+   "GET('', function () {});});",
+   "",
+   "",
+   "function rescue_save(params) {",
+   " if (params) {",
+      "return crudStorage.save[params];",
+   " }",
+    "return JSON.stringify(crudStorage.save);",
+"  }",
+   ],
+  "description": "generate full test describes its"
+},
+"generate POST": {
+  "scope": "javascript,typescript",
+  "prefix": "post",
+  "body": ["POST('$1', function () {});", "$2"],
+  "description": "generate post"
+},
+"generate GET": {
+  "scope": "javascript,typescript",
+  "prefix": "get",
+  "body": ["GET('$1', function () {});", "$2"],
+  "description": "generate get"
+},
+"generate PUT": {
+  "scope": "javascript,typescript",
+  "prefix": "put",
+  "body": ["PUT('$1', function () {});", "$2"],
+  "description": "generate PUT"
+},
+"generate DELETE": {
+  "scope": "javascript,typescript",
+  "prefix": "delete",
+  "body": ["DELETE('$1', function () {});", "$2"],
+  "description": "generate DELETE"
+},
+"generate PATH": {
+  "scope": "javascript,typescript",
+  "prefix": "path",
+  "body": ["PATH('$1', function () {});", "$2"],
+  "description": "generate PATH"
 },
  "generate test": {
   "scope": "javascript,typescript",
@@ -216,10 +301,11 @@ const snippetContent = `
 }
 
 }
+
 `;
+const projectRootPathJsconfig = path.resolve(__dirname, "../../");
 
 try {
-  const projectRootPathJsconfig = path.resolve(__dirname, "../../");
 
   const jsconfigFilePath = path.join(projectRootPathJsconfig, "jsconfig.json");
 
@@ -244,6 +330,7 @@ try {
   console.error("Erro ao criar o arquivo jsconfig.json:", error);
 }
 
+
 if (!fs.existsSync(vscodeFolderPath)) {
   fs.mkdirSync(vscodeFolderPath);
 }
@@ -255,9 +342,41 @@ fs.writeFileSync(snippetsFilePath, snippetContent);
 const projectRootPathJSON = path.resolve(__dirname, "../../cypress/fixtures/");
 const vscodeFolderPathJSON = path.join(projectRootPathJSON, "examples");
 
+
+const exampleJSON = path.join(projectRootPathJSON, "example_json.json")
+const examploJSONContent = `{
+  "request": {
+    "method": "GET",
+    "url": "http://demo7018197.mockable.io/",
+    "mock": "mocks/mockJson"
+  },
+  "save": [],
+  "expects":[]
+}
+`
+fs.writeFileSync(exampleJSON, examploJSONContent);
+
+const examploMockJson = path.join(projectRootPathJSON, "example_mock_json.json")
+const examploMockJsonContent = `{
+  "intercept": {
+    "method": "GET",
+    "url": "/users/2"
+  },
+  "response": {
+    "status": 200,
+    "body": {},
+    "headers": { "Content-Type": "application/json" }
+  }
+}`
+fs.writeFileSync(examploMockJson, examploMockJsonContent);
+
+
 //mocks folder
 const jsonExampleMock = path.join(projectRootPathJSON, "mocks");
 const mocksJson = path.join(jsonExampleMock, "jsonWithMock.json");
+
+
+
 
 const contentMock = `
 {
@@ -532,11 +651,13 @@ import json from "../fixtures/examples/big_data";
 import users from "../fixtures/examples/users";
 
 describe("template spec", () => {
-    afterEach(() => {
+  afterEach(() => {
     cy.crudScreenshot();
   });
   it("Example simple requisition", () => {
-    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" }).save({ path: "id", alias: "id_user" })
+    cy.crud({ payload: "examples/jsonNotAlias" })
+      .save({ path: "id" })
+      .save({ path: "id", alias: "id_user" });
   });
   it("Example simple requisition return array", () => {
     cy.crud({ payload: "examples/jsonGetArray" }).then((response) => {
@@ -554,15 +675,15 @@ describe("template spec", () => {
   });
 
   it("Example whit  .save", () => {
-    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" })
-   // .crudScreenshot(); // or save({path:'id', log: false}) // save id 7
+    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" });
+    // .crudScreenshot(); // or save({path:'id', log: false}) // save id 7
   });
 
   it("Example whit .save and .write, create JSON response in", () => {
     cy.crud({ payload: "examples/jsonNotAlias" })
       .save({ path: "id" }) // or save({path:'id', log: false})
-      .write({ path: "user/user" })
-      //.crudScreenshot(); // save in fixtures/user/user.json .write() // save in fixtures/response.json
+      .write({ path: "user/user" });
+    //.crudScreenshot(); // save in fixtures/user/user.json .write() // save in fixtures/response.json
   });
 
   it("Example whit  .save", () => {
@@ -584,7 +705,7 @@ describe("template spec", () => {
     "validations": [{ "path": "status", "value": 200 }, { "path": "first_name" }]
   }
    */
-    cy.crud({ payload: "examples/jsonAlias" })
+    cy.crud({ payload: "examples/jsonAlias" });
     // .crudScreenshot(); ;
   });
 
@@ -645,7 +766,14 @@ describe("template spec", () => {
   });
 
    */
-     cy.crud({ payload: "examples/jsonEndpoint" });
+    // chanve environment and new endpoint add
+    let env = Cypress.env();
+    env.environment = "DEV";
+    env.DEV = {
+      getUser: "https://reqres.in/api/users/2",
+    };
+    console.log(env);
+    cy.crud({ payload: "examples/jsonEndpoint" });
   });
 
   it("Example without path endpoint, but path id_user/continueEndpoint", () => {
@@ -660,7 +788,7 @@ describe("template spec", () => {
       request: {
         method: "POST",
         url: "https://reqres.in/api/users/2",
-        path: "save/continueWhitWndpoint",
+        path: "id/continueWhitWndpoint",
         body: null,
         qs: null,
         headers: {
@@ -678,7 +806,7 @@ describe("template spec", () => {
       request: {
         method: "POST",
         url: "https://reqres.in/api/users/2",
-        path: "save/continueWhitWndpoint",
+        path: "id/continueWhitWndpoint",
         body: null,
         qs: null,
         headers: {
@@ -718,20 +846,24 @@ describe("template spec", () => {
     cy.log("ID first requisition", crudStorage.save.id_Seven);
   });
 
-    it("Example simple requisition whit MOCK", () => {
+  it("Example simple requisition whit MOCK", () => {
     cy.crud({ payload: "examples/jsonGETMock" });
   });
-    it("Example simple requisition", () => {
-    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" , alias:"access_token"})
+  it("Example simple requisition", () => {
+    cy.crud({ payload: "examples/jsonNotAlias" }).save({
+      path: "first_name",
+      alias: "access_token",
+    });
   });
-    it("Example simple requisition with replace token, param, etc...", () => {
-    cy.crud({ payload: "examples/jsonReplaceAlias" }).save({
-      path: "Authorization",
-    })
-    .save({ path: "Authorization", position: 1 });
+  it("Example simple requisition with replace token, param, etc...", () => {
+    cy.crud({ payload: "examples/jsonReplaceAlias" })
+      .save({
+        path: "Authorization",
+      })
+      .save({ path: "Authorization", position: 1 });
   });
 
-   it("JSON 1", function () {
+  it("JSON 1", function () {
     cy.crud({ payload: "mockable/json1" });
   });
 
@@ -762,29 +894,28 @@ describe("template spec", () => {
       .save({ path: "type", eq: "residential", alias: "address" })
       .save({ path: "name", eq: "Maria Smith", alias: "user" })
       .save({ path: "features", alias: "features" })
-      .save({ path: "features", alias: "features", position: 3 })
+      // .save({ path: "features", alias: "features", position: 2 })
       .save({ path: "vehicle", alias: "veh" })
       .save({ path: "name", alias: "username" })
-      .save({ path: "name", alias: "username", position: 2 });
+      .save({ path: "name", alias: "username", position: 2 })
+      .save({ path: "addresses", alias: "addresses" });
   });
 
   it("POST data testing", function () {
     let data = clone(json);
     data.request.method = "POST";
     data.request.url = "https://reqres.in/api/users/2";
-    data.request.replace = "save, year, address, user, features, veh";
+    data.request.replace =
+      "save, year, address, user, features, veh, addresses";
     data.request.body = {
       name: "year address user",
       city: "address",
       lastName: "user",
       vacation: "features",
       professional: "veh",
+      addresses: "addresses",
     };
-    data.expects = [
-      { path: "status", eq: 201 },
-      { path: "model", eq: "Model S" },
-      { path: "make", eq: "Tesla" },
-    ];
+    data.expects = [{ path: "status", eq: 201 }];
     cy.crud({ payload: data });
     console.log(rescue_save());
   });
@@ -797,7 +928,7 @@ describe("template spec", () => {
   });
   it("Test rescue save_id_users", () => {
     let data = clone(users);
-    data.request.url += '/'+ rescue_save("save_id_users");
+    data.request.url += "/" + rescue_save("save_id_users");
     // data.request.path = 'save_id_users'
     data.expects = [{ path: "userName", eq: "User 5" }, { path: "status" }];
     cy.crud({ payload: data });
@@ -806,12 +937,73 @@ describe("template spec", () => {
     console.log(rescue_save()); // save, token, access_token, etc.
     cy.log(rescue_save());
   });
+  it("GET Rest Countries", () => {
+    let payload = {
+      // set in file .json payload.json
+      request: {
+        method: "GET",
+        url: "https://restcountries.com/v3.1/name/eesti",
+      },
+      expect: [
+        { path: "common" },
+        { path: "common", type: "array" },
+        { path: "tld" },
+        { path: "cca2" },
+        { path: "common", position: 3 },
+        { path: "cioc" },
+        { path: "independent", eq: true },
+        { path: "kor" },
+        { path: "latlng" },
+        { path: "borders" },
+        { path: "f" },
+        { path: "postalCode" },
+        { path: "status" },
+        { path: "EUR" },
+        { path: "suffixes" },
+        { path: "symbol" },
+        { path: "timezones" },
+        { path: "flag" },
+        { path: "flags" },
+        { path: "car" },
+        { path: "signs" },
+        { path: "startOfWeek" },
+        { path: "region" },
+        { path: "official" },
+        { path: "root", eq: "+3" },
+        { path: "side" },
+        { path: "side", eq: "right" },
+        { path: "side", eq: "right", type: "string" },
+      ],
+    };
+    // set path fixtures payload.json ex: cy.crud({path: '../fixtures/payload.json'})
+    cy.crud({ payload: payload });
+  });
+
+  it("GET Rest Countries EESTI and save[alias] search TRUE", () => {
+    let payload = {
+      // set in file .json payload.json
+      request: {
+        method: "GET",
+        url: "https://restcountries.com/v3.1/name/eesti",
+      },
+      expect: [
+        { search: ".ee" },
+        { search: ".ee", alias: "ee" },
+        { search: "€" },
+        { search: "€", alias: "euro" },
+        { search: 200, alias: "status" },
+        { search: "EST", alias: "est" },
+      ],
+    };
+    // set path fixtures payload.json ex: cy.crud({path: '../fixtures/payload.json'})
+    cy.crud({ payload: payload });
+  });
 });
 function rescue_save(params) {
   if (params) {
     return crudStorage.save[params];
   }
-  return SON.stringify(crudStorage.save);
+  return JSON.stringify(crudStorage.save);
 }
 after(() => {
   console.log(crudStorage.request);

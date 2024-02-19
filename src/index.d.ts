@@ -11,25 +11,25 @@ declare namespace Cypress {
      * Custom command to validate JSON response.
      * @example cy.bodyResponse({ path: "type", eq: "express" }, { path: "age", eq: 30 })
      */
-     bodyResponse(...args: { path: string; eq: any }[]): Chainable<Element>;
+     bodyResponse(...args: { path: string; eq: any, type: any, search: string, as: string }[]): Chainable<Element>;
 
     /**
      * Custom command to validate JSON response.
      * @example cy.response({ path: "type", eq: "express" }, { path: "age", eq: 30 })
      */
-     response(...args: { path: string; eq: any }[]): Chainable<Element>;
+     response(...args: { path: string; eq: any, type: any, search: string , as: string}[]): Chainable<Element>;
 
 /**
      * Custom command to validate JSON response.
      * @example cy.res({ path: "type", eq: "express" }, { path: "age", eq: 30 })
      */
-     res(...args: { path: string; eq: any }[]): Chainable<Element>;
+     res(...args: { path: string; eq: any, type: any, search: string, as: string }[]): Chainable<Element>;
 
   /**
      * Custom command to validate JSON response.
      * @example cy.expects({ path: "type", eq: "express" }, { path: "age", eq: 30 })
      */
-   expects(...args: { path: string; eq: any }[]): Chainable<Element>;
+   expects(...args: { path: string; eq: any, type: any, search: string, as: string }[]): Chainable<Element>;
 
     save(
       options: {
@@ -38,6 +38,7 @@ declare namespace Cypress {
         position?: number | null;
         eq?: any | null;
         log?: boolean;
+        as?: string;
       } = {}
     ): Chainable<any>;
 

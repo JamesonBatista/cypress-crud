@@ -52,7 +52,7 @@ fs.readFile(`${jsconfigFilePath}/app.js`, "utf8", (err, data) => {
   }
 
   const substituicoes = [
-    { procurar: "Adam Gruber", substituirPor: "Jam Batista / Gabriel Lopes" },
+    { procurar: "Adam Gruber", substituirPor: "Jam Batista | Gabriel Lopes" },
     {
       procurar: "http://adamgruber.github.io/mochawesome",
       substituirPor: "https://github.com/JamesonBatista/cypress-crud",
@@ -99,6 +99,12 @@ h4{
     letter-spacing: 1px;
 }
 }
+.footer--component---1WcTR a {
+  color: greenyellow;
+  }
+.footer--component---1WcTR p {
+    color: white;
+    }
   `;
 
   fs.appendFile(`${jsconfigFilePath}/app.css`, css, "utf8", (err) => {});
