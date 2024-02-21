@@ -240,8 +240,8 @@ const snippetContent = `
   "scope": "javascript,typescript",
   "prefix": "test_crud_generate",
   "body": [
-  "import { faker, clone, crudStorage, POST, GET, Request } from '../support/e2e';",
-  "Request('', function () {",
+  "import { faker, clone, crudStorage, POST, GET, Requests } from '../support/e2e';",
+  "Requests('', function () {",
   "",
    "GET('', function () {});});",
    "",

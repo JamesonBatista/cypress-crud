@@ -347,12 +347,27 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response", log = false 
     // if (crud && crud.request.mock) {
     //   delete crud.request.path;
     // }
+
+    const reqPath = crud.request || crud.req
+
+    if (payload.includes("get_") && !reqPath.method) {
+      reqPath.method = "GET"
+    } else if (payload.includes("post_") && !reqPath.method) {
+      reqPath.method = "POST"
+    } else if (payload.includes("delete_") && !reqPath.method) {
+      reqPath.method = "DELETE"
+    } else if (payload.includes("path_") && !reqPath.method) {
+      reqPath.method = "PATH"
+    } else if (payload.includes("put_") && !reqPath.method) {
+      reqPath.method = "PUT"
+    }
+    
     if ((crud.request && crud.request.url.endsWith("/")) || (crud.req && crud.req.url.endsWith("/"))) {
       const req = crud.request || crud.req;
 
       req.url = req.url.slice(0, -1);
     }
-    const reqPath = crud.request || crud.req
+ 
 
 
     if (reqPath.url && !reqPath.url.startsWith('http')) {

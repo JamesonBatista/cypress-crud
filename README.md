@@ -514,6 +514,30 @@ Cenario("", function () {
 
 <br>
 
+### **Use JSON**
+
+During requests, if your JSON file starts with some CRUD (get_, post_ delete_, put_, path_), get_allUsers.json, etc.
+In your JSON file, you don't need to use method.
+
+**Before:**
+```json
+{
+	"req":{
+		"method":"GET", // POST, DELETE, PUT, PATH,
+		"url":"http....."
+	}
+}
+```
+
+**After:**
+```json
+// get_AllUsers.json get_idUser.json ...
+{
+	"req":{
+		"url":"http....."
+	}
+}
+```
 ### **cy.crud**
 
 The `cy.crud` function facilitates making requests with a specific payload and assessing the response.

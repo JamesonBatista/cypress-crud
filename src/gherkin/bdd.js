@@ -23,7 +23,7 @@ function createTestWrapper(testFunction) {
     app.document.head.appendChild(fontLink);
 
     if (spanElement && !Cypress.env("subTitle")) {
-      spanElement.innerText = text;
+      // spanElement.innerText = text;
 
       spanElement.style.color = "white";
       spanElement.style.borderRadius = "5px";
