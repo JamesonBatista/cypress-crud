@@ -96,9 +96,22 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response", log = false 
 
 
     if (reqPath.url && !reqPath.url.startsWith('http')) {
-      let environment = Cypress.env(Cypress.env("environment")) && Cypress.env(Cypress.env("environment"))[reqPath.url] || Cypress.env(reqPath.url)
-      if (environment) reqPath.url = environment
+      if(reqPath.url.includes("/")){
+        let split_url = reqPath.url.split("/")
+        split_url.forEach(endpoint=>{
+          let url = Cypress.env(Cypress.env("environment")) && Cypress.env(Cypress.env("environment"))[endpoint]  || Cypress.env(endpoint)
+          if(url){
+           environment = url;
 
+          }else{
+            environment = `${environment}/${endpoint}`
+            reqPath.url = environment
+          }
+        })
+      }else{
+        environment = Cypress.env(Cypress.env("environment")) && Cypress.env(Cypress.env("environment"))[reqPath.url] || Cypress.env(reqPath.url)
+        if (environment) reqPath.url = environment
+      }
 
 
       if (Cypress.env("environment"))
@@ -347,7 +360,6 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response", log = false 
     // if (crud && crud.request.mock) {
     //   delete crud.request.path;
     // }
-
     const reqPath = crud.request || crud.req
 
     if (payload.includes("get_") && !reqPath.method) {
@@ -361,19 +373,34 @@ Cypress.Commands.add("crud", ({ payload = null, alias = "response", log = false 
     } else if (payload.includes("put_") && !reqPath.method) {
       reqPath.method = "PUT"
     }
-    
+
+
+
+
     if ((crud.request && crud.request.url.endsWith("/")) || (crud.req && crud.req.url.endsWith("/"))) {
       const req = crud.request || crud.req;
 
       req.url = req.url.slice(0, -1);
     }
- 
-
+    let environment;
 
     if (reqPath.url && !reqPath.url.startsWith('http')) {
-      let environment = Cypress.env(Cypress.env("environment")) && Cypress.env(Cypress.env("environment"))[reqPath.url] || Cypress.env(reqPath.url)
-      if (environment) reqPath.url = environment
+      if(reqPath.url.includes("/")){
+        let split_url = reqPath.url.split("/")
+        split_url.forEach(endpoint=>{
+          let url = Cypress.env(Cypress.env("environment")) && Cypress.env(Cypress.env("environment"))[endpoint]  || Cypress.env(endpoint)
+          if(url){
+           environment = url;
 
+          }else{
+            environment = `${environment}/${endpoint}`
+            reqPath.url = environment
+          }
+        })
+      }else{
+        environment = Cypress.env(Cypress.env("environment")) && Cypress.env(Cypress.env("environment"))[reqPath.url] || Cypress.env(reqPath.url)
+        if (environment) reqPath.url = environment
+      }
 
 
       if (Cypress.env("environment"))
@@ -1137,12 +1164,12 @@ function save({ path = null, alias = null, log = true, eq = null, position = nul
   }
 
   if (valueToSave !== undefined) {
-    window.save[as ||alias || path] = valueToSave;
+    window.save[as || alias || path] = valueToSave;
 
     if (log) {
       Cypress.log({
         name: 'save',
-        message: `[${as||alias || path}] = ${JSON.stringify(valueToSave)}`,
+        message: `[${as || alias || path}] = ${JSON.stringify(valueToSave)}`,
         consoleProps: () => ({
           alias: alias,
           value: valueToSave,
@@ -1152,7 +1179,7 @@ function save({ path = null, alias = null, log = true, eq = null, position = nul
     } else {
       Cypress.log({
         name: 'save',
-        message: `value hidden saved in [${as||alias || path}]`,
+        message: `value hidden saved in [${as || alias || path}]`,
         consoleProps: () => ({
           alias: alias,
           value: "No value to save",
@@ -1163,7 +1190,7 @@ function save({ path = null, alias = null, log = true, eq = null, position = nul
   } else if (log) {
     Cypress.log({
       name: 'save',
-      message: `[${eq || path || 'error'}] has not been found and will not be saved for [${as||alias || path}]`,
+      message: `[${eq || path || 'error'}] has not been found and will not be saved for [${as || alias || path}]`,
       consoleProps: () => ({
         alias: alias,
         value: "No value to save",

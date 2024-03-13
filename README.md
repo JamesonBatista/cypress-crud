@@ -538,6 +538,21 @@ In your JSON file, you don't need to use method.
 	}
 }
 ```
+ **Nested json, with the url like this ```
+the code will look for the endpoint or any name given in the 
+<br>
+`env:{
+endpoint: "http....."
+}`
+and concatenate with ``/users``**
+```json
+// get_AllUsers.json get_idUser.json ...
+{
+	"req":{
+		"url":"endpoint/users"
+	}
+}
+```
 ### **cy.crud**
 
 The `cy.crud` function facilitates making requests with a specific payload and assessing the response.
