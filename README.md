@@ -210,7 +210,7 @@ A graphical interface has been designed to enhance user experience. By default, 
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "getUser"
   }
@@ -224,7 +224,7 @@ Another way is `endpoint` in JSON, which was created to facilitate the identific
 ```json
 {
   "endpoint": "getUser",
-  "request": {
+  "request": { // our req:{}
     "method": "POST",
     "url": "https://reqres.in/api/users/2",
     "headers": {
@@ -277,7 +277,7 @@ For your project setup, you need to create a JSON file inside the `Fixtures` fol
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
     "body": null,
@@ -514,45 +514,71 @@ Cenario("", function () {
 
 <br>
 
+## **it and describe with counter**
+
+> Use counter describe it
+
+```js
+import { clone, crudStorage, faker, Requests, t, d } from "../support/e2e";
+import json from "../fixtures/examples/big_data";
+import users from "../fixtures/examples/users";
+
+describe(d("template spec"), () => {
+  afterEach(() => {
+    cy.crudScreenshot();
+  });
+
+  it(t("Example simple requisition"), () => {
+    cy.crud({ payload: "examples/jsonNotAlias" })
+      .save({ path: "id" })
+      .save({ path: "id", alias: "id_user" });
+  });
+});
+```
+
 ### **Use JSON**
 
-During requests, if your JSON file starts with some CRUD (get_, post_ delete_, put_, path_), get_allUsers.json, etc.
+During requests, if your JSON file starts with some CRUD (get*, post* delete*, put*, path\_), get_allUsers.json, etc.
 In your JSON file, you don't need to use method.
 
 **Before:**
+
 ```json
 {
-	"req":{
-		"method":"GET", // POST, DELETE, PUT, PATH,
-		"url":"http....."
-	}
+  "req": {
+    "method": "GET", // POST, DELETE, PUT, PATH,
+    "url": "http....."
+  }
 }
 ```
 
 **After:**
+
 ```json
 // get_AllUsers.json get_idUser.json ...
 {
-	"req":{
-		"url":"http....."
-	}
+  "req": {
+    "url": "http....."
+  }
 }
 ```
- **Nested json, with the url like this ```
-the code will look for the endpoint or any name given in the 
+
+**Nested json, with the url like this ``` the code will look for the endpoint or any name given in the 
 <br>
 `env:{
 endpoint: "http....."
 }`
 and concatenate with ``/users``**
+
 ```json
 // get_AllUsers.json get_idUser.json ...
 {
-	"req":{
-		"url":"endpoint/users"
-	}
+  "req": {
+    "url": "endpoint/users"
+  }
 }
 ```
+
 ### **cy.crud**
 
 The `cy.crud` function facilitates making requests with a specific payload and assessing the response.
@@ -685,7 +711,7 @@ There are two ways to perform validations: `within the test file` and `within th
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
     "body": null,
@@ -711,7 +737,7 @@ OR
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
     "body": null,
@@ -736,7 +762,7 @@ OR
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
     "body": null,
@@ -761,7 +787,7 @@ OR
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
     "body": null,
@@ -786,7 +812,7 @@ OR
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
     "body": null,
@@ -811,7 +837,7 @@ OR
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
     "headers": {
@@ -834,7 +860,7 @@ OR
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
     "headers": {
@@ -877,7 +903,7 @@ OR
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
     "body": null,
@@ -917,7 +943,7 @@ Another validation method introduced is the `search` for specific values, this w
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users",
     "headers": {
@@ -956,7 +982,7 @@ cy.crud({ payload: "token/createToken.json" }).save({ path: "access_token", alia
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users",
     "body": null,
@@ -966,8 +992,6 @@ cy.crud({ payload: "token/createToken.json" }).save({ path: "access_token", alia
     },
     "save": { "path": "access_token" },
     "save": { "path": "access_token", "as": "token" }
-
-
   }
 }
 ```
@@ -980,7 +1004,7 @@ Inside the JSON file located in the fixtures
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://reqres.in/api/users",
     "headers": {
@@ -1061,7 +1085,7 @@ To reuse the values ​​stored in other requests, simply reference the `path` 
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "POST",
     "url": "https://reqres.in/api/users",
     "replace": "bearer_token",
@@ -1077,7 +1101,7 @@ To reuse the values ​​stored in other requests, simply reference the `path` 
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "POST",
     "url": "https://reqres.in/api/users",
     "path": "bearer_token",
@@ -1092,7 +1116,7 @@ Alternatively, in situations where it is necessary to concatenate the stored val
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "POST",
     "url": "https://reqres.in/api/users",
     "path": "id/city",
@@ -1109,7 +1133,7 @@ Alternatively, in situations where it is necessary to concatenate the stored val
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "POST",
     "url": "https://reqres.in/api/users",
     "replace": "user", // Specifies the key 'user' for replacement
@@ -1143,7 +1167,7 @@ For requests that require a mock, simply specify the `mock` variable and provide
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://demo0065046.mockable.io/",
     "mock": "mocks/json_mock",
@@ -1204,7 +1228,7 @@ In this example, the `body` field directs to the mock file located in the `mocks
 
 ```json
 {
-  "request": {
+  "request": { // our req:{}
     "method": "GET",
     "url": "https://demo0065046.mockable.io/",
     "mock": "mocks/json_mock",
