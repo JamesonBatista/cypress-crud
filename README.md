@@ -1,39 +1,7 @@
 # Cypress-Crud Introduction
 
-## Index
 
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-
-## Structure of the files
-
-- [Guide to building the project](#guide-to-building-the-project)
-- [Snippets](#snippets)
-
-## Type of Functions
-
-- [crud](#cycrud)
-- [save](#save)
-- [bodyResponse](#bodyresponse)
-- [response](#response)
-- [expects](#expects)
-- [schema](#schema)
-- [res](#res)
-- [validateSchema](#validateschema)
-- [write](#write)
-- [read](#read)
-
-## Support
-
-- [Type validations](#type-validations)
-- [Type save](#type-save)
-- [Managing values with Save](#managing-values-with-save)
-- [Use Mock](#use-mock)
-
-<br>
-
-### **Prerequisites**
+### **Pre-requisitos**
 
 NodeJS must be installed and Cypress must be version 10 or higher for this package to function correctly.
 
@@ -49,6 +17,14 @@ NodeJS must be installed and Cypress must be version 10 or higher for this packa
 To install the package in your Cypress project, use the command
 
 ```brash
+npm i cypress
+
+npx cypress open
+
+and
+
+configure cypress
+
 npm i cypress-crud
 ```
 
@@ -58,29 +34,11 @@ npm i cypress-crud
 
 The CRUD was designed to automatically add dependencies and configurations to the `e2e.js` file and the `cypress.config.js` file, eliminating the need to manually include anything for the library's functionality.
 
-`e2e.js:`
+- `e2e.js:`
 
 ```javaScript
 export {
-  Scenario,
-  Given,
-  When,
-  And,
-  Then,
-  Cenario,
-  Dado,
-  Quando,
-  E,
-  Entao,
-  describes,
-  its,
   crudStorage,
-  POST,
-  GET,
-  DELETE,
-  PUT,
-  PATH,
-  Requests,
 } from "cypress-crud/src/gherkin/bdd.js";
 import "cypress-plugin-steps";
 export const faker = require("generate-datafaker");
@@ -89,7 +47,8 @@ import "cypress-plugin-api";
 import "cypress-mochawesome-reporter/register";
 import spok from "cy-spok";
 // export default spok;
-
+const applyStyles = require("../../node_modules/cypress-crud/src/style");
+if (!Cypress.env("styles") && Cypress.env("crudStyles")) applyStyles();
 // close json file in variable
 import _ from "lodash";
 export function clone(json) {
@@ -97,7 +56,7 @@ export function clone(json) {
 }
 ```
 
-`cypress.config.js:`
+- `cypress.config.js:`
 
 ```javaScript
 
@@ -108,8 +67,6 @@ module.exports = defineConfig({
 
   e2e: {
     setupNodeEvents(on, config) {
-      // reporter: "cypress-mochawesome-reporter",
-
       require("cypress-mochawesome-reporter/plugin")(on);
       on("task", {
         crudLog(message) {
@@ -135,193 +92,669 @@ module.exports = defineConfig({
     },
     testIsolation: false, //  in e2e:{}
     experimentalRunAllSpecs: true, // in e2e:{}
-    env: {
-      // in e2e:{}
-      screenshot: false, // required true, for active screenshot
-      visualPayloads: false,
-      crudStyles: true // active styles crud designer
-  //   environment: "QA", // change environment
-  //   QA: {
-  //     getUser: "https://reqres.in/api/users",
-  //   },
-  //   DEV: {
-  //     getUser: "https://reqres.in/api/users/2",
-  //   },
-  //   PROD: {
-  //     getUser: "https://reqres.in/api/users/2",
-  //   },
-    },
   },
 });
 ```
 
-- ### **_interface_**
-
-A graphical interface has been designed to enhance user experience. By default, the `cypress-plugin-api` interface is used, but there's also an option for `visualPayloads`. Switching between them only requires a minor configuration adjustment.
-
-- `cypress-plugin-api`: default
-
-![Demonstração do recurso](https://raw.githubusercontent.com/filiphric/cypress-plugin-api/HEAD/images/demo.gif)
-
-- `visualPayloads`: To enable the option, simply add `visualPayloads: true` to the `cypress.config.js` file.
-
-```javaScript
-    env: {
-      // in e2e:{}
-      screenshot: false, // required true, for active screenshot
-      visualPayloads: true,
-      crudStyles: true // active styles crud designer
-  //   environment: "QA", // change environment
-  //   QA: {
-  //     getUser: "https://reqres.in/api/users",
-  //   },
-  //   DEV: {
-  //     getUser: "https://reqres.in/api/users/2",
-  //   },
-  //   PROD: {
-  //     getUser: "https://reqres.in/api/users/2",
-  //   },
-    },
-```
-
-- ### **_Enviroment_**
-  Environment configuration within cypress.config.js allows you to set specific environment variables for different testing contexts such as QA (Quality Assurance), DEV (Development) and PROD (Production). These variables can be used to change the behavior of tests or to provide environment-specific data without having to change the test code.
-
-`Example:` If you have a getUser variable that needs to point to different URLs depending on the environment in which the tests are running, you can configure these URLs within the QA, DEV, and PROD sections of the environment configuration. Then, when creating the JSON, just pass the variable corresponding to the url.
-
-**cypress.config.js:**
-
-```javaScript
-    env: {
-    environment: "QA", // change environment
-    QA: {
-      getUser: "https://reqres.in/api/users",
-    },
-    DEV: {
-      getUser: "https://reqres.in/api/users/2",
-    },
-    PROD: {
-      getUser: "https://reqres.in/api/users/2",
-    },
-    },
-```
-
-**JSON Fixtures:**
+- `cypress.env.json:`
 
 ```json
 {
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "getUser"
-  }
-}
-```
-
-Another way is `endpoint` in JSON, which was created to facilitate the identification and access to specific points of the API, optimizing the configuration and execution of tests.
-
-`Example:` Including the `endpoint` variable in the fixtures JSON allows automatic concatenation of this with the base URL in tests, simplifying the reference to different API endpoints.
-
-```json
-{
-  "endpoint": "getUser",
-  "request": { // our req:{}
-    "method": "POST",
-    "url": "https://reqres.in/api/users/2",
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
-}
-```
-
-- ### **_Report_**
-
-To generate the report, the tests must be executed in `run` mode. Furthermore, to include screenshots of the request payload in the report, a specific configuration needs to be adjusted in the `cypress.config.js` file and in your `test` file.
-
-`cypress.config.js:` To activate the option, simply add `screenshot: true`
-
-```javascript
-    env: {
-      // in e2e:{}
-      screenshot: true, // required true, for active screenshot
-      visualPayloads: false,
-      crudStyles: true // active styles crud designer
-  //   environment: "QA", // change environment
-  //   QA: {
-  //     getUser: "https://reqres.in/api/users",
-  //   },
-  //   DEV: {
-  //     getUser: "https://reqres.in/api/users/2",
-  //   },
-  //   PROD: {
-  //     getUser: "https://reqres.in/api/users/2",
-  //   },
+  "environment": "QA",
+  "QA": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
     },
-```
-
-`File test:` Pass afterEach
-
-```javaScript
-    afterEach(() => {
-    cy.crudScreenshot();
-  });
-```
-
-<br>
-
-### **Guide to building the project**
-
-For your project setup, you need to create a JSON file inside the `Fixtures` folder. This file can be placed directly in the folder or within a subfolder for better organization according to your project's needs.
-
-`Example path:` Fixtures/Token/createToken.json
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
-}
-```
-
-Or in your test file
-
-```javascript
-let obj = {
-  request: {
-    method: "GET",
-    url: "https://reqres.in/api/users/2",
-    body: null,
-    qs: null,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
   },
+  "PROD": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  },
+  "DEV": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  },
+
+  "screenshot": true,
+  "crudStyles": true
+  // "title": "TESTING",
+  // "subTitle": "Project in Cypress"
+}
+```
+
+- `commands.js:`
+
+```js
+// CREATE COUNTER IMPORT IN FILE .CY.JS
+
+IMPORT IN FILE  // import { des, its } from "../support/commands";
+
+const counter = window;
+let compare;
+if (!counter.des) {
+  counter.des = 1;
+  counter.its = 1;
+}
+const confer = () => counter.des;
+console.log(confer());
+
+export let des = () => {
+  return String(counter.des++).padStart(2, "0") + " ➠ "  ;
+};
+export let its = () => {
+  if (!compare || confer() !== compare) {
+    counter.its = 1;
+    compare = confer();
+  }
+  return String(counter.its++).padStart(2, "0") + " - " ;
 };
 ```
 
+- `env_qa.js:`
+
+```js
+const { defineConfig } = require("cypress");
+
+const config = require("./cypress.config");
+
+const e2e = {
+  ...config.e2e,
+  env: {
+    endpoint: "https://restcountries.com/v3.1/translation/germany",
+    reqres: "https://reqres.in/api/users/2",
+    swagger: "https://api-desafio-qa.onrender.com/",
+    location: "https://rickandmortyapi.com/api/location",
+    ...config.env,
+  },
+
+  testIsolation: false, //  in e2e:{}
+  experimentalRunAllSpecs: true, // in e2e:{}
+  chromeWebSecurity: false,
+};
+
+module.exports = defineConfig({
+  ...config,
+  e2e,
+});
+
+// IN PACKAGE.JSON
+// "scripts": {
+//     "cy:run:qa": "cypress run --config-file env_qa.js"
+//   },
+```
+
+- `package.json`
+
+```json
+// create new environment DEV env_dev.js, env_prod.js
+"scripts": {
+    "cy:run:qa": "cypress run --config-file env_qa.js",
+    "cy:open:qa": "cypress open --config-file env_qa.js",
+
+  }
+```
+
+- ### **Version 2.4.4 +**
+
+_Use faker. options for generate data faker_
+
+```json
+
+    {
+      "post": "swagger/login",
+      "body": {
+        "username": "admin",
+        "password": "password",
+        "name": "faker.name", // faker.nome
+        "email": "faker.email",
+        "enterprise": "faker.enterpriseName", // faker.empresaNome
+        "state": "faker.state", // faker.estado
+        "city": "faker.city", // faker.cidade
+        "country": "faker.country", //faker.pais
+        "street": "faker.street", // faker.endereco // faker.address // faker.rua
+        "phoneNumber": "faker.phoneNumber", // faker.numeroTelefone
+        "cep": "faker.cep",
+        "cpf": "faker.cpf",
+        "cnpj": "faker.cnpj",
+        "passwords": "faker.password", //faker.senha
+        "uuid": "faker.uuid",
+        "birthdate": "faker.birthdate", // faker.aniversario
+        "avatar": "faker.avatar",
+        "professional": "faker.professional", // faker.profissao
+        "product": "faker.product", // faker.produto
+      },
+    };
+
+
+// result
+
+    {
+      "username": "admin",
+      "password": "password",
+      "test": "Jam Batista",
+      "email": "joaogabriel@hotmail.com",
+      "enterprise": "Ana Clara CloudNet",
+      "state": "Ceará",
+      "city": "Guatemala City",
+      "country": "Alemanha",
+      "street": "Alhambra, Granada, Spain",
+      "phoneNumber": "11995655467",
+      "cep": "69304525",
+      "cpf": "94344989023",
+      "cnpj": "02708629000116",
+      "passwords": "4)={[W.oHj",
+      "uuid": "0de2e006-8bfa-44cb-b05f-d3c019249a20",
+      "birthdate": "1952-06-15T02:41:02.520Z",
+      "avatar": "https://avatars.githubusercontent.com/u/36132952"
+    }
+
+```
+
+- ### **Version 2.4.1 +**
+
+```js
+it("Run all JSONs in folder", () => {
+  cy.runFixtures("examples"); // run all JSONs in folder
+});
+it("Run all JSONs", () => {
+  cy.runFixtures(); // run all JSONs in fixtures
+});
+```
+
 <br>
 
-Once your JSON file is set up, you can simply invoke the `cy.crud` function in your test file to make the request.
+### **Types of JSONs**
 
-`Observation:` If your JSON file is located in the 'fixtures' folder, simply specify the path including the name of the subfolder and the JSON file to access it.
+`en:` For your project setup, you need to create a JSON file inside the `Fixtures` folder. This file can be placed directly in the folder or within a subfolder for better organization according to your project's needs.<br>
+<br>
+`br:` Para configurar o seu projeto, você precisa criar um arquivo JSON dentro da pasta `Fixtures`. Este arquivo pode ser colocado diretamente na pasta ou dentro de uma subpasta para melhor organização de acordo com a necessidade do seu projeto.
 
-```javascript
-cy.crud({ payload: "examples/jsonExamples" });
+`Example path:` Fixtures/Token/createToken.json
+
+- 1 `JSON`:<br>
+  `br:` Aqui temos algumas formas de usar o GET, que pode ser diretamente com a url preterida, ou com o nome da key criada no env (cypress.env.json) swagger (ou qualquer outro nome), e também você pode usar a continuação da sua url.
+  <br><br>
+  `en:` Here we have some ways to use GET, which can be directly with the deprecated url, or with the name of the key created in the env (cypress.env.json) swagger (or any other name), and you can also use the continuation of your url.
+
+```json
+{
+  "get": "https://reqres.in/api/users/2",
+}
+
+{
+  "get": "swagger", // show in cypress.env.json
+}
+
+{
+  "get": "swagger/login", // result: https://api-desafio-qa.onrender.com/login
+}
+
 ```
 
-`Observation:` If your JSON file is outside the 'fixtures' folder, it is necessary to use the import statement.
+- 1.1
+  <br>
+  <br>
+  `br:` Abaixo, um JSON efetuando uma request com a path `text` que servirá para documentar a ação do JSON.
+  <br><br>
+  `en:` Below, a JSON making a request with path `text` that will serve to document the JSON action.
 
-```javascript
-import json from "../examples/jsonExamples";
-
-cy.crud({ payload: json });
+```json
+{
+  "text": "efetaundo request Mockable.io",
+  "get": "http://demo7018197.mockable.io/"
+}
 ```
+
+![GET whit text]('../../src/images/get_text.png)
+
+- 1.2 <br>
+  <br>
+  <br>
+  `br:` Efetuando request e salvando o email do retorno da requisição. Conforme imagem, imagem foi salva na variável email. (crudStorage.save.email).
+  <br>
+  Caso, seja necessário salvar essa variável com outro nome, basta usar da forma 2 ou 3.
+  Exemplo 4 antes de salvar verificamos se o valor é igual.
+  <br><br>
+  `en:`
+  Making a request and saving the request return email. As shown in the image, the image was saved in the email variable. (crudStorage.save.email).
+  <br>
+  If it is necessary to save this variable with another name, just use form 2 or 3.
+  Example 4, before saving, we check if the value is the same.
+
+```json
+// 1
+{
+  "text": "efetaundo request Reqres.in",
+  "get": "https://reqres.in/api/users/2",
+  "save": "email"
+}
+// 2
+{
+  "text": "efetaundo request Reqres.in",
+  "get": "https://reqres.in/api/users/2",
+  "save": "email ::: user_email"
+}
+// 3
+{
+  "text": "efetaundo request Reqres.in",
+  "get": "https://reqres.in/api/users/2",
+  "save": {"path":"email", "as": "user_email"}
+}
+// 4
+{
+  "text": "salvando com variável email e alias",
+  "get": "https://reqres.in/api/users/2",
+  "save": {
+    "path": "email",
+    "eq": "janet.weaver@reqres.in",
+    "as": "user_email"
+  }
+}
+```
+
+> save email 1
+> <br>
+
+![save email]('../../src/images/save_email.png)
+
+> save whit alias 2<br>
+
+![save email alias]('../../src/images/save_email_alias.png)
+
+> save whit path and as 3
+> <br>
+
+![save email alias]('../../src/images/save_email_alias.png)
+
+> save whit path eq and as 4
+> <br>
+
+![save email alias]('../../src/images/save_email_alias.png)
+
+### Used saved value
+
+`br:` Para usar, resgatar um valor salvo na requisição anterior ou requisições feitas ante, existem duas forma:
+<br>
+
+`en:` To use, redeem a value saved in the previous request or requests made before, there are two ways:
+
+```text
+  Request JSON
+```
+
+```json
+{
+  "text": "Expect validação do tipo de retorno string number boolean ...",
+  "get": "https://reqres.in/api/users/2",
+  "expect": {
+    "path": "first_name",
+    "as": "name"
+  }
+}
+```
+
+![save email alias]('../../src/images/saveUse.png)
+
+```text
+  Use data save
+```
+
+```json
+[
+  {
+    "text": "salvando para usar em outra request",
+    "get": "https://reqres.in/api/users/2",
+    "expect": {
+      "path": "first_name",
+      "as": "name"
+    }
+  },
+  {
+    "text": "usando valor salvo",
+    "post": "https://reqres.in/api/users/2",
+    "body": {
+      "name": "{name}"
+    },
+    "expect": "name"
+  }
+]
+```
+
+```text
+  Result
+```
+
+![save email alias]('../../src/images/resultUseSave.png)
+
+```text
+Rescue save valur in url
+```
+
+```json
+{
+  "text": "save id",
+  "get": "https://reqres.in/api/users/2",
+  "save": "id"
+}
+```
+
+```json
+// in new json rescue id
+
+{
+  "text": "rescue id and use in url",
+  "get": "https://reqres.in/api/users/{id}"
+}
+```
+
+```text
+Second way of use
+```
+
+```js
+import { faker, clone, crudStorage } from "../support/e2e";
+describe("", () => {
+  afterEach(() => {
+    cy.crudScreenshot();
+  });
+  it("request show json", () => {
+    console.log(crudStorage.save.name); // result Janet
+  });
+});
+```
+
+## Expect
+
+`br:` Expect irá nos ajudar nas validações das keys, veremos exemplos:
+<br>
+
+1. validação simples, apenas verificando se o campo existe
+
+`en:` Expect will help us with key validations, we will see examples:
+<br>
+
+1. simple validation, just checking if the field exists
+
+```json
+{
+  "text": "usando expect",
+  "get": "https://reqres.in/api/users/2",
+  "expect": "first_name"
+}
+```
+
+![expect]('../../src/images/expect.png)
+
+### Expect equal
+
+`br:` Usando === você usará o equal para validar
+<br>
+
+`en:` Using === you will use equal to validate
+<br>
+
+```json
+ // 1
+{
+  "text": "usando expect com === para validar",
+  "get": "https://reqres.in/api/users/2",
+  "expect": "first_name === Janet"
+}
+// 2
+{
+  "text": "usando expect com === para validar",
+  "get": "https://reqres.in/api/users/2",
+  "expect": {"path":"first_name", "eq": "Janet"}
+}
+
+```
+
+![expect]('../../src/images/expect_save===.png)
+
+### Expect save
+
+`br:` Usando ::: você usará o salvar o valor da key
+<br>
+
+`en:` Using === you will use save the key value
+<br>
+
+```json
+ // 1
+{
+  "text": "usando expect com ::: para salvar o valor da key",
+  "get": "https://reqres.in/api/users/2",
+  "expect": "first_name ::: name"
+}
+// 2
+{
+  "text": "usando expect com ::: para validar",
+  "get": "https://reqres.in/api/users/2",
+  "expect": {"path":"first_name", "as": "name"}
+}
+// 3
+{
+  "text": "usando expect com ::: para salvar o valor da key",
+  "get": "https://reqres.in/api/users/2",
+  "expect": { "path": "first_name", "eq": "Janet", "as": "name" }
+}
+
+```
+
+![expect](./src/images/expect:::.png)
+
+> expect eq and as
+> <br>
+
+![expect](./src/images/expect_eq_as.png)
+
+### Expect position
+
+`br:` Usando o position você consegue validar numa lista de array a posição informada.
+<br>
+
+`en:`Using position you can validate the entered position in an array list.
+
+```txt
+Return image
+```
+
+![array image](./src/images/array.png)
+
+```json
+{
+  "text": "Expect validação por array",
+  "get": "https://reqres.in/api/users",
+  "expect": { "path": "first_name", "position": 2 }
+}
+```
+
+```text
+Result image
+```
+
+![return image](./src/images/return.png)
+
+```md
+save position
+```
+
+```json
+{
+  "text": "Expect validação por array",
+  "get": "https://reqres.in/api/users",
+  "expect": { "path": "first_name", "position": 2, "as": "name" }
+}
+```
+
+![return image](./src/images/array_save_position.png)
+
+### Expect type
+
+`br:` Adicionando type ao seu json, você irá validar qual o tipo o dado retornado
+<br>
+
+`en:` By adding type to your json, you will validate the type of data returned.
+
+```json
+{
+  "text": "Expect validação do tipo de retorno string number boolean ...",
+  "get": "https://reqres.in/api/users/2",
+  "expect": {
+    "path": "first_name",
+    "type": "string"
+  }
+}
+```
+
+```text
+Return
+```
+
+![return image](./src/images/typereturn.png)
+
+### Expect validating various possibilities
+
+`br:` Usando `||` você consegue validar a possibilidade de vários valores, ideal para quando o retorno pode ser de valores diferentes.
+<br>
+
+`en:` Using `||` you can validate the possibility of multiple values, ideal for when the return may be different values.
+
+```json
+{
+  "text": "Equal validando possibilidade de vários valores",
+  "get": "https://reqres.in/api/users/2",
+  "expect": {
+    "path": "first_name",
+    "eq": "Jam || Batista || test || Janet"
+  }
+}
+```
+
+![return image](./src/images/expectmultiplevalues.png)
+
+## CRUD
+
+`br:` Para usar o cy.crud é simples, basta colocar os jsons na pasta `fixtures` ou subpastas da `fixtures` abaixo formas de uso:
+<br>
+
+`en:` To use cy.crud, it's simple, just place the jsons in the `fixtures` folder or subfolders of `fixtures` below:
+
+```js
+it("request show json", () => {
+  cy.crud("examples/big_data");
+});
+
+it("request show json", () => {
+  cy.crud("big_data");
+});
+```
+
+```text
+Use for object
+```
+
+```js
+let json = { get: "http..." };
+it("request show json", () => {
+  cy.crud(json);
+});
+```
+
+```js
+it("request show json", () => {
+  cy.crud({ get: "http...." });
+});
+```
+
+### CRUD use expect
+
+```js
+cy.crud({ get: "http...." }).expect({ path: "first_name" });
+```
+
+### CRUD use save
+
+```js
+cy.crud({ get: "http...." }).save({ path: "first_name" });
+```
+
+### CRUD run all jsons our run all jsons in path
+
+`br:` Com o cy.crud você consegue em apenas um `it` rodas todos os jsons que estão na pasta `fixtures` ou subpastas.
+<br>
+
+`en:` With cy.crud you can in just one `it` run all the jsons that are in the `fixtures` folder or subfolders.
+
+![return image](./src/images/runall.png)
+
+```js
+it("RUN all jsons in path fixtures", () => {
+  cy.runFixtures();
+});
+```
+
+```text
+Run all jsons in path
+```
+
+![return image](./src/images/runallpath.png)
+
+```js
+it("RUN all jsons in path fixtures", () => {
+  cy.runFixtures("crud");
+});
+```
+
+### Schema
+
+`br:` A função `schema`. Ele garante que a resposta de uma solicitação atenda aos critérios especificados em um esquema JSON específico. Essa validação ajuda a confirmar se a estrutura e os dados retornados estão alinhados com as expectativas definidas no teste.
+<br>
+
+`en:` The `schema` function. It ensures that a request's response meets criteria specified in a specific JSON schema. This validation helps confirm that the structure and data returned align with the expectations defined in the test.
+
+```json
+{
+  "text": "validando schema",
+  "get": "https://reqres.in/api/users/2",
+  "schema": "crud_users"
+}
+```
+
+```js
+cy.crud("json");
+```
+
+```javaScript
+ cy.crud({ payload: "examples/json" }).schema({schema: "crud_users",});
+```
+![return image](./src/images/schema.png)
 
 <br>
 
@@ -332,25 +765,13 @@ A snippet has been created to streamline the test construction process.
 - crud
 
 ```javascript
-cy.crud({ payload: "" });
+cy.crud();
 ```
 
 - .save
 
 ```javascript
 .save({path:''})
-```
-
-- .bodyResponse
-
-```javascript
-.bodyResponse({path:''})
-```
-
-- .resp
-
-```javascript
-.response({path:''})
 ```
 
 - .expects
@@ -365,322 +786,15 @@ cy.crud({ payload: "" });
 .schema({schema:''})
 ```
 
-- scenario
-
-```javascript
-Scenario("", function () {}, {});
-```
-
-- given
-
-```javascript
-Given("", function () {}, {});
-```
-
-- when
-
-```javascript
-when("", function () {}, {});
-```
-
-- and
-
-```javascript
-And("", function () {}, {});
-```
-
-- then
-
-```javascript
-Then("", function () {}, {});
-```
-
-- cenario
-
-```javascript
-Cenario("", function () {}, {});
-```
-
-- dado
-
-```javascript
-Dado("", function () {}, {});
-```
-
-- quando
-
-```javascript
-Quando("", function () {}, {});
-```
-
-- e
-
-```javascript
-E("", function () {}, {});
-```
-
-- entao
-
-```javascript
-Entao("", function () {}, {});
-```
-
-- post
-
-```javascript
-POST("", function () {});
-```
-
-- get
-
-```js
-GET("", function () {});
-```
-
-- delete
-
-```javascript
-DELETE("", function () {});
-```
-
-- put
-
-```javascript
-PUT("", function () {});
-```
-
-- PATH
-
-```js
-PATH("", function () {});
-```
-
-- test_bdd
-
-```javascript
-import { Given, Scenario, faker, When, And, Then } from "../support/e2e";
-Scenario("", function () {
-  before(() => {
-    cy.visit("");
-  });
-  Given("", function () {}, {});
-});
-```
-
-- test_des_its
-
-```javascript
-import { faker, clone, crudStorage } from "../support/e2e";
-describe("", function () {
-  GET("", function () {});
-});
-function rescue_save(params) {
-  if (params) {
-    return crudStorage.save[params];
-  }
-  return crudStorage.save;
-}
-```
-
-- test_crud_generate
-
-```javascript
-import { faker, clone, crudStorage, POST, GET, Requests } from "../support/e2e";
-Requests("", function () {
-  GET("", function () {});
-});
-function rescue_save(params) {
-  if (params) {
-    return crudStorage.save[params];
-  }
-  return crudStorage.save;
-}
-```
-
-- test_bdd_BR
-
-```javascript
-import { Dado, Cenario, faker, Quando, E, Entao } from "../support/e2e";
-Cenario("", function () {
-  before(() => {
-    cy.visit("");
-  });
-  Dado("", function () {}, {});
-  Quando("", function () {}, {});
-  E("", function () {}, {});
-  Entao("", function () {}, {});
-});
-```
-
 <br>
-
-## **it and describe with counter**
-
-> Use counter describe it
-
-```js
-import { clone, crudStorage, faker, Requests, t, d } from "../support/e2e";
-import json from "../fixtures/examples/big_data";
-import users from "../fixtures/examples/users";
-
-describe(d("template spec"), () => {
-  afterEach(() => {
-    cy.crudScreenshot();
-  });
-
-  it(t("Example simple requisition"), () => {
-    cy.crud({ payload: "examples/jsonNotAlias" })
-      .save({ path: "id" })
-      .save({ path: "id", alias: "id_user" });
-  });
-});
 ```
-
-### **Use JSON**
-
-During requests, if your JSON file starts with some CRUD (get*, post* delete*, put*, path\_), get_allUsers.json, etc.
-In your JSON file, you don't need to use method.
-
-**Before:**
-
-```json
-{
-  "req": {
-    "method": "GET", // POST, DELETE, PUT, PATH,
-    "url": "http....."
-  }
-}
-```
-
-**After:**
-
-```json
-// get_AllUsers.json get_idUser.json ...
-{
-  "req": {
-    "url": "http....."
-  }
-}
-```
-
-**Nested json, with the url like this ``` the code will look for the endpoint or any name given in the 
-<br>
-`env:{
-endpoint: "http....."
-}`
-and concatenate with ``/users``**
-
-```json
-// get_AllUsers.json get_idUser.json ...
-{
-  "req": {
-    "url": "endpoint/users"
-  }
-}
-```
-
-### **cy.crud**
-
-The `cy.crud` function facilitates making requests with a specific payload and assessing the response.
-
-`Example:`
-
-```javaScript
-     cy.crud({ payload: "examples/jsonEndpoint" });
-```
-
-<br>
-
-### **save**
-
-The 'save' method reserves a value inserted to be used in the future when requested.
-
-`Example:`
-
-```javaScript
-cy.crud({ payload: "token/createToken.json" }).save({ path: "name" });
-
-console.log("storage", crudStorage.save.name);
-```
-
-`explanation:` Saves the value 'name' in crudStorage
-
-Another way to use save is by passing aliases, providing an alternative name for a stored value, simplifying its reference and usage in your test code.
-
-```javaScript
-cy.crud({ payload: "token/createToken.json" }).save({ path: "name", alias: "user_name" });
-
-console.log('storage', crudStorage.save.user_name)
-```
-
-<br>
-
-### **bodyResponse**
-
-The `bodyResponse` function is used to check if the response body contains a specific value at a given path.
-
-```javaScript
-cy.crud({ payload: "token/createToken.json" }).bodyResponse({path: "name", eq:"Jam Batista"})
-```
-
-<br>
-
-### **response**
-
-The `response` function performs the same task as the `bodyResponse` function, i.e., it checks if the response body contains a specific value at a given path.
-
-```javaScript
-cy.crud({ payload: "token/createToken.json" }).response({path: "name", eq:"Jam Batista"})
-```
-
-<br>
-
-### **expects**
-
-The `expects` function performs the same task as the previous functions, i.e., it checks if the response body contains a specific value at a given path.
-
-```javaScript
-cy.crud({ payload: "token/createToken.json" }).expects({path: "name", eq:"Jam Batista"})
-```
-
-<br>
-
-### **schema**
-
-The `schema` function performs the same task as the `validateSchema` command. It ensures that the response of a request adheres to the criteria specified in a particular JSON schema. This validation helps confirm whether the returned structure and data align with the expectations defined in the test.
-
-```javaScript
- cy.crud({ payload: "examples/jsonNotAlias" }).schema({schema: "jsonSchema",});
-```
-
-<br>
-
-### **res**
-
-The `res` function serves the same purpose as the `response` command. It validates if the response body contains a specific value at a given path. This validation is crucial for ensuring that the response meets the expected criteria defined in the test.
-
-```javaScript
-  cy.crud({ payload: put }).res({ path: 'job' }, { path: 'name' })
-```
-
-<br>
-
-### **validateSchema**
-
-The `validateSchema` command is used to ensure that the response of a request meets the criteria defined in a specific JSON schema. This is useful for verifying if the returned structure and data are correct according to the test expectations.
-
-```javaScript
-  cy.crud({ payload: "examples/jsonNotAlias" }).validateSchema({schema: "jsonSchema",});
-```
-
-<br>
 
 ### **write**
 
 This function is used to write data to a JSON file in the Cypress fixtures directory. It creates a JSON file with the provided data from the specified request response. This is useful for generating simulated response files for testing purposes.
 
 ```javaScript
-cy.crud({ payload: "token/createToken.json" }).write({ path: "user/getUser" });
+cy.crud( "token/createToken.json").write({ path: "user/getUser" });
 ```
 
 `explanation:` create json response in cypress/fixtures/user
@@ -692,7 +806,7 @@ cy.crud({ payload: "token/createToken.json" }).write({ path: "user/getUser" });
 This function is used to read data from a JSON file in the Cypress fixtures directory. It reads the content of the specified JSON file and makes it available for use in the test
 
 ```javaScript
-cy.crud({ payload: "token/createToken.json" }).read({ path: "user/getUser" });
+cy.crud( "token/createToken.json" ).read({ path: "user/getUser" });
 
 cy.read({ path: "user/getUser" }).then((json) => {
   console.log(json);
@@ -700,462 +814,6 @@ cy.read({ path: "user/getUser" }).then((json) => {
 ```
 
 `explanation:` read json response in cypress/fixtures/user
-
-<br>
-
-### **Type Validations**
-
-There are two ways to perform validations: `within the test file` and `within the JSON file`. Both are designed to facilitate the construction process.
-
-- `JSON Validation fixtures:` After creating the JSON, you can use either the 'validation' or 'expects' key:
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "validation": [{ "path": "status", "eq": 200 }, { "path": "first_name" }, ...],
-
-  //Or To validate just one field
-
-  "validation":{ "path": "status", "eq": 200 },
-
-  // Or validate the field with two values
-
-  "validation":{ "path": "name", "eq": "Jam || Batista" }
-
-}
-```
-
-OR
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "expects": [{ "path": "status", "eq": 200 }, { "path": "first_name" }, ...],
-
-  //Or To validate just one field
-
-  "expects":{ "path": "status", "eq": 200 },
-
-  // Or validate the field with two values
-
-  "expects":{ "path": "name", "eq": "Jam || Batista" }
-}
-```
-
-OR
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "expect": [{ "path": "status", "eq": 200 }, { "path": "first_name" }, ...],
-
-  //Or To validate just one field
-
-  "expect":{ "path": "status", "eq": 200 },
-
-  // Or validate the field with two values
-
-  "expect":{ "path": "name", "eq": "Jam || Batista" }
-}
-```
-
-OR
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "response": [{ "path": "status", "eq": 200 }, { "path": "first_name" }, ...],
-
-  //Or To validate just one field
-
-  "response":{ "path": "status", "eq": 200 },
-
-  // Or validate the field with two values
-
-  "response":{ "path": "name", "eq": "Jam || Batista" }
-}
-```
-
-OR
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "res": [{ "path": "status", "eq": 200 }, { "path": "first_name" }, ...],
-
-  //Or To validate just one field
-
-  "res":{ "path": "status", "eq": 200 },
-
-  // Or validate the field with two values
-
-  "res":{ "path": "name", "eq": "Jam || Batista" }
-}
-```
-
-OR
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "checks": [{ "path": "status", "eq": 200 }, { "path": "first_name" }, ...],
-
-  //Or To validate just one field
-
-  "checks":{ "path": "status", "eq": 200 },
-
-  // Or validate the field with two values
-
-  "checks":{ "path": "name", "eq": "Jam || Batista" }
-}
-```
-
-OR
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "check": [{ "path": "status", "eq": 200 }, { "path": "first_name" }, ...],
-
-  //Or To validate just one field
-
-  "check":{ "path": "status", "eq": 200 },
-
-  // Or validate the field with two values
-
-  "check":{ "path": "name", "eq": "Jam || Batista" }
-}
-```
-
-- `Test Validation:` The bodyResponse, response, res, and expects functions are responsible for this:
-
-```javaScript
-cy.crud({ payload: "token/createToken.json" }).bodyResponse({path: "name", eq:"Jam Batista"})
-cy.crud({ payload: "token/createToken.json" }).response({path: "name", eq:"Jam Batista"})
-cy.crud({ payload: "token/createToken.json" }).expects({path: "name", eq:"Jam Batista"})
-cy.crud({ payload: "token/createToken.json" }).res({ path: 'job' }, { path: 'nam' })
-```
-
-- `Validation type - file Test:` You can use this option to validate the nature of the field, whether it's an Object, a Number, a String, etc.
-
-```javaScript
-cy.crud({ payload: "token/createToken.json" }).bodyResponse({path: "name", type:"string"})
-cy.crud({ payload: "token/createToken.json" }).response({path: "value", eq: 1, type: "number"})
-cy.crud({ payload: "token/createToken.json" }).expects({path: "enterprise", type: "object"})
-cy.crud({ payload: "token/createToken.json" }).res({ path: "users", type: "array" })
-```
-
-OR
-
-- `Validation type - JSON fixtures:` You can use this option to validate the nature of the field, whether it's an Object, a Number, a String, etc.
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "validation": [{ "path": "name", "type": "string" }],
-  // OR
-
-  "expects": [{ "path": "value", "eq": 1, "type": "number" }],
-
-  // OR
-
-  "expect": [{ "path": "value", "eq": 1, "type": "number" }],
-
-  // OR
-
-  "response": [{ "path": "enterprise", "type": "object" }],
-
-  // OR
-
-  "res": [{ "path": "users", "type": "array" }],
-
-  // OR
-
-  "checks": [{ "path": "name", "type": "string" }],
-
-  // OR
-
-  "check": [{ "path": "value", "eq": 1, "type": "number" }]
-}
-```
-
-Another validation method introduced is the `search` for specific values, this way saves this value automatically, but to save it with a specific value, just pass the **alias**, or **as**.
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users",
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "validation": [{ "search": "Jam" }, { "search": 200, "alias": "value" }],
-  //OR
-  "expects": [{ "search": "Jam" }, { "search": 200, "as": "status_code" }],
-  //OR
-  "expect": [{ "search": "Jam" }, { "search": 200 }],
-  //OR
-  "response": [{ "search": "Jam" }, { "search": 200 }],
-  //OR
-  "res": [{ "search": "Jam" }, { "search": 200 }],
-  //OR
-  "checks": [{ "search": "Jam" }, { "search": 200 }],
-  //OR
-  "check": [{ "search": "Jam" }, { "search": 200 }]
-}
-```
-
-<br>
-
-### **Type save**
-
-The `save` is used to Store the provided value so that it can be retrieved and used later as required.
-
-- `File Test:` The value located at the path specified by the `path` parameter, in this case, "access_token", is retrieved and assigned the name "bearer_token" via the `alias`. This procedure ensures that the "access_token" value can be accessed and used later in the code under the name "bearer_token".
-
-```javaScript
-cy.crud({ payload: "token/createToken.json" }).save({ path: "access_token", alias: "bearer_token" // OR as: "bearer_token"});
-```
-
-- `JSON fixtures:` The value located in the path defined by the `save` parameter, here being "access_token".
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "save": { "path": "access_token" },
-    "save": { "path": "access_token", "as": "token" }
-  }
-}
-```
-
-- `Search option:` By using the `search` command to locate the desired field, you can choose to save it with a specific value by employing the term 'alias'.
-
-`JSON fixtures:`
-
-Inside the JSON file located in the fixtures
-
-```json
-{
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://reqres.in/api/users",
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "validation": [{ "search": "access_token", "alias": "bearer_token" // OR as: "bearer_token" }],
-  //OR
-  "expects": [{ "search": "access_token", "alias": "bearer_token" }],
-  //OR
-  "expect": [{ "search": "access_token", "alias": "bearer_token" }],
-  //OR
-  "response": [{ "search": "access_token", "alias": "bearer_token" }],
-  //OR
-  "res": [{ "search": "access_token", "alias": "bearer_token" }],
-  //OR
-  "checks": [{ "search": "access_token", "alias": "bearer_token" }],
-  //OR
-  "check": [{ "search": "access_token", "alias": "bearer_token" }]
-}
-```
-
-`File Test`
-
-creating variable
-
-```javaScript
-let payload = {
-  request: {
-    method: "GET",
-    url: "https://reqres.in/api/users",
-    headers: {
-      "Content-Type": "application/json"
-    }
-  },
-
-  validation: [{search: "access_token", alias: "bearer_token"}],
-  //OR
-  expects: [{search: "access_token", alias: "bearer_token"}],
-  //OR
-  expect: [{search: "access_token", alias: "bearer_token"}],
-  //OR
-  response: [{search: "access_token", alias: "bearer_token"}],
-  //OR
-  res: [{search: "access_token", alias: "bearer_token"}],
-  //OR
-  checks: [{search: "access_token", alias: "bearer_token"}],
-  //OR
-  check: [{search: "access_token", alias: "bearer_token"}]
-}
-```
-
-validation method
-
-```javaScript
-cy.crud({payload: "examples/jsonExamples"}).bodyResponse({search: "access_token", alias: "bearer_token"})
-
-// OR
-
-cy.crud({payload: "examples/jsonExamples"}).response({search: "access_token", alias: "bearer_token"})
-
-// OR
-
-cy.crud({payload: "examples/jsonExamples"}).expects({search: "access_token", alias: "bearer_token"})
-
-//OR
-
-cy.crud({payload: "examples/jsonExamples"}).res({search: "access_token", alias: "bearer_token"})
-```
-
-<br>
-
-### **Managing values with Save**
-
-To reuse the values ​​stored in other requests, simply reference the `path` in the JSON file within the fixtures, using the value associated with the `alias`. If an `alias` was not specified, the values ​​can be accessed directly using whatever is passed in `path` or `search`.
-
-`Example 1°:` In the previous example, we used the `search` and `path` parameters to locate the **access_token** value, which was then stored under the name **bearer_token** using the **alias** parameter. In the following example, we will demonstrate how this stored value is utilized in the `Authorization`. Furthermore, we use replace to adapt and apply the value to other variables, enabling flexible manipulation of this data in different contexts of the request.
-
-```json
-{
-  "request": { // our req:{}
-    "method": "POST",
-    "url": "https://reqres.in/api/users",
-    "replace": "bearer_token",
-    "headers": {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer bearer_token"
-    }
-  }
-}
-```
-
-`Example 2°:` For scenarios such as appending a value to the URL being passed, simply include the `path` variable and the value assigned to **alias** or use the value specified in `search` and `path`.
-
-```json
-{
-  "request": { // our req:{}
-    "method": "POST",
-    "url": "https://reqres.in/api/users",
-    "path": "bearer_token",
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
-}
-```
-
-Alternatively, in situations where it is necessary to concatenate the stored value with another value to be passed simultaneously, you can simply use `/` for concatenation. In the following example, the value is stored in the `id` key, but the request also requires the `city` to complete. To achieve this, the `city` is concatenated with the id value stored in the path, as shown below:
-
-```json
-{
-  "request": { // our req:{}
-    "method": "POST",
-    "url": "https://reqres.in/api/users",
-    "path": "id/city",
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
-}
-
-//exit example -> https://reqres.in/api/users/123456789/city
-```
-
-`Example 3°:` For situations requiring validation of the value stored in the `alias` or specified in the `search` and `path`, In the example below, a value has been stored under the key **user**, eliminating the need to pass the value itself—only the key is required.
-
-```json
-{
-  "request": { // our req:{}
-    "method": "POST",
-    "url": "https://reqres.in/api/users",
-    "replace": "user", // Specifies the key 'user' for replacement
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "validation": [{ "path": "name_user", "eq": "user" }],
-  //OR
-  "expects": [{ "path": "name_user", "eq": "user" }],
-  //OR
-  "expect": [{ "path": "name_user", "eq": "user" }],
-  //OR
-  "response": [{ "path": "name_user", "eq": "user" }],
-  //OR
-  "res": [{ "path": "name_user", "eq": "user" }],
-  //OR
-  "checks": [{ "path": "name_user", "eq": "user" }],
-  //OR
-  "check": [{ "path": "name_user", "eq": "user" }]
-}
-```
 
 <br>
 
@@ -1167,55 +825,21 @@ For requests that require a mock, simply specify the `mock` variable and provide
 
 ```json
 {
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://demo0065046.mockable.io/",
-    "mock": "mocks/json_mock",
-    "headers": {
-      "Content-Type": "application/json"
-    }
+  "get": "https://demo0065046.mockable.io/", // or get: true // post: true // delete": true // path: true
+  "mock": "mocks/json_mock",
+  "headers": {
+    "Content-Type": "application/json"
   }
 }
 ```
 
 `Mock construction:`
 
-- **Incorporating the complete field structure in the body:**
-
 ```json
 {
-  "intercept": {
-    "method": "GET",
-    "url": "/users/2"
-  },
   "response": {
     "status": 200,
-    "body": {
-      "users": [
-        {
-          "name": "Alice",
-          "enterprise": "AcmeCorp",
-          "access_code": "AC1234"
-        }
-      ]
-    },
-    "headers": { "Content-Type": "application/json" }
-  }
-}
-```
-
-- **Specify the path in the body of the request to reference the structure of the fields:**
-
-```json
-{
-  "intercept": {
-    "method": "GET",
-    "url": "/users/2"
-  },
-  "response": {
-    "status": 200,
-    "body": "mocks/json_structure_mock",
-    "headers": { "Content-Type": "application/json" }
+    "body": { "authorization": "Bearer" }
   }
 }
 ```
@@ -1228,44 +852,164 @@ In this example, the `body` field directs to the mock file located in the `mocks
 
 ```json
 {
-  "request": { // our req:{}
-    "method": "GET",
-    "url": "https://demo0065046.mockable.io/",
-    "mock": "mocks/json_mock",
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-
-  "validation": [{ "path": "name", "eq": "Alice" }],
-  //OR
-  "expects": [{ "path": "name", "eq": "Alice" }],
-  //OR
-  "expect": [{ "path": "name", "eq": "Alice" }],
-  //OR
-  "response": [{ "path": "name", "eq": "Alice" }],
-  //OR
-  "res": [{ "path": "name", "eq": "Alice" }],
-  //OR
-  "checks": [{ "path": "name", "eq": "Alice" }],
-  //OR
-  "check": [{ "path": "name", "eq": "Alice" }]
+  "get": "https://demo0065046.mockable.io/", // or get: true // post: true // delete": true // path: true
+  "mock": "mocks/json_mock",
+  "headers": {
+    "Content-Type": "application/json"
+  }
 }
 ```
 
-- `file test:`
+<br>
 
-```javaScript
-cy.crud({ payload: "jsonMock.json" }).bodyResponse({path: "name", eq:"Alice"})
-  //OR
-cy.crud({ payload: "jsonMock.json" }).response({path: "name", eq:"Alice"})
-  //OR
-cy.crud({ payload: "jsonMock.json" }).expects({path: "name", eq:"Alice"})
-  //OR
-cy.crud({ payload: "jsonMock.json" }).res({ path: 'name', eq:"Alice" })
+- ### **_Tips_**
+
+```js
+cy.crud({ get: "swagger/eventos", expect: "id::id" }); // save id expect:{path: "id", as: "id"}
+cy.crud({ get: "swagger/eventos", expect: "name===Jam" }); // equal result expect:{path: "name", eq: "Jam"}
 ```
 
 <br>
+
+<br>
+
+### **crudSafeData**
+
+```js
+describe(`Test cypress-crud Property search`, () => {
+  let data;
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIxMjM0NTY3ODkwIiwicGFzc3dvcmQiOiJKb2huIERvZSJ9.d7gibg6eK9oxrpcCob-MuNz65NHMWNK1x4otVLyHPCo";
+
+  before(function () {
+    cy.crudSafeData(token).then((safe) => {
+      crudStorage.save.email_login = safe.key;
+      crudStorage.save.password_login = safe.password;
+    });
+  });
+
+  it("Decode", () => {
+    console.log(crudStorage.save);
+  });
+});
+
+  OUR
+
+  IN CYPRESS.ENV.JSON
+
+  "dataSafe": "token jwt",
+  "hideCredentials": true,
+  "hideCredentialsOptions": { "body": ["email", "password"] } // change for your paths
+
+  COMPLETE ENV
+    env: {
+        hideCredentials: true,
+        hideCredentialsOptions: {
+          headers: ['authorization'],
+          auth: ['pass'],
+          body: ['username'],
+          query: ['password']
+        }
+      }
+
+   OUR
+
+  CYPRESS.CONFIG.JS
+
+  env:{
+  "dataSafe": "your token jwt",
+  "hideCredentials": true,
+  "hideCredentialsOptions": { "body": ["email", "password"] } // change for your paths
+  }
+
+  COMPLETE ENV
+    env: {
+        hideCredentials: true,
+        hideCredentialsOptions: {
+          headers: ['authorization'],
+          auth: ['pass'],
+          body: ['username'],
+          query: ['password']
+        }
+      }
+```
+
+<br>
+
+### **hideReport**
+
+```json
+// in cypress.env.json
+
+ "hideReport": ["body", "headers"]
+
+ // result
+
+ {
+  "method": "POST",// or get: true // post: true // delete": true // path: true
+  "url": "https://reqres.in/api/users/2",
+  "failOnStatusCode": false,
+  "body": "hide active in path",
+  "headers": "hide active in path"
+}
+
+```
+
+<br>
+
+- ### **_Report_**
+
+To generate the report, the tests must be executed in `run` mode. Furthermore, to include screenshots of the request payload in the report, a specific configuration needs to be adjusted in the `cypress.config.js` file and in your `test` file.
+
+`cypress.config.js:` To activate the option, simply add `screenshot: true`
+
+```json
+{
+  "environment": "QA",
+  "QA": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  },
+  "PROD": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  },
+  "DEV": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  },
+
+  "screenshot": true,
+  "crudStyles": true
+}
+```
 
 ## **Authors and Contributors**
 
@@ -1273,5 +1017,5 @@ This project is the collaborative effort of Jameson Batista and Gabriel Lopes. W
 
 For tips, inquiries, or just to connect, follow us on LinkedIn:
 
-- LinkeIn [Jam Batista](https://www.linkedin.com/in/jam-batista-98101015b/)
-- LinkeIn [Gabriel Lopes](https://www.linkedin.com/in/gabriel-lopes-500b71269/)
+- LinkedIn [Jam Batista](https://www.linkedin.com/in/jam-batista-98101015b/)
+- LinkedIn [Gabriel Lopes](https://www.linkedin.com/in/gabriel-lopes-500b71269/)

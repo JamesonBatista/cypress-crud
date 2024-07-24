@@ -18,39 +18,23 @@ function findProjectRoot(dir) {
 }
 
 const projectRoot = findProjectRoot(__dirname);
+const projectRootPathJsconfig = path.resolve(__dirname, "../../");
 
 const supportFilePath = path.join(projectRoot, "cypress/support/e2e.js");
 
 const contentToAdd = `
 export {
-  Scenario,
-  Given,
-  When,
-  And,
-  Then,
-  Cenario,
-  Dado,
-  Quando,
-  E,
-  Entao,
-  describes,
-  its,
   crudStorage,
-  POST,
-  GET,
-  DELETE,
-  PUT,
-  PATH,
-  Requests,
-} from "cypress-crud/src/gherkin/bdd.js";
+} from "cypress-crud/src/functions/storage.js";
 import "cypress-plugin-steps";
 export const faker = require("generate-datafaker");
 import "cypress-crud";
 import "cypress-plugin-api";
 import "cypress-mochawesome-reporter/register";
 import spok from "cy-spok";
-export { t, d } from "cypress-crud/src/support.js";
 // export default spok;
+const applyStyles = require("../../node_modules/cypress-crud/src/style");
+if (!Cypress.env("styles") && Cypress.env("crudStyles")) applyStyles();
 
 // close json file in variable
 import _ from "lodash";
@@ -73,25 +57,178 @@ const appendToFile = (filePath, content) => {
 
 appendToFile(supportFilePath, contentToAdd);
 //
+// ADD command.js
+const supportFilePathCommand = path.join(
+  projectRoot,
+  "cypress/support/commands.js"
+);
+const contentToAddCommand = `
+// CREATE COUNTER
+
+const counter = window;
+let compare;
+if (!counter.des) {
+  counter.des = 1;
+  counter.its = 1;
+}
+const confer = () => counter.des;
+
+export let des = () => {
+  return String(counter.des++).padStart(2, "0") + " ➠ "  ;
+};
+export let its = () => {
+  if (!compare || confer() !== compare) {
+    counter.its = 1;
+    compare = confer();
+  }
+  return String(counter.its++).padStart(2, "0") + " - " ;
+};
+
+export const BDD_ = {
+  given: "𝐆𝐢𝐯𝐞𝐧 - ",
+  when: "𝐖𝐡𝐞𝐧 - ",
+  and: "𝐀𝐧𝐝 - ",
+  then: "𝐓𝐡𝐞𝐧 - ",
+  scenario: "𝐒𝐜𝐞𝐧𝐚𝐫𝐢𝐨 ➠ ",
+};
+`;
+// config.env.js
+const supportConfigEnv = path.join(projectRootPathJsconfig, "cypress.env.json");
+const supportConfigEnv_content = `
+{
+  "environment": "QA",
+  "QA": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  },
+  "PROD": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  },
+  "DEV": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+
+  },
+
+  "screenshot": true,
+  "crudStyles": true
+}
+`;
+
+//
+const appendToFileCommand = (filePath, content) => {
+  if (fs.existsSync(filePath)) {
+    const existingContent = fs.readFileSync(filePath, "utf8");
+
+    if (!existingContent.includes(content.trim())) {
+      fs.appendFileSync(filePath, content, "utf8");
+    }
+  } else {
+    console.error(`path not found: ${filePath}`);
+  }
+};
+
+appendToFileCommand(supportFilePathCommand, contentToAddCommand);
 
 const projectRootPath = path.resolve(__dirname, "../../");
 const vscodeFolderPath = path.join(projectRootPath, ".vscode");
 
-const snippetsFilePath = path.join(vscodeFolderPath, "action.code-snippets");
+const snippetsFilePath = path.join(vscodeFolderPath, "global.code-snippets");
 const snippetsFilePathSave = path.join(vscodeFolderPath, "settings.json");
 const contentSave = `{"editor.formatOnSave":true, "cSpell.words": ["Cenario", "datafaker", "Entao"]}`;
 
 const snippetContent = `
-
 {
   "create cy.crud": {
     "scope": "javascript,typescript",
     "prefix": "crud",
     "body": [
-      "cy.crud({payload:'$1'})",
+      "cy.crud('$1')",
       "$2"
     ],
     "description": "create cy.crud"
+  },
+  "create path": {
+    "scope": "javascript,typescript",
+    "prefix": "pathExpect",
+    "body": [
+      "{path: ''}",
+      "$2"
+    ],
+    "description": "create cy.crud"
+  },
+  "create as": {
+    "scope": "javascript,typescript",
+    "prefix": "asExpect",
+    "body": [
+      "as: ''",
+      "$2"
+    ],
+    "description": "create cy.as"
+  },
+  "create eq": {
+    "scope": "javascript,typescript",
+    "prefix": "eqExpect",
+    "body": [
+      "eq: ''",
+      "$2"
+    ],
+    "description": "create cy.as"
+  },
+  "create search": {
+    "scope": "javascript,typescript",
+    "prefix": "searchExpect",
+    "body": [
+      "search: ''",
+      "$2"
+    ],
+    "description": "create cy.as"
+  },
+  "create alias": {
+    "scope": "javascript,typescript",
+    "prefix": "asExpect",
+    "body": [
+      "alias: ''",
+      "$2"
+    ],
+    "description": "create cy.as"
+  },
+  "create schema": {
+    "scope": "javascript,typescript",
+    "prefix": "schemaExpect",
+    "body": [
+      "schema: ''",
+      "$2"
+    ],
+    "description": "create cy.as"
   },
   "create snippet for path": {
     "scope": "javascript,typescript",
@@ -102,7 +239,7 @@ const snippetContent = `
     ],
     "description": "create cy.crud"
   },
-  "create snippet for requests": {
+  "create snippet for reqs": {
     "scope": "javascript,typescript",
     "prefix": "requests",
     "body": [
@@ -177,113 +314,15 @@ const snippetContent = `
     ],
     "description": "create cy.expects"
   },
-  "generate scenario": {
-    "scope": "javascript,typescript",
-    "prefix": "scenario",
-    "body": [
-      "Scenario('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate scenario"
-  },
-  "generate given": {
-    "scope": "javascript,typescript",
-    "prefix": "given",
-    "body": [
-      "Given('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate given"
-  },
-  "generate when": {
-    "scope": "javascript,typescript",
-    "prefix": "when",
-    "body": [
-      "when('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate when"
-  },
-  "generate And": {
-    "scope": "javascript,typescript",
-    "prefix": "and",
-    "body": [
-      "And('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate And"
-  },
-  "generate Then": {
-    "scope": "javascript,typescript",
-    "prefix": "then",
-    "body": [
-      "Then('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate Then"
-  },
-  "generate cenario": {
-    "scope": "javascript,typescript",
-    "prefix": "cenario",
-    "body": [
-      "Cenario('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate Cenario"
-  },
-  "generate Dado": {
-    "scope": "javascript,typescript",
-    "prefix": "dado",
-    "body": [
-      "Dado('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate Dado"
-  },
-  "generate Quando": {
-    "scope": "javascript,typescript",
-    "prefix": "quando",
-    "body": [
-      "Quando('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate Quando"
-  },
-  "generate E": {
-    "scope": "javascript,typescript",
-    "prefix": "e",
-    "body": [
-      "E('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate E"
-  },
-  "generate Entao": {
-    "scope": "javascript,typescript",
-    "prefix": "entao",
-    "body": [
-      "Entao('$1', function()  {}, {});",
-      "$2"
-    ],
-    "description": "generate Entao"
-  },
-  "generate test bdd": {
-    "scope": "javascript,typescript",
-    "prefix": "test_bdd",
-    "body": [
-      "import {Given, Scenario,faker, When,And, Then} from '../support/e2e'; ",
-      "Scenario('', function () {",
-      "before(() => {cy.visit(''); });",
-      "Given('', function () {}, {});});"
-    ],
-    "description": "generate full test"
-  },
   "generate test describes its": {
     "scope": "javascript,typescript",
     "prefix": "test_des_its",
     "body": [
-      "import {faker, clone, crudStorage, t, d} from '../support/e2e'; ",
+      "import {faker, clone, crudStorage} from '../support/e2e'; ",
       "describe('', function () {",
+      " afterEach(() => {",
+      "cy.crudScreenshot();",
+      "  });",
       "",
       "it('', function () {});});",
       "",
@@ -297,113 +336,16 @@ const snippetContent = `
     ],
     "description": "generate full test describes its"
   },
-  "generate test crud": {
-    "scope": "javascript,typescript",
-    "prefix": "test_crud_generate",
-    "body": [
-      "import { faker, clone, crudStorage, POST, GET, Requests } from '../support/e2e';",
-      "Requests('', function () {",
-      "",
-      "GET('', function () {});});",
-      "",
-      "",
-      "function rescue_save(params) {",
-      " if (params) {",
-      "return crudStorage.save[params];",
-      " }",
-      "return JSON.stringify(crudStorage.save);",
-      "  }",
-    ],
-    "description": "generate full test describes its"
-  },
-  "generate POST": {
-    "scope": "javascript,typescript",
-    "prefix": "post",
-    "body": [
-      "POST('$1', function () {});",
-      "$2"
-    ],
-    "description": "generate post"
-  },
-  "generate GET": {
-    "scope": "javascript,typescript",
-    "prefix": "get",
-    "body": [
-      "GET('$1', function () {});",
-      "$2"
-    ],
-    "description": "generate get"
-  },
-  "generate PUT": {
-    "scope": "javascript,typescript",
-    "prefix": "put",
-    "body": [
-      "PUT('$1', function () {});",
-      "$2"
-    ],
-    "description": "generate PUT"
-  },
-  "generate DELETE": {
-    "scope": "javascript,typescript",
-    "prefix": "delete",
-    "body": [
-      "DELETE('$1', function () {});",
-      "$2"
-    ],
-    "description": "generate DELETE"
-  },
-  "generate PATH": {
-    "scope": "javascript,typescript",
-    "prefix": "path",
-    "body": [
-      "PATH('$1', function () {});",
-      "$2"
-    ],
-    "description": "generate PATH"
-  },
-  "generate test": {
-    "scope": "javascript,typescript",
-    "prefix": "test_bdd_BR",
-    "body": [
-      "import {Dado, Cenario, faker, Quando,E, Entao} from '../support/e2e'; ",
-      "Cenario('$1', function () {",
-      "before(() => {cy.visit(''); })",
-      "Dado('$2', function () {}, {});",
-      "Quando('$3', function () {}, {});",
-      "E('$4', function () {}, {});",
-      "Entao('$5', function () {}, {});",
-      "});"
-    ],
-    "description": "generate full test"
-  },
-  "generate it whit text conuter": {
-    "scope": "javascript,typescript",
-    "prefix": "it_text",
-    "body": [
-      "it(t('$1'), () => {    });",
-      "$2"
-    ],
-    "description": "generate it_text"
-  },
-  "generate describe whit text conuter": {
-    "scope": "javascript,typescript",
-    "prefix": "des_text",
-    "body": [
-      "describe(d('$1'), () => {  it(t('$1'), () => {    });  });",
-      "$2"
-    ],
-    "description": "generate des_text"
-  },
   "generate test describes its text": {
     "scope": "javascript,typescript",
     "prefix": "complete_test",
     "body": [
-      "import {faker, clone, crudStorage, t, d} from '../support/e2e'; ",
-      "describe(d('$1'), () => { ",
-     " afterEach(() => {",
-        "cy.crudScreenshot();",
-    "  });",
-       "it(t('$1'), () => {    });  });",
+      "import {faker, clone, crudStorage} from '../support/e2e'; ",
+      "describe('$1', () => { ",
+      " afterEach(() => {",
+      "cy.crudScreenshot();",
+      "  });",
+      "it('$1', () => {    });  });",
       "",
       "",
       "function rescue_save(params) {",
@@ -416,14 +358,9 @@ const snippetContent = `
     "description": "generate full test describes its text"
   }
 }
-
-
-
 `;
-const projectRootPathJsconfig = path.resolve(__dirname, "../../");
 
 try {
-
   const jsconfigFilePath = path.join(projectRootPathJsconfig, "jsconfig.json");
 
   const contentTsConfig = `{
@@ -443,10 +380,44 @@ try {
 `;
 
   fs.writeFileSync(jsconfigFilePath, contentTsConfig);
+  fs.writeFileSync(supportConfigEnv, supportConfigEnv_content);
 } catch (error) {
   console.error("Erro ao criar o arquivo jsconfig.json:", error);
 }
+const env_qa = path.join(projectRootPathJsconfig, "env_qa.js");
 
+const contentEnv = `
+const { defineConfig } = require("cypress");
+
+const config = require("./cypress.config");
+
+const e2e = {
+  ...config.e2e,
+  env: {
+    endpoint: "https://restcountries.com/v3.1/translation/germany",
+    reqres: "https://reqres.in/api/users/2",
+    swagger: "https://fakerestapi.azurewebsites.net/api/v1/",
+    location: "https://rickandmortyapi.com/api/location",
+    ...config.env,
+  },
+
+  testIsolation: false, //  in e2e:{}
+  experimentalRunAllSpecs: true, // in e2e:{}
+  chromeWebSecurity: false,
+};
+
+module.exports = defineConfig({
+  ...config,
+  e2e,
+});
+
+// IN PACKAGE.JSON
+// "scripts": {
+//     "cy:run:qa": "cypress run --config-file env_qa.js"
+//   },
+`;
+
+fs.writeFileSync(env_qa, contentEnv);
 
 if (!fs.existsSync(vscodeFolderPath)) {
   fs.mkdirSync(vscodeFolderPath);
@@ -459,48 +430,38 @@ fs.writeFileSync(snippetsFilePath, snippetContent);
 const projectRootPathJSON = path.resolve(__dirname, "../../cypress/fixtures/");
 const vscodeFolderPathJSON = path.join(projectRootPathJSON, "examples");
 
-
-const exampleJSON = path.join(projectRootPathJSON, "example_json.json")
+const exampleJSON = path.join(projectRootPathJSON, "example_json.json");
 const examploJSONContent = `{
-  "request": {
     "method": "GET",
     "url": "http://demo7018197.mockable.io/",
-    "mock": "mocks/mockJson"
-  },
+    "mock": "mocks/mockJson",
   "save": [],
   "expects":[]
 }
-`
-fs.writeFileSync(exampleJSON, examploJSONContent);
+`;
+// fs.writeFileSync(exampleJSON, examploJSONContent);
 
-const examploMockJson = path.join(projectRootPathJSON, "example_mock_json.json")
-const examploMockJsonContent = `{
-  "intercept": {
-    "method": "GET",
-    "url": "/users/2"
-  },
+const examploMockJson = path.join(
+  projectRootPathJSON,
+  "example_mock_json.json"
+);
+const examploMockJsonContent = `
+{
   "response": {
-    "status": 200,
-    "body": {},
+    "status": 201,
+    "body": { "id": 7, "name": "mock response" },
     "headers": { "Content-Type": "application/json" }
   }
-}`
+}
+`;
 fs.writeFileSync(examploMockJson, examploMockJsonContent);
-
 
 //mocks folder
 const jsonExampleMock = path.join(projectRootPathJSON, "mocks");
 const mocksJson = path.join(jsonExampleMock, "jsonWithMock.json");
 
-
-
-
 const contentMock = `
 {
-  "intercept": {
-    "method": "POST",
-    "url": "/users/2"
-  },
   "response": {
     "status": 201,
     "body": { "id": 7, "name": "mock response" },
@@ -514,37 +475,15 @@ const payloadWithReplace = path.join(
 );
 const contentReplaceAlias = `
 {
-  "request": {
     "method": "POST",
     "url": "https://reqres.in/api/users/2",
-    "replace": "access_token",
     "body": null,
     "qs": null,
     "headers": {
       "Content-Type": "application/json",
-      "Authorization": "Bearer access_token"
+      "Authorization": "Bearer {access_token}"
     }
-  }
 }
-`;
-const mockRequestJson = path.join(vscodeFolderPathJSON, "jsonGETMock.json");
-
-const contentRequestMock = `
-{
-  "endpoint": "getUser",
-  "request": {
-    "method": "POST",
-    "url": "https://reqres.in/api/users/2",
-    "mock": "mocks/jsonWithMock.json",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "expects": [{ "path": "status", "eq": 201 }, { "path": "id" }]
-}
-
 `;
 
 //schemas
@@ -554,9 +493,6 @@ const snippetsFilePathJSONSchemas = path.join(
   "jsonSchema.json"
 );
 
-const snippetsFilePathJSON = path.join(vscodeFolderPathJSON, "jsonAlias.json");
-const jsonWhitParam = path.join(vscodeFolderPathJSON, "jsonWithParam.json");
-
 const jsonWithoutValidation = path.join(
   vscodeFolderPathJSON,
   "jsonWithoutValidation.json"
@@ -565,75 +501,18 @@ const snippetsFilePathNotAlias = path.join(
   vscodeFolderPathJSON,
   "jsonNotAlias.json"
 );
-const snippetsFileEndpoint = path.join(
-  vscodeFolderPathJSON,
-  "jsonEndpoint.json"
-);
-const jsonBigData = path.join(
-  vscodeFolderPathJSON,
-  "big_data.json"
-);
-const jsonUsers = path.join(
-  vscodeFolderPathJSON,
-  "users.json"
-);
 
-const snippetsFileEndpointArray = path.join(
-  vscodeFolderPathJSON,
-  "jsonGetArray.json"
-);
-const contentEndpointArray = `
-{
-  "request": {
-    "method": "GET",
-    "url": "https://reqres.in/api/users?page=2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
-}
-`;
-const jsonWithParamContent = `
-{
-  "request": {
-    "method": "GET",
-    "url": "https://reqres.in/api/users?page=2",
-    "path": "id_user/continueEndpoint",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
-}
-`;
-
-const contentEndpoint = `
-{
-  "endpoint": "getUser",
-  "request": {
-    "method": "POST",
-    "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
-}
-`;
+const jsonBigData = path.join(vscodeFolderPathJSON, "big_data.json");
+const jsonUsers = path.join(vscodeFolderPathJSON, "users.json");
 
 const contentBigData = `
 {
-  "request": {
+
     "method": "GET",
     "url": "http://demo7018197.mockable.io/",
     "headers": {
       "Content-Type": "application/json"
-    }
-  },
+    },
   "expects": [
     { "path": "status", "eq": 200 },
     { "path": "team", "eq": "John Doe" },
@@ -645,58 +524,39 @@ const contentBigData = `
 `;
 const contentUsers = `
 {
-  "request": {
     "method": "GET",
     "url": "https://fakerestapi.azurewebsites.net/api/v1/Users",
-    "body": null,
-    "qs": null,
+    "body": {},
+    "qs": {},
     "headers": {
       "Content-Type": "application/json"
-    }
-  },
+    },
   "expects": [{ "path": "status", "eq": 200 }]
 }
 
 `;
 
-const contentJSonAlias = `
-{
-  "request": {
-    "method": "POST",
-    "url": "https://reqres.in/api/users/2",
-    "path": "id",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  },
-  "expects": [{ "path": "status", "eq": 201 }, { "path": "id" }]
-}
-`;
 
 const contentJSonAliasNot = `
 {
-  "request": {
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
+    "body": {},
+    "qs": {},
     "headers": {
       "Content-Type": "application/json"
-    }
-  },
+    },
   "expects": [{ "path": "status", "eq": 200 }, { "path": "first_name" }]
 }
 `;
 
 const contentWithoutValid = `
 {
-  "request": {
+  "req": {
     "method": "GET",
     "url": "https://reqres.in/api/users/2",
-    "body": null,
-    "qs": null,
+    "body": {},
+    "qs": {},
     "headers": {
       "Content-Type": "application/json"
     }
@@ -762,27 +622,25 @@ const contentSchemas = `
 const generateFileExample = path.resolve(__dirname, "../../cypress/e2e/");
 const snipExample = path.join(generateFileExample, "crud.cy.js");
 
-const contentExample = `
+const contentExample =`
+
 import { clone, crudStorage, faker } from "../support/e2e";
 import json from "../fixtures/examples/big_data";
 import users from "../fixtures/examples/users";
 
-describe("template spec", () => {
+describe("Examples cypress-crud", () => {
   afterEach(() => {
     cy.crudScreenshot();
+  });
+  before(() => {
+    crudStorage.save.name_mercado = faker.generateName();
+    crudStorage.save.cnpj = faker.generateCNPJ();
+    crudStorage.save.address = faker.generateStreet();
   });
   it("Example simple requisition", () => {
     cy.crud({ payload: "examples/jsonNotAlias" })
       .save({ path: "id" })
       .save({ path: "id", alias: "id_user" });
-  });
-  it("Example simple requisition return array", () => {
-    cy.crud({ payload: "examples/jsonGetArray" }).then((response) => {
-      for (let items of response.body?.data) {
-        expect(items.id).to.exist;
-        if (items.id == 7) crudStorage.save.id_Seven = items.id;
-      }
-    });
   });
   it("Example whit .bodyResponse", () => {
     cy.crud({ payload: "examples/jsonNotAlias" }).bodyResponse({
@@ -807,31 +665,11 @@ describe("template spec", () => {
     cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" }); // or save({path:'id', log: false})
   });
 
-  it("Example use JSON whit alias, rescue save", () => {
-    /** {
-    "request": {
-      "method": "GET",
-      "url": "https://reqres.in/api/users/2",
-      "path": "save",
-      "body": null,
-      "qs": null,
-      "headers": {
-        "Content-Type": "application/json"
-      }
-    },
-    "validations": [{ "path": "status", "value": 200 }, { "path": "first_name" }]
-  }
-   */
-    cy.crud({ payload: "examples/jsonAlias" });
-    // .crudScreenshot(); ;
-  });
-
   it("Example crud change JSON before request", () => {
     let json = require("../fixtures/examples/jsonNotAlias");
-    cy.log(json);
     let data = { ...json };
 
-    data.request.body = { id: crudStorage.save.save }; // Authorization: Bearer token, etc.
+    data.body = { id: crudStorage.save.save }; // Authorization: Bearer token, etc.
 
     cy.crud({ payload: data });
   });
@@ -856,116 +694,15 @@ describe("template spec", () => {
 
     crudStorage.reserve.value = "Hello"; // another reserve.value reserve.body reserve.id etc
   });
-  it("Example change ENVIRONMENT QA DEV PROD etc", () => {
-    /** USE in cypress.config.js
-   *
-   * const { defineConfig } = require("cypress");
-
-    module.exports = defineConfig({
-    e2e: {
-      setupNodeEvents(on, config) {
-        // implement node event listeners here
-      },
-      testIsolation: false,
-      env: {
-        environment: "QA", // chance environment
-        QA: {
-          getUser: "https://reqres.in/api/users/2",
-        },
-        DEV: {
-          getUser: "https://reqres.in/api/users/2",
-        },
-        PROD: {
-          getUser: "https://reqres.in/api/users/2",
-        },
-      },
-    },
-  });
-
-   */
-    // chanve environment and new endpoint add
-    let env = Cypress.env();
-    env.environment = "DEV";
-    env.DEV = {
-      getUser: "https://reqres.in/api/users/2",
-    };
-    console.log(env);
-    cy.crud({ payload: "examples/jsonEndpoint" });
-  });
-
-  it("Example without path endpoint, but path id_user/continueEndpoint", () => {
-    cy.crud({ payload: "examples/jsonWithParam" });
-  });
-
-  it("Example whit path endpoint, but path id_user/continueEndpoint", () => {
-    // Used whit JSON file
-
-    let obj = {
-      endpoint: "getUser", // configure env in cypress.config.js
-      request: {
-        method: "POST",
-        url: "https://reqres.in/api/users/2",
-        path: "id/continueWhitWndpoint",
-        body: null,
-        qs: null,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    };
-
-    cy.crud({ payload: obj });
-  });
-
-  it("Example without path endpoint, but path id_user/continueEndpoint", () => {
-    // Used in JSON file
-    let obj = {
-      request: {
-        method: "POST",
-        url: "https://reqres.in/api/users/2",
-        path: "id/continueWhitWndpoint",
-        body: null,
-        qs: null,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    };
-
-    cy.crud({ payload: obj });
-  });
-
-  it("Example without path endpoint, but path /continueEndpoint", () => {
-    // Used in JSON file
-
-    // endpoint:"alias defined"
-    let obj = {
-      request: {
-        method: "POST",
-        url: "https://reqres.in/api/users/2",
-        path: "/continueWhitWndpoint",
-        body: null,
-        qs: null,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    };
-
-    cy.crud({ payload: obj });
-  });
 
   it("Example validate schema", () => {
     cy.crud({ payload: "examples/jsonNotAlias" }).validateSchema({
-      schema: "jsonSchema",
+      schemas: "schemas/jsonSchema",
     });
 
-    cy.log("ID first requisition", crudStorage.save.id_Seven);
+    cy.log("ID first requisition", crudStorage.save.id_user);
   });
 
-  it("Example simple requisition whit MOCK", () => {
-    cy.crud({ payload: "examples/jsonGETMock" });
-  });
   it("Example simple requisition", () => {
     cy.crud({ payload: "examples/jsonNotAlias" }).save({
       path: "first_name",
@@ -1020,17 +757,16 @@ describe("template spec", () => {
 
   it("POST data testing", function () {
     let data = clone(json);
-    data.request.method = "POST";
-    data.request.url = "https://reqres.in/api/users/2";
-    data.request.replace =
-      "save, year, address, user, features, veh, addresses";
-    data.request.body = {
-      name: "year address user",
-      city: "address",
-      lastName: "user",
-      vacation: "features",
-      professional: "veh",
-      addresses: "addresses",
+    delete data.status
+    data.method = "POST";
+    data.url = "https://reqres.in/api/users/2";
+    data.body = {
+      name: "{year} {address} {user}",
+      city: "{address}",
+      lastName: "{user}",
+      vacation: "{features}",
+      professional: "{veh}",
+      addresses: "{addresses}",
     };
     data.expects = [{ path: "status", eq: 201 }];
     cy.crud({ payload: data });
@@ -1045,8 +781,8 @@ describe("template spec", () => {
   });
   it("Test rescue save_id_users", () => {
     let data = clone(users);
-    data.request.url += "/" + rescue_save("save_id_users");
-    // data.request.path = 'save_id_users'
+    data.url += "/" + rescue_save("save_id_users");
+    // data.req.path = 'save_id_users'
     data.expects = [{ path: "userName", eq: "User 5" }, { path: "status" }];
     cy.crud({ payload: data });
   });
@@ -1054,66 +790,191 @@ describe("template spec", () => {
     console.log(rescue_save()); // save, token, access_token, etc.
     cy.log(rescue_save());
   });
-  it("GET Rest Countries", () => {
-    let payload = {
-      // set in file .json payload.json
-      request: {
-        method: "GET",
-        url: "https://restcountries.com/v3.1/name/eesti",
-      },
-      expect: [
-        { path: "common" },
-        { path: "common", type: "array" },
-        { path: "tld" },
-        { path: "cca2" },
-        { path: "common", position: 3 },
-        { path: "cioc" },
-        { path: "independent", eq: true },
-        { path: "kor" },
-        { path: "latlng" },
-        { path: "borders" },
-        { path: "f" },
-        { path: "postalCode" },
-        { path: "status" },
-        { path: "EUR" },
-        { path: "suffixes" },
-        { path: "symbol" },
-        { path: "timezones" },
-        { path: "flag" },
-        { path: "flags" },
-        { path: "car" },
-        { path: "signs" },
-        { path: "startOfWeek" },
-        { path: "region" },
-        { path: "official" },
-        { path: "root", eq: "+3" },
-        { path: "side" },
-        { path: "side", eq: "right" },
-        { path: "side", eq: "right", type: "string" },
-      ],
-    };
-    // set path fixtures payload.json ex: cy.crud({path: '../fixtures/payload.json'})
-    cy.crud({ payload: payload });
+});
+describe("Change url in endpoint", () => {
+  const json = {
+    // create json or use variable
+    status: 200,
+    url: "http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid=48184f322c95a02a6a1f322431a2a170",
+  };
+  const json_change = {
+    status: 200, // create json or use variable
+    url: "http://api.openweathermap.org/geo/1.0/direct?q={lon}&limit=5&appid=48184f322c95a02a6a1f322431a2a170",
+  };
+
+  afterEach(() => {
+    cy.crudScreenshot();
+  });
+  it("Change URL using storage and { }", () => {
+    cy.crud({ payload: json }).save({ path: "an", as: "lon" });
+  });
+  it("url change for Londres", () => {
+    cy.crud({ payload: json_change });
+
+    cy.log(crudStorage.save);
+  });
+});
+describe("Change url in endpoint or replace in complete json", () => {
+  const json = {
+    status: 200,
+    url: "http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid=48184f322c95a02a6a1f322431a2a170",
+  };
+  const json_change = {
+    status: 200,
+    url: "http://api.openweathermap.org/geo/1.0/direct?q={lon}&limit=5&appid=48184f322c95a02a6a1f322431a2a170",
+    body: {
+      city: "Bearer {lon} {ton}",
+    },
+  };
+
+  afterEach(() => {
+    cy.crudScreenshot();
+  });
+  it("Change URL using storage and { }", () => {
+    cy.crud({ payload: json }).save(
+      { path: "an", as: "lon" },
+      { path: "to", as: "ton" }
+    );
+  });
+  it("url change for Londres", () => {
+    cy.crud({ payload: json_change });
+
+    cy.log(crudStorage.save);
+  });
+});
+describe("Test", () => {
+  afterEach(() => {
+    cy.crudScreenshot();
   });
 
-  it("GET Rest Countries EESTI and save[alias] search TRUE", () => {
-    let payload = {
-      // set in file .json payload.json
-      request: {
-        method: "GET",
-        url: "https://restcountries.com/v3.1/name/eesti",
+  const json = {
+    status: 200,
+    url: "getUser",
+  };
+  const post_ = {
+    method: "POST",
+    status: 200,
+    url: "https://reqres.in/api/users/{id}",
+    body: {
+      name: "{nameUser} Jackson",
+    },
+  };
+  it("Test", () => {
+    cy.crud(json).save({ path: "first_name", as: "nameUser" }, { path: "id" });
+  });
+
+  it("Post change", () => {
+    delete post_.status
+    cy.crud({ payload: post_ }).res({ path: "name", eq: "{nameUser} Jackson" });
+  });
+});
+describe("Test autenticação and validation schema", () => {
+  crudStorage.save.name_mercado = faker.generateName();
+  crudStorage.save.cnpj = faker.generateCNPJ();
+  crudStorage.save.address = faker.generateStreet();
+  const array_jsons = [
+    { url: "swagger/mercado", status: 200 },
+    {
+      status: 201,
+      post: true,
+      url: "swagger/mercado",
+      body: {
+        nome: "{name_mercado}",
+        cnpj: "{cnpj}",
+        endereco: "{address}",
       },
-      expect: [
-        { search: ".ee" },
-        { search: ".ee", alias: "ee" },
-        { search: "€" },
-        { search: "€", alias: "euro" },
-        { search: 200, alias: "status" },
-        { search: "EST", alias: "est" },
-      ],
-    };
-    // set path fixtures payload.json ex: cy.crud({path: '../fixtures/payload.json'})
-    cy.crud({ payload: payload });
+      save: { path: "id" },
+      expect: { path: "nome" },
+    },
+    {
+      post: true,
+      url: "endpoint_mercado/hortifruit/frutas",
+      body: { nome: "Uva", valor: 7 },
+      status: 201,
+      save: { path: "id", as: "frutaId" },
+    },
+    {
+      url: "endpoint_mercado/hortifruit/frutas",
+      status: 200,
+      expect: { path: "nome" },
+    },
+
+    {
+      post: true,
+      url: "endpoint_mercado/hortifruit/legumes",
+      body: { nome: "Cenoura", valor: 12 },
+      status: 201,
+      save: { path: "id", as: "legumesId" },
+    },
+    {
+      url: "endpoint_mercado/hortifruit/legumes",
+      status: 200,
+      expect: { path: "nome" },
+    },
+    {
+      post: true,
+      url: "endpoint_mercado/padaria/doces",
+      body: { nome: "Brigadeiro", valor: 10 },
+      status: 201,
+      save: { path: "id", as: "docesId" },
+    },
+    {
+      url: "endpoint_mercado/padaria/doces",
+      status: 200,
+      expect: { path: "nome" },
+    },
+    {
+      post: true,
+      url: "endpoint_mercado/padaria/salgados",
+      body: { nome: "Pastel", valor: 10 },
+      status: 201,
+      save: { path: "id", as: "salgadosId" },
+    },
+    {
+      url: "endpoint_mercado/padaria/salgados",
+      status: 200,
+      expect: { path: "nome" },
+    },
+    {
+      post: true,
+      url: "swagger/mercado/{id}/produtos/acougue/bovinos",
+      body: { nome: "Picanha", valor: 10 },
+      status: 201,
+    },
+    {
+      url: "swagger/mercado/{id}/produtos/acougue/bovinos",
+      status: 200,
+      expect: { path: "nome" },
+    },
+    {
+      post: true,
+      url: "swagger/mercado/{id}/produtos/acougue/suinos",
+      body: { nome: "Bacon", valor: 10 },
+      status: 201,
+    },
+    {
+      url: "swagger/mercado/{id}/produtos/acougue/suinos",
+      status: 200,
+      expect: { path: "nome" },
+    },
+    {
+      post: true,
+      url: "swagger/mercado/{id}/produtos/acougue/aves",
+      body: { nome: "Coxa de Frango", valor: 10 },
+      status: 201,
+      save: { path: "id", as: "avesId" },
+    },
+    {
+      url: "swagger/mercado/{id}/produtos/acougue/aves",
+      status: 200,
+      expect: { path: "nome" },
+    },
+  ];
+
+  it("Runner in array json", () => {
+    for (let index = 0; index < array_jsons.length; index++) {
+      cy.crud(array_jsons[index]);
+    }
   });
 });
 function rescue_save(params) {
@@ -1127,16 +988,14 @@ after(() => {
   console.log(crudStorage.response);
 });
 
-`;
+
+` ;
 
 fs.writeFileSync(snipExample, contentExample);
 
 if (!fs.existsSync(vscodeFolderPathJSON)) {
   fs.mkdirSync(vscodeFolderPathJSON);
 }
-
-// request mock
-fs.writeFileSync(mockRequestJson, contentRequestMock);
 
 // replace
 fs.writeFileSync(payloadWithReplace, contentReplaceAlias);
@@ -1151,17 +1010,14 @@ if (!fs.existsSync(jsonExampleMock)) {
 }
 fs.writeFileSync(mocksJson, contentMock);
 
-fs.writeFileSync(snippetsFilePathJSON, contentJSonAlias);
-fs.writeFileSync(jsonWhitParam, jsonWithParamContent);
-
 //schemas
 fs.writeFileSync(snippetsFilePathJSONSchemas, contentSchemas);
 
-fs.writeFileSync(snippetsFileEndpoint, contentEndpoint);
+
 fs.writeFileSync(jsonBigData, contentBigData);
 fs.writeFileSync(jsonUsers, contentUsers);
 
-fs.writeFileSync(snippetsFileEndpointArray, contentEndpointArray);
+
 
 fs.writeFileSync(jsonWithoutValidation, contentWithoutValid);
 
@@ -1171,11 +1027,16 @@ const configPath = path.resolve(__dirname, "../../");
 const jsconfigFilePath = path.join(configPath, "cypress.config.js");
 const newContent = `
 const { defineConfig } = require("cypress");
-
+const fs = require("fs");
+const path = require("path");
+const readFixtures = require("./node_modules/cypress-crud/src/runAllJson");
 module.exports = defineConfig({
   reporter: "cypress-mochawesome-reporter",
 
   e2e: {
+    defaultCommandTimeout: 180000,
+    pageLoadTimeout: 160000,
+    requestTimeout: 160000,
     setupNodeEvents(on, config) {
       // reporter: "cypress-mochawesome-reporter",
 
@@ -1184,6 +1045,19 @@ module.exports = defineConfig({
         crudLog(message) {
           console.log(message);
           return null;
+        },
+        runFixtures({ folderPath }) {
+          const fixturesDir = path.join(
+            __dirname,
+            "./cypress/fixtures",
+            folderPath || ""
+          );
+          const files = readFixtures(fixturesDir);
+          const data = files.map((file) => ({
+            fileName: file.replace(fixturesDir + path.sep, ""),
+            content: JSON.parse(fs.readFileSync(file, "utf8")),
+          }));
+          return data;
         },
       });
       // adjust to print size
@@ -1204,24 +1078,14 @@ module.exports = defineConfig({
     },
     testIsolation: false, //  in e2e:{}
     experimentalRunAllSpecs: true, // in e2e:{}
-    env: {
-      // in e2e:{}
-      screenshot: false, // required true, for active screenshot
-      visualPayloads: false,
-      crudStyles: true // active styles crud designer
-  //   environment: "QA", // change environment
-  //   QA: {
-  //     getUser: "https://reqres.in/api/users",
-  //   },
-  //   DEV: {
-  //     getUser: "https://reqres.in/api/users/2",
-  //   },
-  //   PROD: {
-  //     getUser: "https://reqres.in/api/users/2",
-  //   },
-    },
   },
 });
+
+// CHANGE TITLE and SUBTITLE
+// in cypress.env.json
+
+// "title": "TESTING",
+// "subTitle": "Project in Cypress"
 
 `;
 
@@ -1235,15 +1099,14 @@ if (!fs.existsSync(jsonExampleMockable)) {
 const mocksJson1 = path.join(jsonExampleMockable, "json1.json");
 const contentMock1 = `
 {
-  "request": {
+
     "method": "GET",
     "url": "https://demo8370198.mockable.io/",
-    "body": null,
-    "qs": null,
+    "body": {},
+    "qs": {},
     "headers": {
       "Content-Type": "application/json"
-    }
-  },
+    },
   "expects": [
     { "path": "status", "eq": 200 },
     { "path": "street", "eq": "Gordon Russell 123" }
@@ -1257,15 +1120,14 @@ fs.writeFileSync(mocksJson1, contentMock1);
 const mocksJson2 = path.join(jsonExampleMockable, "json2.json");
 const contentMock2 = `
 {
-  "request": {
+
     "method": "GET",
     "url": "https://demo8168190.mockable.io/",
-    "body": null,
-    "qs": null,
+    "body": {},
+    "qs": {},
     "headers": {
       "Content-Type": "application/json"
-    }
-  },
+    },
   "expects": [
     { "path": "status", "eq": 200 },
     { "path": "Order", "eq": 2 }
@@ -1278,15 +1140,14 @@ fs.writeFileSync(mocksJson2, contentMock2);
 const mocksJson3 = path.join(jsonExampleMockable, "json3.json");
 const contentMock3 = `
 {
-  "request": {
+
     "method": "GET",
     "url": "https://demo0065046.mockable.io/",
-    "body": null,
-    "qs": null,
+    "body": {},
+    "qs": {},
     "headers": {
       "Content-Type": "application/json"
-    }
-  },
+    },
   "expects": [
     { "path": "status", "eq": 200 },
     { "path": "city", "eq": "Matthews" }
@@ -1302,16 +1163,14 @@ const mocks4 = path.join(jsonExampleMock, "jsonmock4.json");
 
 const contentMock4 = `
 {
-  "request": {
     "method": "GET",
     "url": "https://demo0065046.mockable.io/",
     "mock": "mocks/jsonmock4",
-    "body": null,
-    "qs": null,
+    "body": {},
+    "qs": {},
     "headers": {
       "Content-Type": "application/json"
-    }
-  },
+    },
   "expects": [
     { "path": "status", "eq": 200 },
     { "path": "social", "eq": "Ford" },
@@ -1324,10 +1183,6 @@ const contentMock4 = `
 `;
 const contentMocks4 = `
 {
-  "intercept": {
-    "method": "GET",
-    "url": "/users/2"
-  },
   "response": {
     "status": 200,
     "body": {
@@ -1433,16 +1288,15 @@ const mocks5 = path.join(jsonExampleMock, "jsonmock5.json");
 
 const contentMock5 = `
 {
-  "request": {
+
     "method": "GET",
     "url": "https://demo0065046.mockable.io/",
     "mock": "mocks/jsonmock5",
-    "body": null,
-    "qs": null,
+    "body": {},
+    "qs": {},
     "headers": {
       "Content-Type": "application/json"
-    }
-  },
+    },
   "expects": [
     { "path": "status", "eq": 200 },
     { "path": "title" },
@@ -1454,10 +1308,6 @@ const contentMock5 = `
 const contentMocks5 = `
 
 {
-  "intercept": {
-    "method": "GET",
-    "url": "/users/2"
-  },
   "response": {
     "status": 200,
     "body": [
@@ -1566,16 +1416,15 @@ const mocks6 = path.join(jsonExampleMock, "jsonmock6.json");
 
 const contentMock6 = `
 {
-  "request": {
+
     "method": "GET",
     "url": "https://demo0065046.mockable.io/",
     "mock": "mocks/jsonmock6",
-    "body": null,
-    "qs": null,
+    "body": {},
+    "qs": {},
     "headers": {
       "Content-Type": "application/json"
-    }
-  },
+    },
   "expects": [
     { "path": "status" },
     { "path": "bancos" },
@@ -1586,10 +1435,6 @@ const contentMock6 = `
 `;
 const contentMocks6 = `
 {
-  "intercept": {
-    "method": "GET",
-    "url": "/users/2"
-  },
   "response": {
     "status": 200,
     "body": [

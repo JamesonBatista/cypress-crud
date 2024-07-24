@@ -25,6 +25,7 @@ module.exports = function applyStyles() {
   if (!app.document.head.querySelector("[data-hover-black-crud]")) {
     const style = app.document.createElement("style");
     let alias = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-save > div > span > div > span.command-info`;
+    let log = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-log > div > span > div > span.command-info`;
     let aliasWrite = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-writeFile > div > span > div > span.command-info`;
     let aliasRead = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-readFile > div > span > div > span.command-info`;
     let valid = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-runValidation > div > span > div > span.command-info`;
@@ -38,6 +39,12 @@ module.exports = function applyStyles() {
     let patch = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-PATCH > div > span > div > span.command-info > span.command-method`;
 
     style.innerHTML = `
+    ${log} span.command-method > span {
+      background-color: #675f5aeb;
+      border-radius: 2px;
+      padding: 0px 4px 1px 4px;
+    }
+
     ${alias} span.command-method > span,
     ${aliasWrite} span.command-method > span,
     ${aliasRead} span.command-method > span,
@@ -48,9 +55,12 @@ module.exports = function applyStyles() {
         border-radius: 2px;
         padding: 0px 4px 1px 4px;
     }
- ${alias} span.command-method{
+    ${alias} span.command-method > span{
         color: white;
- }
+    }
+    ${log} span.command-method > span{
+      color: white;
+    }
     ${valid} span.command-method{
             background-color: red;
             border-radius: 2px;
@@ -63,24 +73,24 @@ module.exports = function applyStyles() {
 
     .reporter .command-name-assert .command-state-passed .command-message strong {
     color: #fb8d04;
-}
+    }
 
 
-#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li > div > span > div > span.command-info:hover ${valueColor}
-.reporter .command-name-assert .command-state-passed .command-method span {
-    background-color: #1fa971;
-    color: white;
-}   
+    #unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li > div > span > div > span.command-info:hover ${valueColor}
+    .reporter .command-name-assert .command-state-passed .command-method span {
+        background-color: #1fa971;
+        color: white;
+    }   
 
-${put}, ${post}, ${deletes}, ${patch} {
-  background-color: rgb(100 112 243 / 1);
-} 
-${deletes} {
-  background-color: rgb(100 112 243 / 1);
-} 
+    ${put}, ${post}, ${deletes}, ${patch} {
+      background-color: rgb(100 112 243 / 1);
+    } 
+    ${deletes} {
+      background-color: rgb(100 112 243 / 1);
+    } 
 
 
-`;
+    `;
 
     style.setAttribute("data-hover-black-crud", "");
     app.document.head.appendChild(style);
@@ -168,9 +178,9 @@ ${deletes} {
      ${overflow} {
         overflow: hidden !important;
     }
-.bg-gray-1000 {
-    background-color: black;
-}
+    .bg-gray-1000 {
+        background-color: black;
+    }
    
     `;
 
