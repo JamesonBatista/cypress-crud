@@ -333,6 +333,26 @@ it("Run all JSONs", () => {
 
 ![GET whit text]('../../src/images/get_text.png)
 
+### Run envs
+
+`br:` Para executar diferentes jsons em diferentes ambientes na mesma execução.
+<br>
+
+`en:` To run different jsons in different environments in the same run.
+
+```js
+  it("request", () => {
+    cy.crud({ get: "crud_get_post", env: "PROD" });
+    cy.crud({ get: "crud_get_post", env: "DEV" });
+  });
+
+```
+```text
+image
+
+```
+![image]('../../src/images/changeenv.png)
+
 - 1.2 <br>
   <br>
   <br>
