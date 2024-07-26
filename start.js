@@ -6,6 +6,26 @@ const jsconfigFilePath = path.join(
   configPath,
   "node_modules/mochawesome-report-generator/dist"
 );
+const changeStepPlugin = path.join(
+  configPath,
+  "node_modules/cypress-plugin-steps/dist/steps"
+);
+const newSteps = `
+ export const step = (message) => {
+    const logMessage = \`\${window.logCalls}: \${message}\`;
+    Cypress.log({
+        name: "description",
+        message: logMessage.toUpperCase(),
+        consoleProps: () => ({
+            framework: "cypress-crud",
+          })
+    });
+    window.testFlow.push(logMessage);
+    window.logCalls++;
+};
+`;
+
+
 const pathPackage = path.join(
   configPath,
   "node_modules/cypress-crud/package.json"
@@ -107,6 +127,11 @@ h4{
     }
   `;
 
+  // change steps
+  fs.writeFile(`${changeStepPlugin}/step.js`, newSteps, "utf8", (err) => {});
+
   fs.appendFile(`${jsconfigFilePath}/app.css`, css, "utf8", (err) => {});
   fs.appendFile(`${jsconfigFilePath}/app.inline.css`, css, "utf8", (err) => {});
+
+
 });

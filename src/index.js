@@ -11,6 +11,8 @@ crudStorage.num.counter = 1;
 crudStorage.counter = {};
 crudStorage.counter.int = 1;
 
+// 2.5.4
+
 function generateInt() {
   const standardColors = [
     "\x1b[30m",
