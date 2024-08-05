@@ -1,6 +1,8 @@
 # Cypress-Crud Introduction
-
-
+[![Npm package weekly downloads](https://badgen.net/npm/dw/cypress-crud)](https://npmjs.com/package/cypress-crud)
+[![Npm package weekly downloads](https://badgen.net/npm/dm/cypress-crud)](https://npmjs.com/package/cypress-crud)
+[![Npm package weekly downloads](https://badgen.net/npm/dy/cypress-crud)](https://npmjs.com/package/cypress-crud)
+[![Npm package weekly downloads](https://badgen.net/npm/dt/cypress-crud)](https://npmjs.com/package/cypress-crud)
 ### **Pre-requisitos**
 
 NodeJS must be installed and Cypress must be version 10 or higher for this package to function correctly.
@@ -47,8 +49,6 @@ import "cypress-plugin-api";
 import "cypress-mochawesome-reporter/register";
 import spok from "cy-spok";
 // export default spok;
-const applyStyles = require("../../node_modules/cypress-crud/src/style");
-if (!Cypress.env("styles") && Cypress.env("crudStyles")) applyStyles();
 // close json file in variable
 import _ from "lodash";
 export function clone(json) {
@@ -60,18 +60,43 @@ export function clone(json) {
 
 ```javaScript
 
-const { defineConfig } = require("cypress");
 
+const { defineConfig } = require("cypress");
+const fs = require("fs");
+const path = require("path");
+const readFixtures = require("./node_modules/cypress-crud/src/runAllJson");
 module.exports = defineConfig({
   reporter: "cypress-mochawesome-reporter",
 
   e2e: {
+    defaultCommandTimeout: 180000,
+    pageLoadTimeout: 160000,
+    requestTimeout: 160000,
+    trashAssetsBeforeRuns: true,
+    testIsolation: false,
+    experimentalRunAllSpecs: true,
+
     setupNodeEvents(on, config) {
+      // reporter: "cypress-mochawesome-reporter",
+
       require("cypress-mochawesome-reporter/plugin")(on);
       on("task", {
         crudLog(message) {
           console.log(message);
           return null;
+        },
+        runFixtures({ folderPath }) {
+          const fixturesDir = path.join(
+            __dirname,
+            "./cypress/fixtures",
+            folderPath || ""
+          );
+          const files = readFixtures(fixturesDir);
+          const data = files.map((file) => ({
+            fileName: file.replace(fixturesDir + path.sep, ""),
+            content: JSON.parse(fs.readFileSync(file, "utf8")),
+          }));
+          return data;
         },
       });
       // adjust to print size
@@ -90,10 +115,15 @@ module.exports = defineConfig({
         return launchOptions;
       });
     },
-    testIsolation: false, //  in e2e:{}
-    experimentalRunAllSpecs: true, // in e2e:{}
+
   },
 });
+
+// CHANGE TITLE and SUBTITLE
+// in cypress.env.json
+
+// "title": "TESTING",
+// "subTitle": "Project in Cypress"
 ```
 
 - `cypress.env.json:`
@@ -139,10 +169,7 @@ module.exports = defineConfig({
       "crud_getId_delete": "swagger/crud/{id}"
     },
     "endpoint_mercado": "swagger/mercado/{id}/produtos"
-  },
-
-  "screenshot": true,
-  "crudStyles": true
+  }
   // "title": "TESTING",
   // "subTitle": "Project in Cypress"
 }
@@ -233,7 +260,7 @@ _Use faker. options for generate data faker_
         "password": "password",
         "name": "faker.name", // faker.nome
         "email": "faker.email",
-        "enterprise": "faker.enterpriseName", // faker.empresaNome
+        "enterprise": "faker.enterpriseName", // faker.empresaNome faker.entrerprise
         "state": "faker.state", // faker.estado
         "city": "faker.city", // faker.cidade
         "country": "faker.country", //faker.pais
@@ -248,6 +275,11 @@ _Use faker. options for generate data faker_
         "avatar": "faker.avatar",
         "professional": "faker.professional", // faker.profissao
         "product": "faker.product", // faker.produto
+        "imagem": "faker.image", // faker.imagem
+        "text": "faker.text", // faker.texto
+        "title": "faker.title", // faker.titulo
+        "actualDate": "faker.actualDate", // faker.dataAtual
+        "futureDate": "faker.futureDate", // faker.dataFutura
       },
     };
 
@@ -341,16 +373,17 @@ it("Run all JSONs", () => {
 `en:` To run different jsons in different environments in the same run.
 
 ```js
-  it("request", () => {
-    cy.crud({ get: "crud_get_post", env: "PROD" });
-    cy.crud({ get: "crud_get_post", env: "DEV" });
-  });
-
+it("request", () => {
+  cy.crud({ get: "crud_get_post", env: "PROD" });
+  cy.crud({ get: "crud_get_post", env: "DEV" });
+});
 ```
+
 ```text
 image
 
 ```
+
 ![image]('../../src/images/changeenv.png)
 
 - 1.2 <br>
@@ -679,6 +712,46 @@ Return
 
 ![return image](./src/images/expectmultiplevalues.png)
 
+## condition
+
+`br:` O condiction está relacionado a request anterior, caso o condition seja condition-accept o `cypress-crud` passará para o JSON seguinte.
+<br>
+
+`en:`
+The condition is related to the previous request, if the condition is condition-accept, `cypress-crud` will pass to the next JSON.
+
+```json
+{
+  "text": "post create new user",
+  "get": "swagger/users"
+} // return 200
+
+{ // if return previous request  name not null
+  "condition": { "path": "name" },
+  "get": "swagger/users",
+}
+```
+```json
+{ // if return previous request status 200
+  "condition": 200,
+  "get": "swagger/users",
+}
+
+{ // if return previous request name
+  "condition": "name",
+  "get": "swagger/users",
+}
+
+```
+```json
+{ // if return previous request name eq Jam
+  "condition": { "path": "name", "eq": "Jam" },
+  "get": "swagger/users",
+}
+
+```
+
+
 ## CRUD
 
 `br:` Para usar o cy.crud é simples, basta colocar os jsons na pasta `fixtures` ou subpastas da `fixtures` abaixo formas de uso:
@@ -774,6 +847,7 @@ cy.crud("json");
 ```javaScript
  cy.crud({ payload: "examples/json" }).schema({schema: "crud_users",});
 ```
+
 ![return image](./src/images/schema.png)
 
 <br>
@@ -966,8 +1040,7 @@ describe(`Test cypress-crud Property search`, () => {
  // result
 
  {
-  "method": "POST",// or get: true // post: true // delete": true // path: true
-  "url": "https://reqres.in/api/users/2",
+  "get": "https://reqres.in/api/users/2",
   "failOnStatusCode": false,
   "body": "hide active in path",
   "headers": "hide active in path"
@@ -1024,10 +1097,7 @@ To generate the report, the tests must be executed in `run` mode. Furthermore, t
       "crud_getId_delete": "swagger/crud/{id}"
     },
     "endpoint_mercado": "swagger/mercado/{id}/produtos"
-  },
-
-  "screenshot": true,
-  "crudStyles": true
+  }
 }
 ```
 

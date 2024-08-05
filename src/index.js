@@ -2,6 +2,9 @@ import { validate } from "jsonschema";
 import { crudStorage } from "./functions/storage.js";
 import { faker, simpleFaker } from "@faker-js/faker";
 import FakerUse from "./faker.js";
+const app = window.top;
+import applyStyles from "../src/style.js";
+
 let counter = 0;
 let counterResponse = 0;
 let colorNum;
@@ -10,8 +13,6 @@ crudStorage.num = {};
 crudStorage.num.counter = 1;
 crudStorage.counter = {};
 crudStorage.counter.int = 1;
-
-// 2.5.4
 
 function generateInt() {
   const standardColors = [
@@ -73,6 +74,8 @@ function textNpxRunCypress({
 }
 
 Cypress.Commands.add("crud", (input) => {
+  applyStyles();
+
   if (typeof input === "string") {
     cy.fixture(`${input}`).then((jsons) => {
       if (Array.isArray(jsons)) {
@@ -89,7 +92,23 @@ Cypress.Commands.add("crud", (input) => {
         cy.supportCrud(item);
       });
     } else {
-      cy.supportCrud(input);
+      if (input.payload) {
+        if (typeof input.payload === "string") {
+          cy.fixture(`${input.payload}`).then((jsons) => {
+            if (Array.isArray(jsons)) {
+              jsons.forEach((item) => {
+                cy.supportCrud(item);
+              });
+            } else {
+              cy.supportCrud(jsons);
+            }
+          });
+        } else {
+          cy.supportCrud(input.payload);
+        }
+      } else {
+        cy.supportCrud(input);
+      }
     }
   }
 });
@@ -148,6 +167,7 @@ Cypress.Commands.add("supportCrud", (input) => {
     }
 
     if (cp.method === "GET") payload.status = 200;
+    if (cp.method === "POST") payload.status = 201;
 
     if (payload.url) cp.url = payload.url;
     if (payload.form) cp.form = payload.form;
@@ -190,9 +210,21 @@ Cypress.Commands.add("supportCrud", (input) => {
     if (payload.retryOnNetworkFailure)
       payloadCreate.retryOnNetworkFailure = payload.retryOnNetworkFailure;
 
-    if (payload.text) payloadCreate.text = payload.text;
+    if (payload.text) {
+
+      payloadCreate.text = formatText(payload.text);
+    
+    }
 
     if (payload.env) cp.env = payload.env;
+
+    if (payload.timeout) {
+      payloadCreate.timou = payload.timeout;
+    } else {
+      payloadCreate.timeout = 60000;
+    }
+
+    if (payload.condition) payloadCreate.condition = payload.condition
 
     const validate =
       payload.expect ||
@@ -214,6 +246,11 @@ Cypress.Commands.add("supportCrud", (input) => {
     if (payload.save) payloadCreate.save = payload.save;
     return payloadCreate;
   };
+  function formatText(text) {
+    const regex = /\{([^}]+)\}/g;
+    const formattedText = text.replace(regex, '*{$1}*');
+    return formattedText;
+}
 
   let payload,
     alias = "response",
@@ -622,6 +659,7 @@ Cypress.Commands.add("supportCrud", (input) => {
     return cy
       .api(data)
       .then((response) => {
+
         if (!window.alias) {
           window.alias = {};
         }
@@ -667,11 +705,16 @@ Cypress.Commands.add("supportCrud", (input) => {
         }
 
         if (payload.search) {
+          ``;
           searchEq(
             window.alias.bodyResponse,
             payload.search.search,
             payload.search.as
           );
+        }
+        if (!Cypress.config("isInteractive")) {
+          // createHTML();
+          cy.screenshot();
         }
       });
   };
@@ -715,19 +758,114 @@ Cypress.Commands.add("supportCrud", (input) => {
       window.mock = {};
       handleMocks(data, payload);
     } else {
-      handleRequest(data, payload);
+      if (payload.condition) {
+        let verify = conditionContinueTest(payload)
+        if (verify) handleRequest(data, payload)
+      } else {
+        handleRequest(data, payload);
+      }
     }
   }
 });
+
+function conditionContinueTest(json) {
+  const formattedJson = JSON.stringify(json, null, 2);
+
+  let condicionAccept = null;
+  let eqCondition = null;
+  let logCondition = false;
+  let result = null;
+  const handleCondition = (json) => {
+    const { path, eq } = json.condition;
+    condicionAccept = path;
+    eqCondition = eq;
+    if (path && eq) {
+      result = findInJson(window.alias.bodyResponse, path);
+      for (let iteration of result) {
+        if (eq.trim().includes("||")) {
+          let splitEq = eq.split("||");
+          for (let splitUse of splitEq) {
+            if (iteration === splitUse.trim()) logCondition = true;
+
+            condicionAccept = path;
+            eqCondition = splitUse;
+          }
+        } else if (iteration === eq) {
+          logCondition = true;
+          eqCondition = eq;
+          condicionAccept = path;
+        }
+      }
+    } else {
+      result = findInJson(window.alias.bodyResponse, path);
+
+      if (result) {
+        logCondition = true;
+      }
+    }
+  }
+
+  if (typeof json.condition === "string") {
+     result = findInJson(window.alias.bodyResponse, json.condition);
+
+    if (result) {
+      logCondition = true;
+    } else {
+      logCondition = false;
+    }
+    condicionAccept = json.condition;
+  } else if (typeof json.condition === "number") {
+    result = findInJson(window.alias.bodyResponse, "status");
+
+    if (result === json.condition) {
+      logCondition = true;
+    } else {
+      logCondition = false;
+    }
+    condicionAccept = json.condition;
+  } else if (typeof json.condition === "object") {
+    if (!Array.isArray(json.condition)) {
+      handleCondition(json)
+    }
+  }
+
+
+  if (logCondition) {
+
+    Cypress.log({
+      name: `condition-accpet`,
+      message: `${condicionAccept ? condicionAccept : json.condition} ${eqCondition ? `: ${eqCondition}` : `[*${result}*]`
+        }`,
+      consoleProps: () => ({
+        json: formattedJson,
+        condition: json.condition,
+        value: result,
+        framework: "cypress-crud",
+      }),
+    });
+  } else {
+    Cypress.log({
+      name: `condition-error`,
+      message: `${condicionAccept ? condicionAccept : ""} ${eqCondition ? `= ${eqCondition}` : ""
+        } [*${formattedJson}*]`,
+      consoleProps: () => ({
+        json: formattedJson,
+        condition: json.condition,
+        value: result,
+        framework: "cypress-crud",
+      }),
+    });
+  }
+  return logCondition;
+}
 function dataVales(searchValue, path) {
   crudStorage.save[path] = searchValue;
   Cypress.log({
     name: `save`,
-    message: `[${path}] = ${
-      typeof searchValue === "object"
-        ? JSON.stringify(searchValue)
-        : searchValue
-    }`,
+    message: `[${path}] = ${typeof searchValue === "object"
+      ? JSON.stringify(searchValue)
+      : searchValue
+      }`,
     consoleProps: () => ({
       alias: path,
       value: searchValue,
@@ -763,13 +901,11 @@ function haveProperty(objeto, propriedade, reserve) {
       ] = searchValue;
       Cypress.log({
         name: "save",
-        message: `[${
-          typeof reserve == "string" ? reserve : propriedade || "save"
-        }] = ${
-          typeof searchValue === "object"
+        message: `[${typeof reserve == "string" ? reserve : propriedade || "save"
+          }] = ${typeof searchValue === "object"
             ? JSON.stringify(searchValue)
             : searchValue
-        }`,
+          }`,
         consoleProps: () => ({
           alias: typeof reserve == "string" ? reserve : propriedade || "save",
           value: searchValue,
@@ -1030,8 +1166,7 @@ function validateTypeAndEquality(paths, initValid, aliasPath, path_and_key) {
     if (value) {
       expect(
         value,
-        `${randonItens()}${initValid.path}:: expected '${
-          initValid.eq
+        `${randonItens()}${initValid.path}:: expected '${initValid.eq
         }' to be found`
       ).to.be.true;
       if (aliasPath)
@@ -1044,8 +1179,7 @@ function validateTypeAndEquality(paths, initValid, aliasPath, path_and_key) {
     } else {
       expect(
         false,
-        `${randonItens()}${initValid.path}:: expected '${
-          initValid.eq
+        `${randonItens()}${initValid.path}:: expected '${initValid.eq
         }' to be found`
       ).to.be.true;
     }
@@ -1068,8 +1202,7 @@ function validateEquality(paths, initValid, aliasPath, path_and_key) {
     if (value) {
       expect(
         value,
-        `${randonItens()}${initValid.path}:: expected '${
-          initValid.eq
+        `${randonItens()}${initValid.path}:: expected '${initValid.eq
         }' to be found`
       ).to.be.true;
       if (aliasPath)
@@ -1082,8 +1215,7 @@ function validateEquality(paths, initValid, aliasPath, path_and_key) {
     } else {
       expect(
         false,
-        `${randonItens()}${initValid.path}:: expected '${
-          initValid.eq
+        `${randonItens()}${initValid.path}:: expected '${initValid.eq
         }' to be found`
       ).to.be.true;
     }
@@ -1168,11 +1300,10 @@ function searchEq(obj, searchValue, reserve) {
       crudStorage.save[reserve] = searchValue;
       Cypress.log({
         name: "save",
-        message: `[${reserve || "save"}] = ${
-          typeof searchValue === "object"
-            ? JSON.stringify(searchValue)
-            : searchValue
-        }`,
+        message: `[${reserve || "save"}] = ${typeof searchValue === "object"
+          ? JSON.stringify(searchValue)
+          : searchValue
+          }`,
         consoleProps: () => ({
           alias: reserve || "save",
           value: searchValue,
@@ -1302,7 +1433,6 @@ function save(input) {
         });
       } else if (results === eq) {
         valueToSave = eq;
-
       }
     }
 
@@ -1333,11 +1463,8 @@ function save(input) {
     } else if (log) {
       Cypress.log({
         name: "save",
-        message: `[${
-           path || "error"
-        }] has not been found and will not be saved for [${
-          as || alias || path
-        }]`,
+        message: `[${path || "error"}] request error, not save value in [${as || alias || path
+          }]`,
         consoleProps: () => ({
           alias: alias,
           value: "No value to save",
@@ -1351,8 +1478,7 @@ let counterResp = 0;
 Cypress.Commands.add("write", ({ path = null, log = true } = {}) => {
   counterResp += 1;
   return cy.writeFile(
-    `cypress/fixtures/${
-      path ? `${path}` : `response/response_${counterResp}`
+    `cypress/fixtures/${path ? `${path}` : `response/response_${counterResp}`
     }.json`,
     window.alias.bodyResponse,
     {
@@ -1472,177 +1598,16 @@ Cypress.Commands.add("findInJson", (obj, keyToFind) => {
 
 Cypress.Commands.add("crudScreenshot", (type = "runner") => {
   if (Cypress.env("screenshot") && !Cypress.config("isInteractive")) {
-    createHTML();
+    // createHTML();
     return cy.screenshot({ capture: type });
   }
 });
 Cypress.Commands.add("crudshot", (type = "runner") => {
-  if (Cypress.env("screenshot") && !Cypress.config("isInteractive")) {
-    createHTML();
+  if (!Cypress.config("isInteractive")) {
+    // createHTML();
     return cy.screenshot({ capture: type });
   }
 });
-const createHTML = () => {
-  const payload =
-    window.alias.payloadReport.request || window.alias.payloadReport.req;
-
-  delete payload.replace;
-
-  if (Cypress.env("hideReport")) {
-    let ArrayHide = Cypress.env("hideReport");
-    if (!Array.isArray(ArrayHide)) ArrayHide = [ArrayHide];
-
-    ArrayHide.forEach((item) => {
-      delete payload[item];
-      payload[item] = { hiden: "hide active in path" };
-    });
-  }
-  const app = window.top;
-  const requestJson = JSON.stringify(payload, null, 2);
-
-  const responseJson = JSON.stringify(
-    window.alias.bodyResponse.body || window.alias.bodyResponse,
-    null,
-    2
-  );
-  let responseText = window.alias.bodyResponse.body
-    ? "🆁🅴🆂🅿🅾🅽🆂🅴:"
-    : "🅼🅾🅲🅺 🆁🅴🆂🅿🅾🅽🆂🅴: ";
-  const htmlContent = `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
-</head>
-    <title >Report Cypress-crud</title>
-    <style>
-    body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-      margin: 0; 
-      padding: 0; 
-      background-color: black;
-      display: flex; 
-      justify-content: center;
-      // align-items: center;
-      height: 100vh;
-    }
-    .container { 
-      display: flex; 
-      flex-direction: row;
-    }
-    .card { 
-      background-color: black;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      overflow: hidden; 
-      padding: 20px;
-      margin-bottom: 20px;
-      padding-top: 5px; /* Reduz o espaçamento superior */
-
-    }
-    .header {
-      font-size: 16px;
-      color: white; /* Cor do título alterada para branco */
-      margin-bottom: 5px; /* Reduz o espaçamento entre o título e o JSON */
-      background: none; /* Remove o background do título, se necessário */
-    }
-    pre { 
-      white-space: pre-wrap; 
-      word-wrap: break-word; 
-      color: gray !important;
-      background-color:#f9f9f917;
-      border-radius: 5px;
-      padding: 10px;
-      font-size: 12px !important;
-      overflow: auto;
-      height: 1000px;
-    }
-  </style>
-  
-  </head>
-  <body>
-    <div class="container">
-      <div class="card">
-        <div class="header">🆁🅴🆀🆄🅴🆂🆃:</div>
-        <pre class="json">${requestJson}</pre>
-      </div>
-      <div class="card">
-        <div class="header">${responseText}</div>
-        <pre class="json">${responseJson}</pre>
-      </div>
-    </div>
-  </body>
-  <script>
-  document.addEventListener('DOMContentLoaded', function () {
-      hljs.highlightAll();
-  });
-  </script>
-  </html>
-  `;
-
-  cy.get("head", { log: false }).then(($head) => {
-    if (!$head.find("[data-hover-style-jsons]").length) {
-      $head.append(`
-          <style data-hover-style-jsons>
-            code, kbd, samp, pre {
-              color: white;
-              font-size: 12px !important;
-            }
-            .requestdiv, .responsediv {
-              border-radius: 8px;
-              box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
-            }
-            .text-\\[14px\\] {
-              display: none;
-            }
-          </style>
-        `);
-    }
-  });
-
-  // Gerar e inserir o HTML necessário
-  cy.get("body", { log: false }).then(($body) => {
-    $body.empty().append(htmlContent);
-    $body.append(`
-          <style data-hover-style-jsons>
-            code, kbd, samp, pre {
-              color: white;
-              font-size: 12px !important;
-            }
-            .requestdiv, .responsediv {
-              border-radius: 8px;
-              box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
-            }
-            .text-\\[14px\\] {
-              display: none;
-            }
-          </style>
-        `);
-  });
-  if (!app.document.head.querySelector("[data-hover-style-jsons]")) {
-    const style = app.document.createElement("style");
-
-    style.innerHTML = `
-  code, kbd, samp, pre{
-   color: white;
-  font-size: 14px !important;
-  }
-
-  .requestdiv, .responsediv {
-    border-radius: 8px;
-     box-shadow: 3px 3px 10px rgba(1, 1, 1, 3);
-  }
- .text-\\[14px\\] {
-    display: none;
-  }
-    `;
-
-    style.setAttribute("data-hover-styles-jsons", "");
-    app.document.head.appendChild(style);
-  }
-};
 
 function replaceAllStrings(obj) {
   function applySubstitutions(currentObj) {
@@ -1659,7 +1624,7 @@ function replaceAllStrings(obj) {
             if (suffix === "name" || suffix === "nome") {
               newObj[key] = fakers.name();
             }
-            if (suffix === "email") newObj[key] = fakers.emails().trim();
+            if (suffix === "email") newObj[key] = fakers.emails();
 
             if (
               suffix === "enterpriseName" ||
@@ -1708,6 +1673,21 @@ function replaceAllStrings(obj) {
 
             if (suffix === "product" || suffix === "produto")
               newObj[key] = fakers.products();
+
+            if (suffix === "image" || suffix === "imagem")
+              newObj[key] = faker.image.url();
+
+            if (suffix === "text" || suffix === "texto")
+              newObj[key] = faker.lorem.text();
+
+            if (suffix === "title" || suffix === "titulo")
+              newObj[key] = faker.person.jobTitle();
+
+            if (suffix === "actualDate" || suffix === "dataAtual")
+              newObj[key] = fakers.actualDate();
+
+            if (suffix === "futureDate" || suffix === "dataFutura")
+              newObj[key] = fakers.futureDate();
           } else {
             newObj[key] = value.replace(/\{(\w+)\}/g, (match, p1) => {
               return window.save.hasOwnProperty(p1) ? window.save[p1] : p1;
@@ -1764,12 +1744,11 @@ function expectValidations(obj) {
         if (obj.save.trim().includes(":::")) {
           const split_ = obj.save.trim().split(":::");
           obj.save = { path: split_[0].trim(), as: split_[1].trim() };
-        }else{
+        } else {
           const valueString = obj.save;
           obj.save = {};
           obj.save.path = valueString;
         }
-
       }
       const { path, alias, eq, position, log, as } = obj.save;
 
@@ -1873,6 +1852,7 @@ function ExpectHandle(args) {
   });
 }
 Cypress.Commands.add("crudSafeData", (token) => {
+  applyStyles();
   const base64UrlDecode = (input) => {
     let str = input.replace(/-/g, "+").replace(/_/g, "/");
     while (str.length % 4) {
@@ -1904,3 +1884,7 @@ Cypress.Commands.add("runFixtures", (path = null) => {
     });
   });
 });
+
+
+
+

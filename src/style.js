@@ -19,7 +19,7 @@ module.exports = function applyStyles() {
 
     spanElement2.innerText = Cypress.env("title")
       ? Cypress.env("title")
-      : "🅲🆈🅿🆁🅴🆂🆂";
+      : "🅲 🆈 🅿 🆁 🅴 🆂 🆂 - 🅲 🆁 🆄 🅳";
   }
 
   if (!app.document.head.querySelector("[data-hover-black-crud]")) {
@@ -37,6 +37,11 @@ module.exports = function applyStyles() {
     let post = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-POST > div > span > div > span.command-info > span.command-method`;
     let deletes = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-DELETE > div > span > div > span.command-info > span.command-method`;
     let patch = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-PATCH > div > span > div > span.command-info > span.command-method`;
+    let description = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-description > div > span > div > span.command-info`;
+    let controls = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li > div > span > div > span.command-controls`;
+    let condition = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-condition-accpet > div > span > div > span.command-info`;
+    let condition_error = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-condition-error > div > span > div > span.command-info`;
+
 
     style.innerHTML = `
     ${log} span.command-method > span {
@@ -44,17 +49,58 @@ module.exports = function applyStyles() {
       border-radius: 2px;
       padding: 0px 4px 1px 4px;
     }
-   #unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li > div > span > div > span.command-controls {
+  ${controls}{
     display: none;
     }
-  #unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-description > div > span > div > span.command-info > span.command-method {
+  ${description} span.command-method {
       background-color: #675f5aeb;
       border-radius: 2px;
       padding: 0px 4px 1px 4px;
     }
-  #unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-description > div > span > div > span.command-info > span.command-message > span.command-message-text {
+  ${condition} span.command-method > span {
+      background-color: #1fa971;
+      border-radius: 2px;
+      padding: 0px 4px 1px 4px;
+    }
+  ${condition} span.command-method span {
       color: white;
+
+    }
+  ${condition_error} span.command-method > span {
+      background-color: red;
+      border-radius: 2px;
+      padding: 0px 4px 1px 4px;
+    }
+  ${condition_error} span.command-method span {
+      color: white;
+
+    }
+  ${description} span.command-message > span.command-message-text {
+      color: gray;
+      font-family: system-ui;
+      font-size: 12px;
       }
+  ${description} span.command-message > span.command-message-text em {
+      color: #ffff00bd;
+
+      }     
+  ${env} {
+        border-top: 1px solid #8080803b;
+    }
+
+  ${description}:hover span.command-message > span.command-message-text {
+      color: white;
+  }
+  ${condition}:hover span.command-message > span.command-message-text {
+      color: white;
+    }
+
+  ${description}:hover span.command-message > span.command-message-text em {
+    color: yellow;
+    font-weight: bold;
+    font-size: 1.2em;
+    }
+
 
 
     ${alias} span.command-method > span,
@@ -66,6 +112,9 @@ module.exports = function applyStyles() {
         background-color: #ff6700eb;
         border-radius: 2px;
         padding: 0px 4px 1px 4px;
+    }
+    ${env}:hover {
+        border-top: 1px solid white;
     }
     ${alias} span.command-method > span{
         color: white;

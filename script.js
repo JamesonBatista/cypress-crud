@@ -33,9 +33,6 @@ import "cypress-plugin-api";
 import "cypress-mochawesome-reporter/register";
 import spok from "cy-spok";
 // export default spok;
-const applyStyles = require("../../node_modules/cypress-crud/src/style");
-if (!Cypress.env("styles") && Cypress.env("crudStyles")) applyStyles();
-
 // close json file in variable
 import _ from "lodash";
 export function clone(json) {
@@ -136,10 +133,7 @@ const supportConfigEnv_content = `
     },
     "endpoint_mercado": "swagger/mercado/{id}/produtos"
 
-  },
-
-  "screenshot": true,
-  "crudStyles": true
+  }
 }
 `;
 
@@ -320,9 +314,6 @@ const snippetContent = `
     "body": [
       "import {faker, clone, crudStorage} from '../support/e2e'; ",
       "describe('', function () {",
-      " afterEach(() => {",
-      "cy.crudScreenshot();",
-      "  });",
       "",
       "it('', function () {});});",
       "",
@@ -342,9 +333,7 @@ const snippetContent = `
     "body": [
       "import {faker, clone, crudStorage} from '../support/e2e'; ",
       "describe('$1', () => { ",
-      " afterEach(() => {",
-      "cy.crudScreenshot();",
-      "  });",
+
       "it('$1', () => {    });  });",
       "",
       "",
@@ -432,8 +421,7 @@ const vscodeFolderPathJSON = path.join(projectRootPathJSON, "examples");
 
 const exampleJSON = path.join(projectRootPathJSON, "example_json.json");
 const examploJSONContent = `{
-    "method": "GET",
-    "url": "http://demo7018197.mockable.io/",
+    "get": "http://demo7018197.mockable.io/",
     "mock": "mocks/mockJson",
   "save": [],
   "expects":[]
@@ -475,8 +463,7 @@ const payloadWithReplace = path.join(
 );
 const contentReplaceAlias = `
 {
-    "method": "POST",
-    "url": "https://reqres.in/api/users/2",
+    "post": "https://reqres.in/api/users/2",
     "body": null,
     "qs": null,
     "headers": {
@@ -508,8 +495,7 @@ const jsonUsers = path.join(vscodeFolderPathJSON, "users.json");
 const contentBigData = `
 {
 
-    "method": "GET",
-    "url": "http://demo7018197.mockable.io/",
+    "get": "http://demo7018197.mockable.io/",
     "headers": {
       "Content-Type": "application/json"
     },
@@ -524,10 +510,9 @@ const contentBigData = `
 `;
 const contentUsers = `
 {
-    "method": "GET",
-    "url": "https://fakerestapi.azurewebsites.net/api/v1/Users",
-    "body": {},
-    "qs": {},
+    "get": "https://fakerestapi.azurewebsites.net/api/v1/Users",
+    "body": null,
+    "qs": null,
     "headers": {
       "Content-Type": "application/json"
     },
@@ -536,13 +521,11 @@ const contentUsers = `
 
 `;
 
-
 const contentJSonAliasNot = `
 {
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": {},
-    "qs": {},
+    "get": "https://reqres.in/api/users/2",
+    "body": null,
+    "qs": null,
     "headers": {
       "Content-Type": "application/json"
     },
@@ -552,14 +535,12 @@ const contentJSonAliasNot = `
 
 const contentWithoutValid = `
 {
-  "req": {
-    "method": "GET",
-    "url": "https://reqres.in/api/users/2",
-    "body": {},
-    "qs": {},
+
+    "get": "https://reqres.in/api/users/2",
+    "body": null,
+    "qs": null,
     "headers": {
       "Content-Type": "application/json"
-    }
   }
 }
 `;
@@ -622,16 +603,14 @@ const contentSchemas = `
 const generateFileExample = path.resolve(__dirname, "../../cypress/e2e/");
 const snipExample = path.join(generateFileExample, "crud.cy.js");
 
-const contentExample =`
+const contentExample = `
 
 import { clone, crudStorage, faker } from "../support/e2e";
 import json from "../fixtures/examples/big_data";
 import users from "../fixtures/examples/users";
 
 describe("Examples cypress-crud", () => {
-  afterEach(() => {
-    cy.crudScreenshot();
-  });
+
   before(() => {
     crudStorage.save.name_mercado = faker.generateName();
     crudStorage.save.cnpj = faker.generateCNPJ();
@@ -773,7 +752,8 @@ describe("Examples cypress-crud", () => {
     console.log(rescue_save());
   });
   it("Test in api save value id", () => {
-    cy.crud({ payload: users }).save({
+     let data = clone(users);
+    cy.crud({ payload: data }).save({
       path: "id",
       eq: 5,
       alias: "save_id_users",
@@ -781,7 +761,7 @@ describe("Examples cypress-crud", () => {
   });
   it("Test rescue save_id_users", () => {
     let data = clone(users);
-    data.url += "/" + rescue_save("save_id_users");
+    data.get += "/" + rescue_save("save_id_users");
     // data.req.path = 'save_id_users'
     data.expects = [{ path: "userName", eq: "User 5" }, { path: "status" }];
     cy.crud({ payload: data });
@@ -802,9 +782,7 @@ describe("Change url in endpoint", () => {
     url: "http://api.openweathermap.org/geo/1.0/direct?q={lon}&limit=5&appid=48184f322c95a02a6a1f322431a2a170",
   };
 
-  afterEach(() => {
-    cy.crudScreenshot();
-  });
+
   it("Change URL using storage and { }", () => {
     cy.crud({ payload: json }).save({ path: "an", as: "lon" });
   });
@@ -827,9 +805,7 @@ describe("Change url in endpoint or replace in complete json", () => {
     },
   };
 
-  afterEach(() => {
-    cy.crudScreenshot();
-  });
+
   it("Change URL using storage and { }", () => {
     cy.crud({ payload: json }).save(
       { path: "an", as: "lon" },
@@ -843,10 +819,6 @@ describe("Change url in endpoint or replace in complete json", () => {
   });
 });
 describe("Test", () => {
-  afterEach(() => {
-    cy.crudScreenshot();
-  });
-
   const json = {
     status: 200,
     url: "getUser",
@@ -989,7 +961,7 @@ after(() => {
 });
 
 
-` ;
+`;
 
 fs.writeFileSync(snipExample, contentExample);
 
@@ -1013,11 +985,8 @@ fs.writeFileSync(mocksJson, contentMock);
 //schemas
 fs.writeFileSync(snippetsFilePathJSONSchemas, contentSchemas);
 
-
 fs.writeFileSync(jsonBigData, contentBigData);
 fs.writeFileSync(jsonUsers, contentUsers);
-
-
 
 fs.writeFileSync(jsonWithoutValidation, contentWithoutValid);
 
@@ -1037,6 +1006,10 @@ module.exports = defineConfig({
     defaultCommandTimeout: 180000,
     pageLoadTimeout: 160000,
     requestTimeout: 160000,
+    trashAssetsBeforeRuns: true,
+    testIsolation: false,
+    experimentalRunAllSpecs: true, 
+
     setupNodeEvents(on, config) {
       // reporter: "cypress-mochawesome-reporter",
 
@@ -1076,8 +1049,7 @@ module.exports = defineConfig({
         return launchOptions;
       });
     },
-    testIsolation: false, //  in e2e:{}
-    experimentalRunAllSpecs: true, // in e2e:{}
+  
   },
 });
 
@@ -1100,10 +1072,9 @@ const mocksJson1 = path.join(jsonExampleMockable, "json1.json");
 const contentMock1 = `
 {
 
-    "method": "GET",
-    "url": "https://demo8370198.mockable.io/",
-    "body": {},
-    "qs": {},
+    "get": "https://demo8370198.mockable.io/",
+    "body": null,
+    "qs": null,
     "headers": {
       "Content-Type": "application/json"
     },
@@ -1121,10 +1092,9 @@ const mocksJson2 = path.join(jsonExampleMockable, "json2.json");
 const contentMock2 = `
 {
 
-    "method": "GET",
-    "url": "https://demo8168190.mockable.io/",
-    "body": {},
-    "qs": {},
+    "get": "https://demo8168190.mockable.io/",
+    "body": null,
+    "qs": null,
     "headers": {
       "Content-Type": "application/json"
     },
@@ -1141,10 +1111,9 @@ const mocksJson3 = path.join(jsonExampleMockable, "json3.json");
 const contentMock3 = `
 {
 
-    "method": "GET",
-    "url": "https://demo0065046.mockable.io/",
-    "body": {},
-    "qs": {},
+    "get": "https://demo0065046.mockable.io/",
+    "body": null,
+    "qs": null,
     "headers": {
       "Content-Type": "application/json"
     },
@@ -1163,11 +1132,10 @@ const mocks4 = path.join(jsonExampleMock, "jsonmock4.json");
 
 const contentMock4 = `
 {
-    "method": "GET",
-    "url": "https://demo0065046.mockable.io/",
+    "get": "https://demo0065046.mockable.io/",
     "mock": "mocks/jsonmock4",
-    "body": {},
-    "qs": {},
+    "body": null,
+    "qs": null,
     "headers": {
       "Content-Type": "application/json"
     },
@@ -1289,11 +1257,10 @@ const mocks5 = path.join(jsonExampleMock, "jsonmock5.json");
 const contentMock5 = `
 {
 
-    "method": "GET",
-    "url": "https://demo0065046.mockable.io/",
+    "get": "https://demo0065046.mockable.io/",
     "mock": "mocks/jsonmock5",
-    "body": {},
-    "qs": {},
+    "body": null,
+    "qs": null,
     "headers": {
       "Content-Type": "application/json"
     },
@@ -1417,11 +1384,10 @@ const mocks6 = path.join(jsonExampleMock, "jsonmock6.json");
 const contentMock6 = `
 {
 
-    "method": "GET",
-    "url": "https://demo0065046.mockable.io/",
+    "get": "https://demo0065046.mockable.io/",
     "mock": "mocks/jsonmock6",
-    "body": {},
-    "qs": {},
+    "body": null,
+    "qs": null,
     "headers": {
       "Content-Type": "application/json"
     },

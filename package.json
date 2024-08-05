@@ -1,13 +1,13 @@
 {
   "name": "cypress-crud",
-  "version": "2.5.6",
+  "version": "3.0.7",
   "description": "cy.crud is a project that aims to have a new framework to make cy.api and cy.request easier",
   "main": "src",
   "peerDependencies": {
     "cypress": ">=10.0.0"
   },
   "scripts": {
-    "postinstall": "node script && node start && node welcome"
+    "postinstall": "node script && node start"
   },
   "repository": {
     "type": "git",

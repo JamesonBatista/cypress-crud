@@ -1,3 +1,5 @@
+const { faker } = require("@faker-js/faker");
+
 class FakerUse {
   name = () => {
     const names = [
@@ -600,18 +602,7 @@ class FakerUse {
     return names[index];
   };
   emails = () => {
-    const domains = [
-      "gmail.com",
-      "yahoo.com",
-      "outlook.com",
-      "hotmail.com",
-      "live.com",
-    ];
-    const nameRandom = removerAcentos(
-      this.name().trim().toLowerCase().replace()
-    );
-    const domainGen = domains[Math.floor(Math.random() * domains.length)];
-    return `${nameRandom}@${domainGen}`;
+    return faker.internet.email();
   };
   enterprise = () => {
     const domains = [
@@ -2177,9 +2168,24 @@ class FakerUse {
 
     return produtos[Math.floor(Math.random() * produtos.length)];
   };
+  actualDate() {
+    const date = new Date();
 
-  
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
 
+    return `${month}/${day}/${year}`;
+  }
+  futureDate() {
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${month}/${day}/${year}`;
+  }
 
   // return enderecosMesclados[Math.floor(Math.random() * enderecosMesclados.length)]
 }
