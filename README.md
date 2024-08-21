@@ -595,7 +595,7 @@ describe("", () => {
 `br:` Usando ::: você usará o salvar o valor da key
 <br>
 
-`en:` Using === you will use save the key value
+`en:` Using ::: you will use save the key value
 <br>
 
 ```json
@@ -616,6 +616,19 @@ describe("", () => {
   "text": "usando expect com ::: para salvar o valor da key",
   "get": "https://reqres.in/api/users/2",
   "expect": { "path": "first_name", "eq": "Janet", "as": "name" }
+}
+{
+  // save name in position 4
+  "expect": "name:::>4"
+}
+{
+  // save name whit alias user_name in position 4
+  "expect": "name:::user_name>4"
+}
+
+{
+  // eq name Micheal save alias user
+  "expect": "name===Michael:::user"
 }
 
 ```
@@ -920,10 +933,7 @@ For requests that require a mock, simply specify the `mock` variable and provide
 ```json
 {
   "get": "https://demo0065046.mockable.io/", // or get: true // post: true // delete": true // path: true
-  "mock": "mocks/json_mock",
-  "headers": {
-    "Content-Type": "application/json"
-  }
+  "mock": "mocks/json_mock"
 }
 ```
 
@@ -947,10 +957,7 @@ In this example, the `body` field directs to the mock file located in the `mocks
 ```json
 {
   "get": "https://demo0065046.mockable.io/", // or get: true // post: true // delete": true // path: true
-  "mock": "mocks/json_mock",
-  "headers": {
-    "Content-Type": "application/json"
-  }
+  "mock": "mocks/json_mock"
 }
 ```
 
@@ -966,6 +973,115 @@ cy.crud({ get: "swagger/eventos", expect: "name===Jam" }); // equal result expec
 <br>
 
 <br>
+
+### **hideReport**
+
+```json
+// in cypress.env.json
+
+ "hideReport": ["body", "headers"]
+
+ // result
+
+ {
+  "get": "https://reqres.in/api/users/2",
+  "failOnStatusCode": false,
+  "body": "hide active in path",
+  "headers": "hide active in path"
+}
+
+```
+
+<br>
+
+## config.env.json
+
+```json
+{
+  "environment": "QA",
+  "QA": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  },
+  "PROD": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  },
+  "DEV": {
+    "endpoint": "https://restcountries.com/v3.1/translation/germany",
+    "reqres": "https://reqres.in/api/users/2",
+    "location": "https://rickandmortyapi.com/api/location",
+    "serverest": "https://serverest.dev",
+    "getUser": "https://reqres.in/api/users/2",
+    "swagger": "https://api-desafio-qa.onrender.com/",
+    "crud_base": {
+      "crud_get_post": "swagger/crud",
+      "crud_getId_delete": "swagger/crud/{id}"
+    },
+    "endpoint_mercado": "swagger/mercado/{id}/produtos"
+  }
+}
+```
+## Tips
+`br:` sempre que você efetua uma requisição, a url é salva em crudStora.save.url, então na próxima requisição você pode usar como a abaixo:
+<br>
+
+`en:` whenever you make a request, the url is saved in crudStora.save.url, so in the next request you can use it like the one below:
+
+
+```json
+
+  {
+    "text": "GET list in projects",
+    "get": "swagger/projects", // https://api-desafio-qa.onrender.com/projects
+  },
+  {
+    "text": `Post in projects using data fakers`,
+    "body": {
+      "name": "faker.enterprise",
+      "leader": "faker.name",
+      "description": "faker.text",
+      "endDate": "2024-08-08",
+    },
+    "post": "{url}", // https://api-desafio-qa.onrender.com/projects
+  }
+```
+```json
+
+  {
+    "text": "GET list in projects",
+    "get": "swagger/projects", // https://api-desafio-qa.onrender.com/projects
+    "save": "id===3"
+  },
+  {
+    "text": `Post in projects using data fakers`,
+    "body": {
+      "name": "faker.enterprise",
+      "leader": "faker.name",
+      "description": "faker.text",
+      "endDate": "2024-08-08",
+    },
+    "post": "{url}/{id}", // https://api-desafio-qa.onrender.com/projects/3
+  }
+```
 
 ### **crudSafeData**
 
@@ -1029,77 +1145,6 @@ describe(`Test cypress-crud Property search`, () => {
 ```
 
 <br>
-
-### **hideReport**
-
-```json
-// in cypress.env.json
-
- "hideReport": ["body", "headers"]
-
- // result
-
- {
-  "get": "https://reqres.in/api/users/2",
-  "failOnStatusCode": false,
-  "body": "hide active in path",
-  "headers": "hide active in path"
-}
-
-```
-
-<br>
-
-- ### **_Report_**
-
-To generate the report, the tests must be executed in `run` mode. Furthermore, to include screenshots of the request payload in the report, a specific configuration needs to be adjusted in the `cypress.config.js` file and in your `test` file.
-
-`cypress.config.js:` To activate the option, simply add `screenshot: true`
-
-```json
-{
-  "environment": "QA",
-  "QA": {
-    "endpoint": "https://restcountries.com/v3.1/translation/germany",
-    "reqres": "https://reqres.in/api/users/2",
-    "location": "https://rickandmortyapi.com/api/location",
-    "serverest": "https://serverest.dev",
-    "getUser": "https://reqres.in/api/users/2",
-    "swagger": "https://api-desafio-qa.onrender.com/",
-    "crud_base": {
-      "crud_get_post": "swagger/crud",
-      "crud_getId_delete": "swagger/crud/{id}"
-    },
-    "endpoint_mercado": "swagger/mercado/{id}/produtos"
-  },
-  "PROD": {
-    "endpoint": "https://restcountries.com/v3.1/translation/germany",
-    "reqres": "https://reqres.in/api/users/2",
-    "location": "https://rickandmortyapi.com/api/location",
-    "serverest": "https://serverest.dev",
-    "getUser": "https://reqres.in/api/users/2",
-    "swagger": "https://api-desafio-qa.onrender.com/",
-    "crud_base": {
-      "crud_get_post": "swagger/crud",
-      "crud_getId_delete": "swagger/crud/{id}"
-    },
-    "endpoint_mercado": "swagger/mercado/{id}/produtos"
-  },
-  "DEV": {
-    "endpoint": "https://restcountries.com/v3.1/translation/germany",
-    "reqres": "https://reqres.in/api/users/2",
-    "location": "https://rickandmortyapi.com/api/location",
-    "serverest": "https://serverest.dev",
-    "getUser": "https://reqres.in/api/users/2",
-    "swagger": "https://api-desafio-qa.onrender.com/",
-    "crud_base": {
-      "crud_get_post": "swagger/crud",
-      "crud_getId_delete": "swagger/crud/{id}"
-    },
-    "endpoint_mercado": "swagger/mercado/{id}/produtos"
-  }
-}
-```
 
 ## **Authors and Contributors**
 

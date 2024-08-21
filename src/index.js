@@ -6,6 +6,8 @@ const app = window.top;
 import applyStyles from "../src/style.js";
 
 let counter = 0;
+let count = 0;
+
 let counterResponse = 0;
 let colorNum;
 let numberRequest = 0;
@@ -13,6 +15,8 @@ crudStorage.num = {};
 crudStorage.num.counter = 1;
 crudStorage.counter = {};
 crudStorage.counter.int = 1;
+crudStorage.save.url = null;
+
 
 function generateInt() {
   const standardColors = [
@@ -72,10 +76,9 @@ function textNpxRunCypress({
       2
     )}\n${colorNum}     -------------------- 🅵 🅸 🅽 🅰  🅻  --------------------\n\n`;
 }
-
+let useStyle = false;
 Cypress.Commands.add("crud", (input) => {
-  applyStyles();
-
+  // if (!useStyle) { applyStyles(); useStyle = true; }
   if (typeof input === "string") {
     cy.fixture(`${input}`).then((jsons) => {
       if (Array.isArray(jsons)) {
@@ -117,59 +120,44 @@ Cypress.Commands.add("supportCrud", (input) => {
   cy.clearAllLocalStorage({ log: false });
 
   const organizeJSON = (payload, payloadCreate) => {
+    payloadCreate = {}
     payloadCreate.req = {};
     let cp = (payloadCreate.req = {});
+    if (!crudStorage.organize) crudStorage.organize = {}
+
+    crudStorage.organize.url = payload[['get', 'post', 'delete', 'path', 'put'].find(key => key in payload) || 'get']
 
     if (payload.method) cp.method = payload.method;
 
-    if (payload.post && typeof payload.post === "boolean") {
-      cp.method = "POST";
-      delete payload.post;
-    } else if (payload.post && typeof payload.post === "string") {
+    if (payload.post && typeof payload.post === "string") {
       cp.method = "POST";
       cp.url = payload.post;
-      delete payload.post;
     }
 
-    if (payload.put && typeof payload.put === "boolean") {
-      cp.method = "PUT";
-      delete payload.put;
-    } else if (payload.put && typeof payload.put === "string") {
+    else if (payload.put && typeof payload.put === "string") {
       cp.method = "PUT";
       cp.url = payload.put;
-      delete payload.put;
-    }
 
-    if (payload.delete && typeof payload.delete === "boolean") {
-      cp.method = "DELETE";
-      delete payload.delete;
-    } else if (payload.delete && typeof payload.delete === "string") {
+    }
+    else if (payload.delete && typeof payload.delete === "string") {
       cp.method = "DELETE";
       cp.url = payload.delete;
-      delete payload.delete;
     }
-
-    if (payload.get && typeof payload.get === "boolean") {
-      cp.method = "GET";
-      delete payload.get;
-    } else if (payload.get && typeof payload.get === "string") {
+    else if (payload.get && typeof payload.get === "string") {
       cp.method = "GET";
       cp.url = payload.get;
-      delete payload.get;
     }
-    if (payload.path && typeof payload.path === "boolean") {
-      cp.method = "PATH";
-      delete payload.path;
-    } else if (payload.path && typeof payload.path === "string") {
+    else if (payload.path && typeof payload.path === "string") {
       cp.method = "PATH";
       cp.url = payload.path;
-      delete payload.path;
     }
+
 
     if (cp.method === "GET") payload.status = 200;
     if (cp.method === "POST") payload.status = 201;
 
-    if (payload.url) cp.url = payload.url;
+
+
     if (payload.form) cp.form = payload.form;
 
     if (payload.status || payload.statusCode)
@@ -210,18 +198,24 @@ Cypress.Commands.add("supportCrud", (input) => {
     if (payload.retryOnNetworkFailure)
       payloadCreate.retryOnNetworkFailure = payload.retryOnNetworkFailure;
 
-    if (payload.text) {
 
+    if (payload.text) {
       payloadCreate.text = formatText(payload.text);
-    
     }
+
+    // delete cp.url
+    // cp.url = payload[['get', 'post', 'delete', 'path'].find(key => key in payload) || 'get']
 
     if (payload.env) cp.env = payload.env;
 
     if (payload.timeout) {
-      payloadCreate.timou = payload.timeout;
+      cp.timeout = payload.timeout;
     } else {
-      payloadCreate.timeout = 60000;
+      cp.timeout = 180000;
+    }
+
+    if (cp.url === undefined) {
+      delete cp.url
     }
 
     if (payload.condition) payloadCreate.condition = payload.condition
@@ -244,13 +238,14 @@ Cypress.Commands.add("supportCrud", (input) => {
     }
 
     if (payload.save) payloadCreate.save = payload.save;
+
     return payloadCreate;
   };
   function formatText(text) {
     const regex = /\{([^}]+)\}/g;
     const formattedText = text.replace(regex, '*{$1}*');
     return formattedText;
-}
+  }
 
   let payload,
     alias = "response",
@@ -261,7 +256,7 @@ Cypress.Commands.add("supportCrud", (input) => {
     ({ payload = input, alias = "response", log = false } = input);
   }
 
-  let payloadCreate = {};
+  let payloadCreate;
 
   if (!window.save) {
     window.save = {};
@@ -322,7 +317,7 @@ Cypress.Commands.add("supportCrud", (input) => {
           });
           return environment;
         };
-        let url;
+        let url = null;
 
         if (reqPath.url.includes("/")) {
           let split_url = reqPath.url.split("/");
@@ -420,6 +415,7 @@ Cypress.Commands.add("supportCrud", (input) => {
       delete payload.req.form;
       delete payload.req.auth;
       delete payload.auth;
+      delete payload.req.timeout;
       if (payload.req.schema) payload.schema = payload.req.schema;
       delete payload.req.schema;
       mock.intercept = payload.req;
@@ -573,18 +569,22 @@ Cypress.Commands.add("supportCrud", (input) => {
       }
     });
   };
+
   function removeBeforePseudoElement() {
     const app = window.top;
 
     if (
       !app.document.head.querySelector("[data-hover-black-delete-beforepost]")
     ) {
+      const selectorForm = (method) => {
+        return `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div.runnable-commands-region > ul > li > div > div.collapsible-content > ul > li.command.command-name-${method}`;
+      }
       const style = app.document.createElement("style");
-      let post = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div.runnable-commands-region > ul > li > div > div.collapsible-content > ul > li.command.command-name-POST`;
-      let get = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div.runnable-commands-region > ul > li > div > div.collapsible-content > ul > li.command.command-name-GET`;
-      let delete_ = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div.runnable-commands-region > ul > li > div > div.collapsible-content > ul > li.command.command-name-DELETE`;
-      let put = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div.runnable-commands-region > ul > li > div > div.collapsible-content > ul > li.command.command-name-PUT`;
-      let path = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div.runnable-commands-region > ul > li > div > div.collapsible-content > ul > li.command.command-name-PATH`;
+      let post = selectorForm('POST')
+      let get = selectorForm('GET')
+      let delete_ = selectorForm('DELETE')
+      let put = selectorForm('PUT')
+      let path = selectorForm('PATH')
 
       let div = `div > span > div > span.command-info > span.command-method::before {content: '';}`;
       style.innerHTML = `
@@ -651,21 +651,46 @@ Cypress.Commands.add("supportCrud", (input) => {
         Cypress.log(log);
       });
   };
+  function removeBeforeSecondHttps(str) {
+    // Encontrar o índice do primeiro "https"
+    let firstHttpsIndex = str.indexOf('https');
+
+    if (firstHttpsIndex === -1) {
+      // Se não houver "https" na string, retornar a string original
+      return str;
+    }
+
+    // Encontrar o índice do segundo "https" começando após o primeiro "https"
+    let secondHttpsIndex = str.indexOf('https', firstHttpsIndex + 1);
+
+    if (secondHttpsIndex === -1) {
+      // Se não houver segundo "https", retornar a string original
+      return str;
+    }
+
+    // Retornar a parte da string a partir do segundo "https"
+    return str.substring(secondHttpsIndex);
+  }
 
   const handleRequest = (data, payload) => {
+
+    if (payload.req.url.startsWith("undefined") || payload.req.url.startsWith("nullundefined")) {
+      let result = removeBeforeSecondHttps(payload.req.url);
+      payload.req.url = result
+    }
     if (payload.text) {
       cy.step(payload.text);
     }
     return cy
-      .api(data)
+      .api(payload.req)
       .then((response) => {
 
         if (!window.alias) {
           window.alias = {};
         }
-        if (data.status) {
+        if (payload.req.status) {
           expect(response.status, `${randonItens()}status::`).to.eq(
-            data.status
+            payload.req.status
           );
         }
         window.alias[alias] = response;
@@ -716,23 +741,35 @@ Cypress.Commands.add("supportCrud", (input) => {
           // createHTML();
           cy.screenshot();
         }
+        count += 1;
+        crudStorage.save.url = payload.req.url
+        crudStorage.save.beforeUrl = payload.req.url
+        crudStorage.save[`url${count}`] = payload.req.url
       });
   };
   if (typeof payload === `object`) {
     const reqExist = payload.req || payload.request;
     if (!reqExist) payload = organizeJSON(payload, payloadCreate);
+    window.test = {}
+    // console.log(payload);
+    // if (payload.req.url) {
+    //   delete payload.req.url
+    // }
+    window.test.url = window.organize.url
+
+    payload.req.url = window.test.url
 
     const reqPath = payload.request || payload.req;
-
+    // console.log(reqPath);
     if (reqPath.url.endsWith("/")) {
-      const req = payload.request || payload.req;
-      req.url = req.url.slice(0, -1);
+      reqPath.url = reqPath.url.slice(0, -1);
     }
 
     if (reqPath.url && !reqPath.url.startsWith("http")) {
       handleEndWithEndpoint(reqPath);
     }
     payload = replaceAllStrings(payload);
+
 
     let req = payload.request || payload.req;
 
@@ -806,7 +843,7 @@ function conditionContinueTest(json) {
   }
 
   if (typeof json.condition === "string") {
-     result = findInJson(window.alias.bodyResponse, json.condition);
+    result = findInJson(window.alias.bodyResponse, json.condition);
 
     if (result) {
       logCondition = true;
@@ -816,8 +853,9 @@ function conditionContinueTest(json) {
     condicionAccept = json.condition;
   } else if (typeof json.condition === "number") {
     result = findInJson(window.alias.bodyResponse, "status");
+    if (result.length === 1) result = result[0]
 
-    if (result === json.condition) {
+    if (result.includes(json.condition)) {
       logCondition = true;
     } else {
       logCondition = false;
@@ -834,8 +872,7 @@ function conditionContinueTest(json) {
 
     Cypress.log({
       name: `condition-accpet`,
-      message: `${condicionAccept ? condicionAccept : json.condition} ${eqCondition ? `: ${eqCondition}` : `[*${result}*]`
-        }`,
+      message: `previus test: [*${json.condition}*] return: [*${result}*]`,
       consoleProps: () => ({
         json: formattedJson,
         condition: json.condition,
@@ -846,8 +883,7 @@ function conditionContinueTest(json) {
   } else {
     Cypress.log({
       name: `condition-error`,
-      message: `${condicionAccept ? condicionAccept : ""} ${eqCondition ? `= ${eqCondition}` : ""
-        } [*${formattedJson}*]`,
+      message: `previus test: [*${json.condition}*] return: [*${result}*]`,
       consoleProps: () => ({
         json: formattedJson,
         condition: json.condition,
@@ -858,21 +894,7 @@ function conditionContinueTest(json) {
   }
   return logCondition;
 }
-function dataVales(searchValue, path) {
-  crudStorage.save[path] = searchValue;
-  Cypress.log({
-    name: `save`,
-    message: `[${path}] = ${typeof searchValue === "object"
-      ? JSON.stringify(searchValue)
-      : searchValue
-      }`,
-    consoleProps: () => ({
-      alias: path,
-      value: searchValue,
-      framework: "cypress-crud",
-    }),
-  });
-}
+
 function haveProperty(objeto, propriedade, reserve) {
   let found = false;
 
@@ -917,23 +939,6 @@ function haveProperty(objeto, propriedade, reserve) {
 }
 
 function runValidation(initValid) {
-  if (typeof initValid === "string") {
-    if (initValid.trim().includes(":::")) {
-      const split_ = initValid.trim().split(":::");
-      initValid = {};
-      initValid.path = split_[0].trim();
-      initValid.as = split_[1].trim();
-    } else if (initValid.trim().includes("===")) {
-      const split_ = initValid.trim().split("===");
-      initValid = {};
-      initValid.path = split_[0].trim();
-      initValid.eq = split_[1].trim();
-    } else {
-      const value = initValid;
-      initValid = {};
-      initValid.path = value;
-    }
-  }
 
   if (
     window.alias &&
@@ -942,339 +947,207 @@ function runValidation(initValid) {
   ) {
     delete window.alias.bodyResponse.allRequestResponses;
   }
-  const {
-    path,
-    eq,
-    position,
-    type,
-    search,
-    alias = null,
-    as = null,
-    property = null,
-    key = null,
-  } = initValid;
 
-  let aliasPath = alias || as;
-  const key_property = property || key;
-  let path_and_key = path || key;
-  path_and_key = path_and_key.trim();
-  if (aliasPath) aliasPath = aliasPath.trim();
+  let responseAlias = window.alias.bodyResponse.body ? window.alias.bodyResponse.body : window.alias.bodyResponse.response
 
-  if (!path_and_key && !eq && !position && !type && search) {
-    searchEq(window.alias.bodyResponse, search, aliasPath);
-    return;
-  }
+  let useEq;
+  const saveLog = (saveName, eq) => {
+    crudStorage.save[saveName] = eq
 
-  if (key_property) {
-    haveProperty(window.alias.bodyResponse, key_property, aliasPath);
-    return;
-  }
-
-  if (initValid && path_and_key && !initValid.search) {
-    validatePathAndKey(initValid, path_and_key, aliasPath);
-  }
-}
-
-function validatePathAndKey(initValid, path_and_key, aliasPath) {
-  const paths = findInJson(window.alias.bodyResponse, path_and_key);
-  const shouldCheckEquality = initValid.hasOwnProperty("eq");
-  const validateType = initValid.hasOwnProperty("type");
-
-  if (Array.isArray(paths) && paths.every(Array.isArray)) {
-    handleNestedArrays(
-      paths,
-      initValid,
-      shouldCheckEquality,
-      validateType,
-      aliasPath
-    );
-  } else if (Array.isArray(paths)) {
-    handleArrayPaths(
-      paths,
-      initValid,
-      shouldCheckEquality,
-      validateType,
-      aliasPath
-    );
-  } else {
-    handleSinglePath(
-      paths,
-      initValid,
-      shouldCheckEquality,
-      validateType,
-      aliasPath,
-      path_and_key
-    );
-  }
-}
-
-function handleNestedArrays(
-  paths,
-  initValid,
-  shouldCheckEquality,
-  validateType,
-  aliasPath
-) {
-  const valueFoundInAnyArray = paths.some((path) => {
-    if (!Array.isArray(path)) return false;
-    return checkPathEquality(path, initValid, shouldCheckEquality);
-  });
-
-  if (shouldCheckEquality && !valueFoundInAnyArray) {
-    reportError(paths, initValid);
-  } else if (shouldCheckEquality && valueFoundInAnyArray) {
-    expectPathToBeFound(valueFoundInAnyArray, initValid, aliasPath);
-    if (validateType)
-      typeAssert(valueFoundInAnyArray, initValid.path, initValid.type);
-  } else if (valueFoundInAnyArray && !shouldCheckEquality) {
-    expectPathToExist(paths, initValid, aliasPath);
-    if (validateType) typeAssert(paths, initValid.path, initValid.type);
-  }
-}
-
-function handleArrayPaths(
-  paths,
-  initValid,
-  shouldCheckEquality,
-  validateType,
-  aliasPath
-) {
-  if (
-    initValid.position &&
-    typeof initValid.position === "number" &&
-    initValid.position <= paths.length
-  ) {
-    validatePosition(
-      paths,
-      initValid,
-      shouldCheckEquality,
-      validateType,
-      aliasPath
-    );
-  } else {
-    const valueFound = checkArrayEquality(
-      paths,
-      initValid,
-      shouldCheckEquality
-    );
-    if (!valueFound) {
-      expectPathToExist(paths, initValid, aliasPath);
-      if (validateType) typeAssert(paths, initValid.path, initValid.type);
-    }
-    if (shouldCheckEquality && !valueFound) {
-      reportError(paths, initValid);
-    } else if (shouldCheckEquality && valueFound) {
-      expectPathToBeFound(valueFound, initValid, aliasPath);
-      if (validateType) typeAssert(valueFound, initValid.path, initValid.type);
-    }
-  }
-}
-
-function handleSinglePath(
-  paths,
-  initValid,
-  shouldCheckEquality,
-  validateType,
-  aliasPath,
-  path_and_key
-) {
-  if (shouldCheckEquality && validateType) {
-    validateTypeAndEquality(paths, initValid, aliasPath, path_and_key);
-  } else {
-    expectPathToExist(paths, initValid, aliasPath);
-    if (shouldCheckEquality) {
-      validateEquality(paths, initValid, aliasPath, path_and_key);
-    }
-    if (validateType) {
-      typeAssert(paths, path_and_key, initValid.type);
-    }
-  }
-}
-
-function checkPathEquality(path, initValid, shouldCheckEquality) {
-  if (!initValid.eq) {
-    if (initValid.position && typeof initValid.position === "number") {
-      return (
-        initValid.position <= path.length &&
-        path[initValid.position - 1] !== undefined
-      );
-    } else {
-      return path;
-    }
-  } else if (typeof initValid.eq === "string") {
-    return initValid.eq
-      .split("||")
-      .map((eqValue) => eqValue.trim())
-      .some((eqValue) => path.includes(eqValue));
-  }
-  return false;
-}
-
-function validatePosition(
-  paths,
-  initValid,
-  shouldCheckEquality,
-  validateType,
-  aliasPath
-) {
-  if (initValid.type && !shouldCheckEquality) {
-    expect(
-      paths[initValid.position - 1],
-      `Type check for path '${initValid.path}':`
-    ).to.be.an(initValid.type);
-    if (aliasPath)
-      dataVales(
-        paths[initValid.position - 1],
-        typeof aliasPath != "boolean" ? aliasPath : path || path
-      );
-  } else if (shouldCheckEquality && initValid.type) {
-    expect(
-      paths[initValid.position - 1],
-      `Type check for path '${initValid.path}':`
-    ).to.be.an(initValid.type);
-    expect(
-      paths[initValid.position - 1],
-      `${randonItens()}${initValid.path}::`
-    ).to.eq(initValid.eq);
-    if (aliasPath)
-      dataVales(
-        paths[initValid.position - 1],
-        typeof aliasPath != "boolean" ? aliasPath : path || path
-      );
-  } else if (!initValid.type && initValid.position) {
-    expect(paths[initValid.position - 1], `${randonItens()}${initValid.path}::`)
-      .to.exist;
-    if (aliasPath)
-      dataVales(
-        paths[initValid.position - 1],
-        typeof aliasPath != "boolean" ? aliasPath : path || path
-      );
-  }
-}
-
-function checkArrayEquality(paths, initValid, shouldCheckEquality) {
-  return paths.some((path) => shouldCheckEquality && path === initValid.eq);
-}
-
-function validateTypeAndEquality(paths, initValid, aliasPath, path_and_key) {
-  typeAssert(paths, initValid.path, initValid.type);
-  if (typeof initValid.eq === "string") {
-    const value = initValid.eq
-      .split("||")
-      .map((eqValue) => eqValue.trim())
-      .some((eqValue) => paths === eqValue);
-    if (value) {
-      expect(
-        value,
-        `${randonItens()}${initValid.path}:: expected '${initValid.eq
-        }' to be found`
-      ).to.be.true;
-      if (aliasPath)
-        dataVales(
-          value,
-          typeof aliasPath != "boolean"
-            ? aliasPath
-            : path_and_key || path_and_key
-        );
-    } else {
-      expect(
-        false,
-        `${randonItens()}${initValid.path}:: expected '${initValid.eq
-        }' to be found`
-      ).to.be.true;
-    }
-  } else {
-    expect(paths, `${randonItens()}${initValid.path}::`).to.eq(initValid.eq);
-    if (aliasPath)
-      dataVales(
-        paths,
-        typeof aliasPath != "boolean" ? aliasPath : path_and_key || path_and_key
-      );
-  }
-}
-
-function validateEquality(paths, initValid, aliasPath, path_and_key) {
-  if (typeof initValid.eq === "string") {
-    const value = initValid.eq
-      .split("||")
-      .map((eqValue) => eqValue.trim())
-      .some((eqValue) => paths === eqValue);
-    if (value) {
-      expect(
-        value,
-        `${randonItens()}${initValid.path}:: expected '${initValid.eq
-        }' to be found`
-      ).to.be.true;
-      if (aliasPath)
-        dataVales(
-          paths,
-          typeof aliasPath != "boolean"
-            ? aliasPath
-            : path_and_key || path_and_key
-        );
-    } else {
-      expect(
-        false,
-        `${randonItens()}${initValid.path}:: expected '${initValid.eq
-        }' to be found`
-      ).to.be.true;
-    }
-  } else {
-    expect(paths, `${randonItens()}${initValid.path}::`).to.eq(initValid.eq);
-    if (aliasPath)
-      dataVales(
-        paths,
-        typeof aliasPath != "boolean" ? aliasPath : path_and_key || path_and_key
-      );
-  }
-}
-
-function expectPathToBeFound(valueFound, initValid, aliasPath) {
-  expect(
-    valueFound,
-    `${randonItens()}${initValid.path}:: expected '${initValid.eq}' to be found`
-  ).to.be.true;
-  if (aliasPath) {
-    dataVales(
-      valueFound,
-      typeof aliasPath != "boolean" ? aliasPath : path || path
-    );
-  }
-}
-
-function expectPathToExist(paths, initValid, aliasPath) {
-  if (typeof paths === "object") {
-    paths.forEach((item) => {
-      expect(JSON.stringify(item), `${randonItens()}${initValid.path}::`).to
-        .exist;
-    });
-  } else {
-    expect(JSON.stringify(paths), `${randonItens()}${initValid.path}::`).to
-      .exist;
-  }
-  if (aliasPath) {
-    dataVales(paths, typeof aliasPath != "boolean" ? aliasPath : path || path);
-  }
-}
-
-function reportError(paths, initValid) {
-  const log = {
-    name: "expect",
-    message: `Expected value '${initValid.eq}' not found in any array for path '${initValid.path}'`,
-    consoleProps: () => {
-      return {
-        found: paths,
-        expected: initValid.eq,
+    return Cypress.log({
+      name: "save",
+      message: `[${saveName}] = ${JSON.stringify(eq)}`,
+      consoleProps: () => ({
+        alias: saveName,
+        value: eq,
         framework: "cypress-crud",
-      };
-    },
-  };
-  Cypress.log(log);
-  expect(
-    false,
-    `Expected value '${initValid.eq}' not found in any array for path '${initValid.path}'`
-  ).to.be.true;
+      }),
+    });
+  }
+  //  const paths = findInJson(window.alias.bodyResponse, path_and_key);
+  if (typeof initValid === "string") {
+    // expect: "name:::product_name>7",
+    // 
+    if (initValid.trim().includes("===") && !initValid.trim().includes(":::") && !initValid.trim().includes(">")) {
+      let validation = false;
+      const splitEq = initValid.trim().split("===")
+      const splitSave = splitEq[1].trim()
+      useEq = splitSave
+      const paths = findInJson(responseAlias, splitEq[0].trim());
+
+      if (!paths || paths === undefined) throw new Error(`${splitEq[0].trim()} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+      for (let path of paths) {
+        let pathResolve = typeof path === 'string' ? path.trim() : path
+        let eqResolve = typeof splitSave === 'string' ? splitSave.trim() : splitSave
+        eqResolve = typeof pathResolve === 'number' ? parseInt(eqResolve) : eqResolve
+
+        if (pathResolve === eqResolve) {
+          validation = true;
+          expect(pathResolve).to.eql(eqResolve)
+          return false;
+        }
+      }
+      if (!validation) {
+        expect(`error validation eqls not found ${useEq} in ${paths}`, true).to.be.false
+      }
+      return;
+    } else if (initValid.trim().includes("===") && initValid.trim().includes(":::") && !initValid.trim().includes(">")) {
+      let validation = false;
+      const splitEq = initValid.trim().split("===")
+      const splitSave = splitEq[1].trim().split(":::")
+      useEq = splitSave[0]
+      const paths = findInJson(responseAlias, splitEq[0].trim());
+
+      if (!paths || paths === undefined) throw new Error(`${splitEq[0].trim()} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+      for (let path of paths) {
+        let pathResolve = typeof path === 'string' ? path.trim() : path
+        let eqResolve = typeof splitSave[0] === 'string' ? splitSave[0].trim() : splitSave[0]
+        eqResolve = typeof pathResolve === 'number' ? parseInt(eqResolve) : eqResolve
+
+        if (pathResolve === eqResolve) {
+          validation = true;
+          expect(eqResolve).to.be.eq(eqResolve)
+          // save
+          const saveName = splitSave[1].trim() ? splitSave[1].trim() : splitEq[0].trim()
+          saveLog(saveName, eqResolve)
+          return false;
+        }
+      }
+      if (!validation) {
+        expect(`error validation eqls not found ${useEq}`, true).to.be.false
+      }
+    }
+
+    else if (initValid.trim().includes(":::") && !initValid.trim().includes("===") && !initValid.trim().includes(">")) {
+      const sliptSave = initValid.trim().split(":::")
+      const paths = findInJson(responseAlias, sliptSave[0].trim());
+
+      if (!paths || paths === undefined) throw new Error(`${sliptSave[0].trim()} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+      const saveName = sliptSave[1].trim() ? sliptSave[1].trim() : sliptSave[0].trim()
+      saveLog(saveName, paths.length === 1 ? paths[0] : paths)
+
+    } else if (initValid.trim().includes(":::") && initValid.trim().includes(">") && !initValid.trim().includes("===")) {
+      const sliptSave = initValid.trim().split(":::")
+      const splitPostition = sliptSave[1].trim().split(">")
+
+      const paths = findInJson(responseAlias, sliptSave[0].trim());
+
+      if (!paths || paths === undefined) throw new Error(`${sliptSave[0].trim()} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+      const saveName = splitPostition[1].trim() && splitPostition[0].trim() !== '' ? splitPostition[0].trim() : sliptSave[0].trim()
+
+      saveLog(saveName, splitPostition[1] ? paths[splitPostition[1] - 1] : paths)
+    } else {
+      const paths = findInJson(responseAlias, initValid);
+
+      if (paths && paths.length === 1) {
+        for (let pathExist of paths) {
+          expect(pathExist, initValid).to.be.exist
+        }
+      } else {
+        if (initValid.includes(">")) {
+          const splitPostition = initValid.trim().split(">")
+          const pathsPosition = findInJson(responseAlias, splitPostition[0].trim());
+          saveLog(splitPostition[0].trim(), pathsPosition[splitPostition[1] - 1])
+        } else {
+          if (!paths || paths === undefined) throw new Error(`${initValid} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+          paths.forEach((value, index) => {
+            expect(value, `[${initValid}] position: ${index + 1}`).to.be.exist
+          })
+        }
+
+      }
+      return false;
+
+    }
+  } else {
+    const {
+      path,
+      eq,
+      position,
+      type,
+      search,
+      alias = null,
+      as = null,
+      property = null,
+      key = null,
+    } = initValid;
+
+    let aliasPath = alias || as || path;
+    let useAlias = alias || as;
+    const key_property = property || key;
+    function filterObject(obj) {
+      const filteredObj = {};
+      for (const [key, value] of Object.entries(obj)) {
+        if (value !== null && value !== undefined) {
+          filteredObj[key] = value;
+        }
+      }
+      return filteredObj;
+    }
+
+    const filteredInitValid = filterObject({
+      path,
+      eq,
+      position,
+      type,
+      search,
+      alias,
+      as,
+      property,
+      key
+    });
+
+    const simbol = '->';
+
+    if (!path && !eq && !position && !type && search) {
+      searchEq(window.alias.bodyResponse, search, aliasPath);
+      return;
+    }
+    const paths = findInJson(responseAlias, path);
+
+    if (!paths || paths === undefined) throw new Error(`${path} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+    if (!eq) {
+
+      if (position) {
+        expect(paths[position - 1], `${JSON.stringify(filteredInitValid)}`).to.be.exist
+        if (type) expect(paths[position - 1], `${JSON.stringify(filteredInitValid)}`).to.be.an(type)
+
+        if (useAlias) saveLog(aliasPath, paths[position - 1])
+      } else {
+        for (let pathExist of paths) expect(pathExist, `${JSON.stringify(filteredInitValid)}`).to.be.exist
+
+        if (useAlias) saveLog(aliasPath, paths)
+      }
+    }
+    else if (eq) {
+      if (position && type) {
+        expect(eq, `${JSON.stringify(filteredInitValid)}`).to.eq(paths[position - 1])
+        expect(paths[position - 1], `${JSON.stringify(filteredInitValid)}`).to.be.an(type)
+        if (useAlias) saveLog(aliasPath, paths[position - 1])
+      }
+      else if (position && !type) {
+        expect(eq, `${JSON.stringify(filteredInitValid)}`).to.be.eq(paths[position - 1])
+        if (useAlias) saveLog(aliasPath, paths[position - 1])
+      }
+      else if (!position) {
+        for (let pathEq of paths) {
+          if (pathEq === eq) {
+            expect(eq, `${JSON.stringify(filteredInitValid)}`).to.be.eq(pathEq)
+            if (type) expect(pathEq, `${JSON.stringify(filteredInitValid)}`).to.be.an(type)
+            if (useAlias) saveLog(aliasPath, pathEq)
+            return false;
+          }
+        }
+      }
+    }
+  }
 }
+
 function searchEq(obj, searchValue, reserve) {
   let found = false;
 
@@ -1316,20 +1189,6 @@ function searchEq(obj, searchValue, reserve) {
   }
 }
 
-function typeAssert(paths, path, type) {
-  if (paths && type) {
-    if (Array.isArray(paths) && type === "array") {
-      expect(paths, `Type check for path '${path}':`).to.be.an(type);
-    } else if (typeof paths === type) {
-      expect(paths, `Type check for path '${path}':`).to.be.an(type);
-    } else {
-      throw new Error(
-        `Expected type '${type}' but found '${typeof paths}' for path '${path}'`
-      );
-    }
-  }
-}
-
 Cypress.Commands.add("runValidation", (validations) => {
   return runValidation(validations);
 });
@@ -1350,7 +1209,11 @@ Cypress.Commands.add("expects", (...args) => {
   ExpectHandle(args);
 });
 Cypress.Commands.add("save", (...input) => {
-  if (!Array.isArray(input)) input = [input];
+  if (typeof input === 'string') {
+    save(input)
+  } else
+
+    if (!Array.isArray(input)) input = [input];
 
   if (Array.isArray(input)) {
     input.forEach((item) => {
@@ -1362,117 +1225,163 @@ Cypress.Commands.add("save", (...input) => {
     }
   }
 });
-function save(input) {
-  let options;
+function save(initValid) {
+  let logCondition;
 
-  if (typeof input === "string") {
-    if (input.includes(":::")) {
-      const split_ = input.split(":::");
-      options = { path: split_[0], as: split_[1] };
-    } else {
-      options = { path: input };
-    }
-  } else if (typeof input === "object" && input !== null) {
-    options = input;
-  } else {
-    throw new Error("Input must be either a string or an object.");
+  if (
+    window.alias &&
+    window.alias.bodyResponse &&
+    window.alias.bodyResponse.allRequestResponses
+  ) {
+    delete window.alias.bodyResponse.allRequestResponses;
   }
 
-  const {
-    path = null,
-    alias = null,
-    log = true,
-    eq = null,
-    position = null,
-    as = null,
-    search = null,
-  } = options;
-  if (!window.save) {
-    window.save = {};
+  let responseAlias = window.alias.bodyResponse.body ? window.alias.bodyResponse.body : window.alias.bodyResponse.response
+
+  let usePath;
+  let useEq;
+  let usePosition;
+  const saveLog = (saveName, eq) => {
+    crudStorage.save[saveName] = eq
+
+    return Cypress.log({
+      name: "save",
+      message: `[${saveName}] = ${JSON.stringify(eq)}`,
+      consoleProps: () => ({
+        alias: saveName,
+        value: eq,
+        framework: "cypress-crud",
+      }),
+    });
   }
-  let as_exist = as || alias;
+  //  const paths = findInJson(window.alias.bodyResponse, path_and_key);
+  if (typeof initValid === "string") {
 
-  if (search) {
-    searchEq(window.alias.bodyResponse, search, as_exist);
-  } else {
-    let results;
-    if (typeof input === "string") {
-      results = findInJson(window.alias.bodyResponse, path);
-      if (results.length > 1) results = results[0];
-    } else {
-      results = findInJson(window.alias.bodyResponse, path);
-    }
+    if (initValid.trim().includes("===") && !initValid.trim().includes(":::") && !initValid.trim().includes(">")) {
+      let validation = false;
+      const splitEq = initValid.trim().split("===")
+      const splitSave = splitEq[1].trim()
+      useEq = splitSave
+      const paths = findInJson(responseAlias, splitEq[0].trim());
 
-    let valueToSave;
-    if (eq === null || eq === undefined) {
-      if (typeof position === "number" && Array.isArray(results)) {
-        if (position <= results.length) {
-          valueToSave = results[position - 1];
-        } else {
-          console.warn(`Position ${position} out of bounds for results.`);
+      if (!paths || paths === undefined) throw new Error(`${splitEq[0].trim()} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+      for (let path of paths) {
+        let pathResolve = typeof path === 'string' ? path.trim() : path
+        let eqResolve = typeof splitSave === 'string' ? splitSave.trim() : splitSave
+        eqResolve = typeof pathResolve === 'number' ? parseInt(eqResolve) : eqResolve
+
+        if (pathResolve === eqResolve) {
+          validation = true;
+          saveLog(splitEq[0].trim(), eqResolve)
+          // expect(pathResolve).to.eql(eqResolve)
+          return false;
         }
-      } else {
-        valueToSave = results;
       }
-    } else {
-      if (Array.isArray(results)) {
-        results.some((subArray) => {
-          if (Array.isArray(subArray)) {
-            if (subArray.includes(eq)) {
-              valueToSave = eq;
+      if (!validation) {
+        expect(`error validation eqls not found ${useEq} in ${paths}`, true).to.be.false
+      }
+      return;
+    } else if (initValid.trim().includes("===") && initValid.trim().includes(":::") && !initValid.trim().includes(">")) {
+      let validation = false;
+      const splitEq = initValid.trim().split("===")
+      const splitSave = splitEq[1].trim().split(":::")
+      useEq = splitSave[0]
+      const paths = findInJson(responseAlias, splitEq[0].trim());
 
-              return true;
-            }
-          } else {
-            if (results.includes(eq)) {
-              valueToSave = eq;
-              return true;
+      if (!paths || paths === undefined) throw new Error(`${splitEq[0].trim()} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+      for (let path of paths) {
+        let pathResolve = typeof path === 'string' ? path.trim() : path
+        let eqResolve = typeof splitSave[0] === 'string' ? splitSave[0].trim() : splitSave[0]
+        eqResolve = typeof pathResolve === 'number' ? parseInt(eqResolve) : eqResolve
+
+        if (pathResolve === eqResolve) {
+          validation = true;
+          // save
+          const saveName = splitSave[1].trim() ? splitSave[1].trim() : splitEq[0].trim()
+          saveLog(saveName, eqResolve)
+          return false;
+        }
+      }
+      if (!validation) {
+        expect(`error validation eqls not found ${useEq}`, true).to.be.false
+      }
+    }
+
+    else if (initValid.trim().includes(":::") && !initValid.trim().includes("===") && !initValid.trim().includes(">")) {
+      const sliptSave = initValid.trim().split(":::")
+      const paths = findInJson(responseAlias, sliptSave[0].trim());
+
+      if (!paths || paths === undefined) throw new Error(`${sliptSave[0].trim()} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+      const saveName = sliptSave[1].trim() ? sliptSave[1].trim() : sliptSave[0].trim()
+      saveLog(saveName, paths.length === 1 ? paths[0] : paths)
+
+    } else if (initValid.trim().includes(":::") && !initValid.trim().includes("===") && initValid.trim().includes(">")) {
+      const sliptSave = initValid.trim().split(":::")
+      const splitPostition = sliptSave[1].trim().split(">")
+
+      const paths = findInJson(responseAlias, sliptSave[0].trim());
+
+      if (!paths || paths === undefined) throw new Error(`${sliptSave[0].trim()} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+      const saveName = splitPostition[1].trim() && !splitPostition[0].trim() === '' ? splitPostition[0].trim() : sliptSave[0].trim()
+
+      saveLog(saveName, splitPostition[1] ? paths[splitPostition[1] - 1] : paths)
+    } else {
+      const paths = findInJson(responseAlias, initValid);
+      if (!paths || paths === undefined) throw new Error(`${initValid} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+      saveLog(initValid, paths.length === 1 ? paths[0] : paths)
+
+      return false;
+
+    }
+  }
+
+  if (typeof initValid === 'object') {
+    if (!Array.isArray(initValid)) initValid = [initValid]
+
+    for (let object of initValid) {
+      const { alias, as, eq, log, path, position, } = object;
+      const useAlias = alias || as || path;
+
+      if (!path) throw new Error(`{path: ""} not found in save, ex: {path: "id"} ${JSON.stringify(object, null, 2)}`);
+
+      const paths = findInJson(responseAlias, path);
+
+      if (!paths || paths === undefined) throw new Error(`${path} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
+
+
+      if (!eq && !position) saveLog(useAlias, paths.length === 1 ? paths[0] : paths)
+
+      if (eq && !position) {
+        let validationEq = false;
+        for (let eqUse of paths) {
+
+          if (Array.isArray(eqUse)) {
+            for (let seconArray of eqUse) {
+              if (seconArray === eq) {
+                saveLog(useAlias, seconArray)
+                validationEq = true
+                return false;
+              }
             }
           }
-          return false;
-        });
-      } else if (results === eq) {
-        valueToSave = eq;
+          if (eqUse === eq) {
+            saveLog(useAlias, eqUse)
+            validationEq = true
+            return false;
+          }
+        }
+        if (!validationEq) throw new Error(`${eq} not found results in JSON. ${JSON.stringify(responseAlias, null, 2)}`);
       }
-    }
 
-    if (valueToSave !== undefined) {
-      window.save[as || alias || path] = valueToSave;
-
-      if (log) {
-        Cypress.log({
-          name: "save",
-          message: `[${as || alias || path}] = ${JSON.stringify(valueToSave)}`,
-          consoleProps: () => ({
-            alias: alias,
-            value: valueToSave,
-            framework: "cypress-crud",
-          }),
-        });
-      } else {
-        Cypress.log({
-          name: "save",
-          message: `value hidden saved in [${as || alias || path}]`,
-          consoleProps: () => ({
-            alias: alias,
-            value: "No value to save",
-            framework: "cypress-crud",
-          }),
-        });
-      }
-    } else if (log) {
-      Cypress.log({
-        name: "save",
-        message: `[${path || "error"}] request error, not save value in [${as || alias || path
-          }]`,
-        consoleProps: () => ({
-          alias: alias,
-          value: "No value to save",
-          framework: "cypress-crud",
-        }),
-      });
+      if (position && !eq) saveLog(useAlias, paths[position - 1])
     }
   }
+
 }
 let counterResp = 0;
 Cypress.Commands.add("write", ({ path = null, log = true } = {}) => {
@@ -1583,10 +1492,7 @@ function findInJson(obj, keyToFind) {
   traverse(obj);
   results = [...new Set(results)];
   if (results.length === 0) {
-    console.error(`Key '${keyToFind}' not found in the provided object`);
     return undefined;
-  } else if (results.length === 1) {
-    return results[0];
   } else {
     return results;
   }
@@ -1694,6 +1600,7 @@ function replaceAllStrings(obj) {
             });
           }
         } else {
+
           newObj[key] = applySubstitutions(value);
         }
       });
@@ -1739,17 +1646,10 @@ function expectValidations(obj) {
         const { path, alias, eq, position, log, as } = item;
         if (path) save({ path, alias, position, eq, log, as });
       });
+    } else if (typeof obj.save === "string") {
+      save(obj.save)
+
     } else {
-      if (typeof obj.save === "string") {
-        if (obj.save.trim().includes(":::")) {
-          const split_ = obj.save.trim().split(":::");
-          obj.save = { path: split_[0].trim(), as: split_[1].trim() };
-        } else {
-          const valueString = obj.save;
-          obj.save = {};
-          obj.save.path = valueString;
-        }
-      }
       const { path, alias, eq, position, log, as } = obj.save;
 
       if (path) save({ path, alias, position, eq, log, as });
@@ -1872,6 +1772,7 @@ Cypress.Commands.add("crudSafeData", (token) => {
   crudStorage.save.crypto = JSON.parse(payload);
   return JSON.parse(payload);
 });
+// function OK
 Cypress.Commands.add("runFixtures", (path = null) => {
   return cy.task("runFixtures", { folderPath: path || "" }).then((fixtures) => {
     fixtures.forEach((item) => {

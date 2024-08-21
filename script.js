@@ -23,10 +23,10 @@ const projectRootPathJsconfig = path.resolve(__dirname, "../../");
 const supportFilePath = path.join(projectRoot, "cypress/support/e2e.js");
 
 const contentToAdd = `
-export {
-  crudStorage,
-} from "cypress-crud/src/functions/storage.js";
+export { crudStorage } from "cypress-crud/src/functions/storage.js";
 import "cypress-plugin-steps";
+import applyStyles from "cypress-crud/src/style";
+applyStyles();
 export const faker = require("generate-datafaker");
 import "cypress-crud";
 import "cypress-plugin-api";
@@ -500,7 +500,7 @@ const contentBigData = `
       "Content-Type": "application/json"
     },
   "expects": [
-    { "path": "status", "eq": 200 },
+    
     { "path": "team", "eq": "John Doe" },
     { "path": "features", "eq": "Premium Interior" },
     { "path": "number", "eq": "123-456-7890" }
@@ -515,8 +515,7 @@ const contentUsers = `
     "qs": null,
     "headers": {
       "Content-Type": "application/json"
-    },
-  "expects": [{ "path": "status", "eq": 200 }]
+    }
 }
 
 `;
@@ -529,7 +528,7 @@ const contentJSonAliasNot = `
     "headers": {
       "Content-Type": "application/json"
     },
-  "expects": [{ "path": "status", "eq": 200 }, { "path": "first_name" }]
+  "expects": [{ "path": "first_name" }]
 }
 `;
 
@@ -604,13 +603,11 @@ const generateFileExample = path.resolve(__dirname, "../../cypress/e2e/");
 const snipExample = path.join(generateFileExample, "crud.cy.js");
 
 const contentExample = `
-
 import { clone, crudStorage, faker } from "../support/e2e";
 import json from "../fixtures/examples/big_data";
 import users from "../fixtures/examples/users";
 
 describe("Examples cypress-crud", () => {
-
   before(() => {
     crudStorage.save.name_mercado = faker.generateName();
     crudStorage.save.cnpj = faker.generateCNPJ();
@@ -628,33 +625,23 @@ describe("Examples cypress-crud", () => {
     });
   });
 
-  it("Example whit  .save", () => {
-    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" });
-    // .crudScreenshot(); // or save({path:'id', log: false}) // save id 7
-  });
-
   it("Example whit .save and .write, create JSON response in", () => {
     cy.crud({ payload: "examples/jsonNotAlias" })
-      .save({ path: "id" }) // or save({path:'id', log: false})
+      .save({ path: "id" })
       .write({ path: "user/user" });
-    //.crudScreenshot(); // save in fixtures/user/user.json .write() // save in fixtures/response.json
   });
 
   it("Example whit  .save", () => {
-    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" }); // or save({path:'id', log: false})
+    cy.crud({ payload: "examples/jsonNotAlias" }).save({ path: "id" });
   });
 
   it("Example crud change JSON before request", () => {
     let json = require("../fixtures/examples/jsonNotAlias");
     let data = { ...json };
 
-    data.body = { id: crudStorage.save.save }; // Authorization: Bearer token, etc.
+    data.body = { id: 3 };
 
     cy.crud({ payload: data });
-  });
-
-  it("Example without  path validations in JSON", () => {
-    cy.crud({ payload: "examples/jsonWithoutValidation" });
   });
 
   it("Example without  path validations in JSON, but use .bodyResponse", () => {
@@ -687,13 +674,6 @@ describe("Examples cypress-crud", () => {
       path: "first_name",
       alias: "access_token",
     });
-  });
-  it("Example simple requisition with replace token, param, etc...", () => {
-    cy.crud({ payload: "examples/jsonReplaceAlias" })
-      .save({
-        path: "Authorization",
-      })
-      .save({ path: "Authorization", position: 1 });
   });
 
   it("JSON 1", function () {
@@ -736,9 +716,8 @@ describe("Examples cypress-crud", () => {
 
   it("POST data testing", function () {
     let data = clone(json);
-    delete data.status
-    data.method = "POST";
-    data.url = "https://reqres.in/api/users/2";
+    delete data.status;
+    data.get = "https://reqres.in/api/users/2";
     data.body = {
       name: "{year} {address} {user}",
       city: "{address}",
@@ -747,12 +726,12 @@ describe("Examples cypress-crud", () => {
       professional: "{veh}",
       addresses: "{addresses}",
     };
-    data.expects = [{ path: "status", eq: 201 }];
+    delete data.expects;
     cy.crud({ payload: data });
     console.log(rescue_save());
   });
   it("Test in api save value id", () => {
-     let data = clone(users);
+    let data = clone(users);
     cy.crud({ payload: data }).save({
       path: "id",
       eq: 5,
@@ -763,7 +742,7 @@ describe("Examples cypress-crud", () => {
     let data = clone(users);
     data.get += "/" + rescue_save("save_id_users");
     // data.req.path = 'save_id_users'
-    data.expects = [{ path: "userName", eq: "User 5" }, { path: "status" }];
+    data.expects = [{ path: "userName", eq: "User 5" }];
     cy.crud({ payload: data });
   });
   it("Rescue data save in alias", function () {
@@ -771,85 +750,16 @@ describe("Examples cypress-crud", () => {
     cy.log(rescue_save());
   });
 });
-describe("Change url in endpoint", () => {
-  const json = {
-    // create json or use variable
-    status: 200,
-    url: "http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid=48184f322c95a02a6a1f322431a2a170",
-  };
-  const json_change = {
-    status: 200, // create json or use variable
-    url: "http://api.openweathermap.org/geo/1.0/direct?q={lon}&limit=5&appid=48184f322c95a02a6a1f322431a2a170",
-  };
 
-
-  it("Change URL using storage and { }", () => {
-    cy.crud({ payload: json }).save({ path: "an", as: "lon" });
-  });
-  it("url change for Londres", () => {
-    cy.crud({ payload: json_change });
-
-    cy.log(crudStorage.save);
-  });
-});
-describe("Change url in endpoint or replace in complete json", () => {
-  const json = {
-    status: 200,
-    url: "http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid=48184f322c95a02a6a1f322431a2a170",
-  };
-  const json_change = {
-    status: 200,
-    url: "http://api.openweathermap.org/geo/1.0/direct?q={lon}&limit=5&appid=48184f322c95a02a6a1f322431a2a170",
-    body: {
-      city: "Bearer {lon} {ton}",
-    },
-  };
-
-
-  it("Change URL using storage and { }", () => {
-    cy.crud({ payload: json }).save(
-      { path: "an", as: "lon" },
-      { path: "to", as: "ton" }
-    );
-  });
-  it("url change for Londres", () => {
-    cy.crud({ payload: json_change });
-
-    cy.log(crudStorage.save);
-  });
-});
-describe("Test", () => {
-  const json = {
-    status: 200,
-    url: "getUser",
-  };
-  const post_ = {
-    method: "POST",
-    status: 200,
-    url: "https://reqres.in/api/users/{id}",
-    body: {
-      name: "{nameUser} Jackson",
-    },
-  };
-  it("Test", () => {
-    cy.crud(json).save({ path: "first_name", as: "nameUser" }, { path: "id" });
-  });
-
-  it("Post change", () => {
-    delete post_.status
-    cy.crud({ payload: post_ }).res({ path: "name", eq: "{nameUser} Jackson" });
-  });
-});
 describe("Test autenticação and validation schema", () => {
   crudStorage.save.name_mercado = faker.generateName();
   crudStorage.save.cnpj = faker.generateCNPJ();
   crudStorage.save.address = faker.generateStreet();
   const array_jsons = [
-    { url: "swagger/mercado", status: 200 },
+    { get: "swagger/mercado", status: 200 },
     {
       status: 201,
-      post: true,
-      url: "swagger/mercado",
+      post: "swagger/mercado",
       body: {
         nome: "{name_mercado}",
         cnpj: "{cnpj}",
@@ -859,85 +769,78 @@ describe("Test autenticação and validation schema", () => {
       expect: { path: "nome" },
     },
     {
-      post: true,
-      url: "endpoint_mercado/hortifruit/frutas",
+      post: "endpoint_mercado/hortifruit/frutas",
       body: { nome: "Uva", valor: 7 },
       status: 201,
       save: { path: "id", as: "frutaId" },
     },
     {
-      url: "endpoint_mercado/hortifruit/frutas",
+      get: "endpoint_mercado/hortifruit/frutas",
       status: 200,
       expect: { path: "nome" },
     },
 
     {
-      post: true,
-      url: "endpoint_mercado/hortifruit/legumes",
+      post: "endpoint_mercado/hortifruit/legumes",
       body: { nome: "Cenoura", valor: 12 },
       status: 201,
       save: { path: "id", as: "legumesId" },
     },
     {
-      url: "endpoint_mercado/hortifruit/legumes",
+      get: "endpoint_mercado/hortifruit/legumes",
       status: 200,
       expect: { path: "nome" },
     },
     {
-      post: true,
-      url: "endpoint_mercado/padaria/doces",
+      post: "endpoint_mercado/padaria/doces",
       body: { nome: "Brigadeiro", valor: 10 },
       status: 201,
       save: { path: "id", as: "docesId" },
     },
     {
-      url: "endpoint_mercado/padaria/doces",
+      get: "endpoint_mercado/padaria/doces",
       status: 200,
       expect: { path: "nome" },
     },
     {
-      post: true,
-      url: "endpoint_mercado/padaria/salgados",
+      post: "endpoint_mercado/padaria/salgados",
       body: { nome: "Pastel", valor: 10 },
       status: 201,
       save: { path: "id", as: "salgadosId" },
     },
     {
-      url: "endpoint_mercado/padaria/salgados",
+      get: "endpoint_mercado/padaria/salgados",
       status: 200,
       expect: { path: "nome" },
     },
     {
-      post: true,
-      url: "swagger/mercado/{id}/produtos/acougue/bovinos",
+      post: "swagger/mercado/{id}/produtos/acougue/bovinos",
       body: { nome: "Picanha", valor: 10 },
       status: 201,
     },
     {
-      url: "swagger/mercado/{id}/produtos/acougue/bovinos",
+      get: "swagger/mercado/{id}/produtos/acougue/bovinos",
       status: 200,
       expect: { path: "nome" },
     },
     {
-      post: true,
-      url: "swagger/mercado/{id}/produtos/acougue/suinos",
+      post: "swagger/mercado/{id}/produtos/acougue/suinos",
       body: { nome: "Bacon", valor: 10 },
       status: 201,
     },
     {
-      url: "swagger/mercado/{id}/produtos/acougue/suinos",
+      get: "swagger/mercado/{id}/produtos/acougue/suinos",
       status: 200,
       expect: { path: "nome" },
     },
     {
-      post: true,
-      url: "swagger/mercado/{id}/produtos/acougue/aves",
+      post: "swagger/mercado/{id}/produtos/acougue/aves",
       body: { nome: "Coxa de Frango", valor: 10 },
       status: 201,
       save: { path: "id", as: "avesId" },
     },
     {
-      url: "swagger/mercado/{id}/produtos/acougue/aves",
+      get: "swagger/mercado/{id}/produtos/acougue/aves",
       status: 200,
       expect: { path: "nome" },
     },
@@ -959,7 +862,6 @@ after(() => {
   console.log(crudStorage.request);
   console.log(crudStorage.response);
 });
-
 
 `;
 
@@ -1071,17 +973,13 @@ if (!fs.existsSync(jsonExampleMockable)) {
 const mocksJson1 = path.join(jsonExampleMockable, "json1.json");
 const contentMock1 = `
 {
-
-    "get": "https://demo8370198.mockable.io/",
-    "body": null,
-    "qs": null,
-    "headers": {
-      "Content-Type": "application/json"
-    },
-  "expects": [
-    { "path": "status", "eq": 200 },
-    { "path": "street", "eq": "Gordon Russell 123" }
-  ]
+  "get": "https://demo8370198.mockable.io/",
+  "body": null,
+  "qs": null,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "expects": [{ "path": "street", "eq": "Gordon Russell 123" }]
 }
 
 `;
@@ -1099,7 +997,6 @@ const contentMock2 = `
       "Content-Type": "application/json"
     },
   "expects": [
-    { "path": "status", "eq": 200 },
     { "path": "Order", "eq": 2 }
   ]
 }
@@ -1118,7 +1015,6 @@ const contentMock3 = `
       "Content-Type": "application/json"
     },
   "expects": [
-    { "path": "status", "eq": 200 },
     { "path": "city", "eq": "Matthews" }
   ]
 }
@@ -1140,7 +1036,6 @@ const contentMock4 = `
       "Content-Type": "application/json"
     },
   "expects": [
-    { "path": "status", "eq": 200 },
     { "path": "social", "eq": "Ford" },
     { "path": "name", "eq": "Nimiror" },
     { "path": "key", "eq": 336699 },
@@ -1265,7 +1160,6 @@ const contentMock5 = `
       "Content-Type": "application/json"
     },
   "expects": [
-    { "path": "status", "eq": 200 },
     { "path": "title" },
     { "path": "main" },
     { "path": "title_quarta_camada" }
@@ -1392,7 +1286,6 @@ const contentMock6 = `
       "Content-Type": "application/json"
     },
   "expects": [
-    { "path": "status" },
     { "path": "bancos" },
     { "path": "cnpj", "eq": 35143510351514 }
   ]

@@ -276,7 +276,7 @@ module.exports = {
     console.log("                     🄲 🅈 🄿 🅁 🄴 🅂 🅂  - 🄲 🅁 🅄 🄳  ");
     console.log("");
   
-    console.log('                    Welcome cypress-crud 3.0.6');
+    console.log('                    Welcome cypress-crud 3.1.6');
     console.log("                The best framework for API testing");
     console.log("");
     console.log("--------------------------------------------------------");
@@ -402,7 +402,7 @@ module.exports = {
     console.log("                     🄲 🅈 🄿 🅁 🄴 🅂 🅂  - 🄲 🅁 🅄 🄳  ");
     console.log("");
   
-    console.log('                    Welcome cypress-crud 3.0.6');
+    console.log('                    Welcome cypress-crud 3.1.6');
     console.log("                The best framework for API testing");
     console.log("");
     console.log("--------------------------------------------------------");
