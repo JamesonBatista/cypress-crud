@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-
+const version = '4.0.1'
 const configPath = path.resolve(__dirname, "../../");
 const jsconfigFilePath = path.join(
   configPath,
@@ -82,7 +82,7 @@ fs.readFile(`${jsconfigFilePath}/app.js`, "utf8", (err, data) => {
     },
     {
       procurar: "6.2.0",
-      substituirPor: `${packageJson.version} - | QA | Tester |`,
+      substituirPor: `${version} - | QA | Tester |`,
     },
     {
       procurar: "Mochawesome",
@@ -276,7 +276,7 @@ module.exports = {
     console.log("                     🄲 🅈 🄿 🅁 🄴 🅂 🅂  - 🄲 🅁 🅄 🄳  ");
     console.log("");
   
-    console.log('                    Welcome cypress-crud 3.1.6');
+    console.log('                    Welcome cypress-crud ${version}');
     console.log("                The best framework for API testing");
     console.log("");
     console.log("--------------------------------------------------------");
@@ -402,7 +402,7 @@ module.exports = {
     console.log("                     🄲 🅈 🄿 🅁 🄴 🅂 🅂  - 🄲 🅁 🅄 🄳  ");
     console.log("");
   
-    console.log('                    Welcome cypress-crud 3.1.6');
+    console.log('                    Welcome cypress-crud ${version}');
     console.log("                The best framework for API testing");
     console.log("");
     console.log("--------------------------------------------------------");

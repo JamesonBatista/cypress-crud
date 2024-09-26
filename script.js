@@ -24,15 +24,14 @@ const supportFilePath = path.join(projectRoot, "cypress/support/e2e.js");
 
 const contentToAdd = `
 export { crudStorage } from "cypress-crud/src/functions/storage.js";
-import "cypress-plugin-steps";
-import applyStyles from "cypress-crud/src/style";
-applyStyles();
 export const faker = require("generate-datafaker");
+import "cypress-plugin-steps";
 import "cypress-crud";
 import "cypress-plugin-api";
 import "cypress-mochawesome-reporter/register";
 import spok from "cy-spok";
 // export default spok;
+
 // close json file in variable
 import _ from "lodash";
 export function clone(json) {
@@ -150,7 +149,7 @@ const appendToFileCommand = (filePath, content) => {
   }
 };
 
-appendToFileCommand(supportFilePathCommand, contentToAddCommand);
+// appendToFileCommand(supportFilePathCommand, contentToAddCommand);
 
 const projectRootPath = path.resolve(__dirname, "../../");
 const vscodeFolderPath = path.join(projectRootPath, ".vscode");
@@ -1481,5 +1480,3 @@ const contentMocks6 = `
 `;
 fs.writeFileSync(mocksJson6, contentMock6);
 fs.writeFileSync(mocks6, contentMocks6);
-
-//

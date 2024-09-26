@@ -1,8 +1,10 @@
 # Cypress-Crud Introduction
+
 [![Npm package weekly downloads](https://badgen.net/npm/dw/cypress-crud)](https://npmjs.com/package/cypress-crud)
 [![Npm package weekly downloads](https://badgen.net/npm/dm/cypress-crud)](https://npmjs.com/package/cypress-crud)
 [![Npm package weekly downloads](https://badgen.net/npm/dy/cypress-crud)](https://npmjs.com/package/cypress-crud)
 [![Npm package weekly downloads](https://badgen.net/npm/dt/cypress-crud)](https://npmjs.com/package/cypress-crud)
+
 ### **Pre-requisitos**
 
 NodeJS must be installed and Cypress must be version 10 or higher for this package to function correctly.
@@ -174,35 +176,6 @@ module.exports = defineConfig({
   // "subTitle": "Project in Cypress"
 }
 ```
-
-- `commands.js:`
-
-```js
-// CREATE COUNTER IMPORT IN FILE .CY.JS
-
-IMPORT IN FILE  // import { des, its } from "../support/commands";
-
-const counter = window;
-let compare;
-if (!counter.des) {
-  counter.des = 1;
-  counter.its = 1;
-}
-const confer = () => counter.des;
-console.log(confer());
-
-export let des = () => {
-  return String(counter.des++).padStart(2, "0") + " ➠ "  ;
-};
-export let its = () => {
-  if (!compare || confer() !== compare) {
-    counter.its = 1;
-    compare = confer();
-  }
-  return String(counter.its++).padStart(2, "0") + " - " ;
-};
-```
-
 - `env_qa.js:`
 
 ```js
@@ -280,6 +253,13 @@ _Use faker. options for generate data faker_
         "title": "faker.title", // faker.titulo
         "actualDate": "faker.actualDate", // faker.dataAtual
         "futureDate": "faker.futureDate", // faker.dataFutura
+        "fruta": "faker.fruta",
+        "fruit": "faker.fruit",
+        "object": "faker.object", // faker.objeto
+        "num": "faker.number(12)", // 123484218445
+        "number": "faker.number(7)", // 9713187
+
+
       },
     };
 
@@ -303,7 +283,9 @@ _Use faker. options for generate data faker_
       "passwords": "4)={[W.oHj",
       "uuid": "0de2e006-8bfa-44cb-b05f-d3c019249a20",
       "birthdate": "1952-06-15T02:41:02.520Z",
-      "avatar": "https://avatars.githubusercontent.com/u/36132952"
+      "avatar": "https://avatars.githubusercontent.com/u/36132952",
+      "num": "123484218445",
+      "number": "9713187"
     }
 
 ```
@@ -744,6 +726,7 @@ The condition is related to the previous request, if the condition is condition-
   "get": "swagger/users",
 }
 ```
+
 ```json
 { // if return previous request status 200
   "condition": 200,
@@ -756,14 +739,14 @@ The condition is related to the previous request, if the condition is condition-
 }
 
 ```
+
 ```json
-{ // if return previous request name eq Jam
+{
+  // if return previous request name eq Jam
   "condition": { "path": "name", "eq": "Jam" },
-  "get": "swagger/users",
+  "get": "swagger/users"
 }
-
 ```
-
 
 ## CRUD
 
@@ -1040,12 +1023,13 @@ cy.crud({ get: "swagger/eventos", expect: "name===Jam" }); // equal result expec
   }
 }
 ```
+
 ## Tips
+
 `br:` sempre que você efetua uma requisição, a url é salva em crudStora.save.url, então na próxima requisição você pode usar como a abaixo:
 <br>
 
 `en:` whenever you make a request, the url is saved in crudStora.save.url, so in the next request you can use it like the one below:
-
 
 ```json
 
@@ -1064,6 +1048,7 @@ cy.crud({ get: "swagger/eventos", expect: "name===Jam" }); // equal result expec
     "post": "{url}", // https://api-desafio-qa.onrender.com/projects
   }
 ```
+
 ```json
 
   {
@@ -1146,6 +1131,106 @@ describe(`Test cypress-crud Property search`, () => {
 
 <br>
 
+## Alias
+
+1. > crudStorage
+1. > crudStorage.alias
+1. > crudStorage.alias.bodyResponse
+1. > crudStorage.save
+1. > crudStorage
+1. > crudStorage.save.url
+1. > crudStorage.save.beforeUrl
+1. > crudStorage.request
+
+## Use
+
+```js
+it("crud run", () => {
+  cy.crud("example").then(() => {
+    expect(crudStorage.save.nome).not.empty;
+  });
+});
+```
+
+## External validation
+
+```json
+// response
+
+[
+  {
+    "address": "Av. Paulista, 1000",
+    "city": "São Paulo",
+    "cnpj": "12345678901234",
+    "employees": [
+      {
+        "email": "maria.silva@techinnovations.com.br",
+        "employeeId": 1,
+        "name": "Maria Silva",
+        "position": "Gerente de Projetos"
+      }
+    ],
+    "id": 1,
+    "name": "Tech Innovations Ltda",
+    "products": [
+      {
+        "price": 5000,
+        "productDescription": "Software completo para gestão empresarial, incluindo módulos de finanças, vendas e operações.",
+        "productId": 1,
+        "productName": "Software de Gestão"
+      }
+    ]
+  }
+]
+
+```
+
+```js
+
+  it("Company crud", () => {
+    cy.crud({ get: "swagger/company" }).then(() => {
+      cy.findInJson("city").should("deep.equal", ["São Paulo"]);
+      cy.findInJson("productId").should("deep.equal", [1]);
+    });
+  });
+
+```
+## Examples:
+> 1 
+
+![alt text](image.png)
+
+> 2
+
+![alt text](image-2.png)
+
+> 3
+
+![alt text](image-3.png)
+
+> 4
+
+![alt text](image-4.png)
+
+> 5
+
+![alt text](image-5.png)
+
+> 6
+
+![alt text](image-6.png)
+
+> 7
+
+![alt text](image-7.png)
+
+> 8
+
+![alt text](image-8.png)
+
+> 9
+
+![alt text](image-9.png)
 ## **Authors and Contributors**
 
 This project is the collaborative effort of Jameson Batista and Gabriel Lopes. We are proud to share our work with the community and hope it can inspire and assist other developers.
