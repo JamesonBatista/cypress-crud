@@ -6,13 +6,12 @@
 [![Npm package weekly downloads](https://badgen.net/npm/dt/cypress-crud)](https://npmjs.com/package/cypress-crud)
 
 <div style="text-align: center;">
-<img src="cypress.png" alt="Rounded Image" style="border-radius: 15px; width: 300px; height: auto; ">
+<img src="cypress.png" alt="Rounded Image" width="400">
 </div>
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 50px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Pre-requisitos</h1>
+<div display="flex" align-items="center">
+  <h1 style="margin: 0;">Pre-requisitos</h1>
 </div>
 <br>
 
@@ -25,9 +24,9 @@ NodeJS must be installed and Cypress must be version 10 or higher for this packa
 
 <br>
 
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Instalattion</h1>
+<div display="flex" align-items="center">
+    
+<h1 style="margin: 0;">  Instalattion</h1>
 </div>
 <br>
 
@@ -46,9 +45,9 @@ npm i cypress-crud
 ```
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Configuration</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Configuration</h1>
 </div>
 <br>
 
@@ -316,9 +315,9 @@ it("Run all JSONs", () => {
 
 <br>
 
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Types od JSONs</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Types od JSONs</h1>
 </div>
 <br>
 
@@ -364,9 +363,9 @@ it("Run all JSONs", () => {
 
 ![GET whit text]('../../src/images/get_text.png)
 
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Run envs</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Run envs</h1>
 </div>
 <br>
 
@@ -390,9 +389,9 @@ image
 ![image]('../../src/images/changeenv.png)
 
 
- <div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Save</h1>
+ <div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Save</h1>
 </div>
 <br>
 
@@ -458,9 +457,9 @@ Example 4, before saving, we check if the value is the same.
 ![save email alias]('../../src/images/save_email_alias.png)
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Save value payload or request</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Save value payload or request</h1>
 </div>
 <br>
 
@@ -477,9 +476,9 @@ Example 4, before saving, we check if the value is the same.
 // saved name
 ```
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Use saved request or payload</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Use saved request or payload</h1>
 </div>
 <br>
 
@@ -494,9 +493,9 @@ Example 4, before saving, we check if the value is the same.
 ```
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Saved in expect</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Saved in expect</h1>
 </div>
 <br>
 
@@ -577,9 +576,9 @@ describe("", () => {
 });
 ```
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Expect</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Expect</h1>
 </div>
 <br>
 
@@ -605,9 +604,9 @@ describe("", () => {
 
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Expect equal</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Expect equal</h1>
 </div>
 <br>
 
@@ -637,9 +636,9 @@ describe("", () => {
 ![expect]('../../src/images/expect_save===.png)
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Expect save</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Expect save</h1>
 </div>
 <br>
 
@@ -692,9 +691,9 @@ describe("", () => {
 ![expect](./src/images/expect_eq_as.png)
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Expect position</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Expect position</h1>
 </div>
 <br>
 
@@ -738,9 +737,9 @@ save position
 ![return image](./src/images/array_save_position.png)
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Expect type</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Expect type</h1>
 </div>
 <br>
 
@@ -767,9 +766,9 @@ Return
 ![return image](./src/images/typereturn.png)
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Expect validating various possibilities</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Expect validating various possibilities</h1>
 </div>
 <br>
 
@@ -794,9 +793,9 @@ Return
 
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Condition</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Condition</h1>
 </div>
 <br>
 
@@ -839,9 +838,9 @@ The condition is related to the previous request, if the condition is condition-
 }
 ```
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">CRUD</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">CRUD</h1>
 </div>
 <br>
 
@@ -878,9 +877,9 @@ it("request show json", () => {
 ```
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">CRUD use expect</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">CRUD use expect</h1>
 </div>
 <br>
 
@@ -889,9 +888,9 @@ cy.crud({ get: "http...." }).expect({ path: "first_name" });
 ```
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">CRUD use save</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">CRUD use save</h1>
 </div>
 <br>
 
@@ -901,9 +900,9 @@ cy.crud({ get: "http...." }).save({ path: "first_name" });
 ```
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">CRUD run all jsons our run all jsons in path</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">CRUD run all jsons our run all jsons in path</h1>
 </div>
 <br>
 
@@ -934,9 +933,9 @@ it("RUN all jsons in path fixtures", () => {
 ```
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Schema</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Schema</h1>
 </div>
 <br>
 
@@ -967,9 +966,9 @@ cy.crud("json");
 <br>
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Snippets</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Snippets</h1>
 </div>
 <br>
 
@@ -1004,9 +1003,9 @@ cy.crud();
 
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">write</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">write</h1>
 </div>
 <br>
 
@@ -1022,9 +1021,9 @@ cy.crud( "token/createToken.json").write({ path: "user/getUser" });
 <br>
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">read</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">read</h1>
 </div>
 <br>
 
@@ -1044,9 +1043,9 @@ cy.read({ path: "user/getUser" }).then((json) => {
 <br>
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Use Mock</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Use Mock</h1>
 </div>
 <br>
 
@@ -1089,9 +1088,9 @@ In this example, the `body` field directs to the mock file located in the `mocks
 <br>
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">hideReport</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">hideReport</h1>
 </div>
 <br>
 
@@ -1115,9 +1114,9 @@ In this example, the `body` field directs to the mock file located in the `mocks
 <br>
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Tips</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Tips</h1>
 </div>
 <br>
 
@@ -1145,9 +1144,9 @@ In this example, the `body` field directs to the mock file located in the `mocks
   }
 ```
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">crudSafeData</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">crudSafeData</h1>
 </div>
 <br>
 
@@ -1213,9 +1212,9 @@ describe(`Test cypress-crud Property search`, () => {
 <br>
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Alias</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Alias</h1>
 </div>
 <br>
 
@@ -1238,9 +1237,9 @@ it("crud run", () => {
 });
 ```
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">External validation</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">External validation</h1>
 </div>
 <br>
 
@@ -1285,9 +1284,9 @@ it("Company crud", () => {
 ```
 
 <br>
-<div style="display: flex; align-items: center;">
-    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
-    <h1 style="margin: 0;">Examples</h1>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Examples</h1>
 </div>
 <br>
 
@@ -1335,3 +1334,7 @@ For tips, inquiries, or just to connect, follow us on LinkedIn:
 
 - LinkedIn [Jam Batista](https://www.linkedin.com/in/jam-batista-98101015b/)
 - LinkedIn [Gabriel Lopes](https://www.linkedin.com/in/gabriel-lopes-500b71269/)
+
+
+
+![alt text](image-10.png)
