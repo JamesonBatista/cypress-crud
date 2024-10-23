@@ -5,7 +5,16 @@
 [![Npm package weekly downloads](https://badgen.net/npm/dy/cypress-crud)](https://npmjs.com/package/cypress-crud)
 [![Npm package weekly downloads](https://badgen.net/npm/dt/cypress-crud)](https://npmjs.com/package/cypress-crud)
 
-### **Pre-requisitos**
+<div style="text-align: center;">
+<img src="cypress.png" alt="Rounded Image" style="border-radius: 15px; width: 300px; height: auto; ">
+</div>
+
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 50px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Pre-requisitos</h1>
+</div>
+<br>
 
 NodeJS must be installed and Cypress must be version 10 or higher for this package to function correctly.
 
@@ -16,7 +25,11 @@ NodeJS must be installed and Cypress must be version 10 or higher for this packa
 
 <br>
 
-### **Installation**
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Instalattion</h1>
+</div>
+<br>
 
 To install the package in your Cypress project, use the command
 
@@ -33,8 +46,11 @@ npm i cypress-crud
 ```
 
 <br>
-
-### **Configuration**
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Configuration</h1>
+</div>
+<br>
 
 The CRUD was designed to automatically add dependencies and configurations to the `e2e.js` file and the `cypress.config.js` file, eliminating the need to manually include anything for the library's functionality.
 
@@ -176,6 +192,7 @@ module.exports = defineConfig({
   // "subTitle": "Project in Cypress"
 }
 ```
+
 - `env_qa.js:`
 
 ```js
@@ -219,8 +236,6 @@ module.exports = defineConfig({
 
   }
 ```
-
-- ### **Version 2.4.4 +**
 
 _Use faker. options for generate data faker_
 
@@ -290,8 +305,6 @@ _Use faker. options for generate data faker_
 
 ```
 
-- ### **Version 2.4.1 +**
-
 ```js
 it("Run all JSONs in folder", () => {
   cy.runFixtures("examples"); // run all JSONs in folder
@@ -303,7 +316,11 @@ it("Run all JSONs", () => {
 
 <br>
 
-### **Types of JSONs**
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Types od JSONs</h1>
+</div>
+<br>
 
 `en:` For your project setup, you need to create a JSON file inside the `Fixtures` folder. This file can be placed directly in the folder or within a subfolder for better organization according to your project's needs.<br>
 <br>
@@ -347,7 +364,11 @@ it("Run all JSONs", () => {
 
 ![GET whit text]('../../src/images/get_text.png)
 
-### Run envs
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Run envs</h1>
+</div>
+<br>
 
 `br:` Para executar diferentes jsons em diferentes ambientes na mesma execução.
 <br>
@@ -368,19 +389,23 @@ image
 
 ![image]('../../src/images/changeenv.png)
 
-- 1.2 <br>
-  <br>
-  <br>
-  `br:` Efetuando request e salvando o email do retorno da requisição. Conforme imagem, imagem foi salva na variável email. (crudStorage.save.email).
-  <br>
-  Caso, seja necessário salvar essa variável com outro nome, basta usar da forma 2 ou 3.
-  Exemplo 4 antes de salvar verificamos se o valor é igual.
-  <br><br>
-  `en:`
-  Making a request and saving the request return email. As shown in the image, the image was saved in the email variable. (crudStorage.save.email).
-  <br>
-  If it is necessary to save this variable with another name, just use form 2 or 3.
-  Example 4, before saving, we check if the value is the same.
+
+ <div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Save</h1>
+</div>
+<br>
+
+`br:` Efetuando request e salvando o email do retorno da requisição. Conforme imagem, imagem foi salva na variável email. (crudStorage.save.email).
+<br>
+Caso, seja necessário salvar essa variável com outro nome, basta usar da forma 2 ou 3.
+Exemplo 4 antes de salvar verificamos se o valor é igual.
+<br><br>
+`en:`
+Making a request and saving the request return email. As shown in the image, the image was saved in the email variable. (crudStorage.save.email).
+<br>
+If it is necessary to save this variable with another name, just use form 2 or 3.
+Example 4, before saving, we check if the value is the same.
 
 ```json
 // 1
@@ -432,16 +457,48 @@ image
 
 ![save email alias]('../../src/images/save_email_alias.png)
 
-### Used saved value
-
-`br:` Para usar, resgatar um valor salvo na requisição anterior ou requisições feitas ante, existem duas forma:
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Save value payload or request</h1>
+</div>
 <br>
 
-`en:` To use, redeem a value saved in the previous request or requests made before, there are two ways:
-
-```text
-  Request JSON
+```json
+// request
+{
+  "text": "Expect validação do tipo de retorno string number boolean ...",
+  "get": "https://reqres.in/api/users/2",
+  "body": {
+    "name": "Jhon"
+  },
+  "saveRequest": "name"
+}
+// saved name
 ```
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Use saved request or payload</h1>
+</div>
+<br>
+
+```json
+{
+  "get": "https://reqres.in/api/users/2",
+  "body": {
+    "name": "{request_name}"
+  }
+  // result Jhon
+}
+```
+
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Saved in expect</h1>
+</div>
+<br>
 
 ```json
 {
@@ -455,10 +512,6 @@ image
 ```
 
 ![save email alias]('../../src/images/saveUse.png)
-
-```text
-  Use data save
-```
 
 ```json
 [
@@ -523,8 +576,12 @@ describe("", () => {
   });
 });
 ```
-
-## Expect
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Expect</h1>
+</div>
+<br>
 
 `br:` Expect irá nos ajudar nas validações das keys, veremos exemplos:
 <br>
@@ -546,7 +603,14 @@ describe("", () => {
 
 ![expect]('../../src/images/expect.png)
 
-### Expect equal
+
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Expect equal</h1>
+</div>
+<br>
+
 
 `br:` Usando === você usará o equal para validar
 <br>
@@ -572,7 +636,12 @@ describe("", () => {
 
 ![expect]('../../src/images/expect_save===.png)
 
-### Expect save
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Expect save</h1>
+</div>
+<br>
 
 `br:` Usando ::: você usará o salvar o valor da key
 <br>
@@ -622,7 +691,12 @@ describe("", () => {
 
 ![expect](./src/images/expect_eq_as.png)
 
-### Expect position
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Expect position</h1>
+</div>
+<br>
 
 `br:` Usando o position você consegue validar numa lista de array a posição informada.
 <br>
@@ -663,7 +737,12 @@ save position
 
 ![return image](./src/images/array_save_position.png)
 
-### Expect type
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Expect type</h1>
+</div>
+<br>
 
 `br:` Adicionando type ao seu json, você irá validar qual o tipo o dado retornado
 <br>
@@ -687,7 +766,13 @@ Return
 
 ![return image](./src/images/typereturn.png)
 
-### Expect validating various possibilities
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Expect validating various possibilities</h1>
+</div>
+<br>
+
 
 `br:` Usando `||` você consegue validar a possibilidade de vários valores, ideal para quando o retorno pode ser de valores diferentes.
 <br>
@@ -707,7 +792,13 @@ Return
 
 ![return image](./src/images/expectmultiplevalues.png)
 
-## condition
+
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Condition</h1>
+</div>
+<br>
 
 `br:` O condiction está relacionado a request anterior, caso o condition seja condition-accept o `cypress-crud` passará para o JSON seguinte.
 <br>
@@ -747,8 +838,12 @@ The condition is related to the previous request, if the condition is condition-
   "get": "swagger/users"
 }
 ```
-
-## CRUD
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">CRUD</h1>
+</div>
+<br>
 
 `br:` Para usar o cy.crud é simples, basta colocar os jsons na pasta `fixtures` ou subpastas da `fixtures` abaixo formas de uso:
 <br>
@@ -782,19 +877,36 @@ it("request show json", () => {
 });
 ```
 
-### CRUD use expect
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">CRUD use expect</h1>
+</div>
+<br>
 
 ```js
 cy.crud({ get: "http...." }).expect({ path: "first_name" });
 ```
 
-### CRUD use save
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">CRUD use save</h1>
+</div>
+<br>
+
 
 ```js
 cy.crud({ get: "http...." }).save({ path: "first_name" });
 ```
 
-### CRUD run all jsons our run all jsons in path
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">CRUD run all jsons our run all jsons in path</h1>
+</div>
+<br>
+
 
 `br:` Com o cy.crud você consegue em apenas um `it` rodas todos os jsons que estão na pasta `fixtures` ou subpastas.
 <br>
@@ -821,7 +933,13 @@ it("RUN all jsons in path fixtures", () => {
 });
 ```
 
-### Schema
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Schema</h1>
+</div>
+<br>
+
 
 `br:` A função `schema`. Ele garante que a resposta de uma solicitação atenda aos critérios especificados em um esquema JSON específico. Essa validação ajuda a confirmar se a estrutura e os dados retornados estão alinhados com as expectativas definidas no teste.
 <br>
@@ -848,7 +966,12 @@ cy.crud("json");
 
 <br>
 
-### **Snippets**
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Snippets</h1>
+</div>
+<br>
 
 A snippet has been created to streamline the test construction process.
 
@@ -879,7 +1002,14 @@ cy.crud();
 <br>
 ```
 
-### **write**
+
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">write</h1>
+</div>
+<br>
+
 
 This function is used to write data to a JSON file in the Cypress fixtures directory. It creates a JSON file with the provided data from the specified request response. This is useful for generating simulated response files for testing purposes.
 
@@ -891,7 +1021,13 @@ cy.crud( "token/createToken.json").write({ path: "user/getUser" });
 
 <br>
 
-### **read**
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">read</h1>
+</div>
+<br>
+
 
 This function is used to read data from a JSON file in the Cypress fixtures directory. It reads the content of the specified JSON file and makes it available for use in the test
 
@@ -907,7 +1043,13 @@ cy.read({ path: "user/getUser" }).then((json) => {
 
 <br>
 
-### **Use Mock**
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Use Mock</h1>
+</div>
+<br>
+
 
 For requests that require a mock, simply specify the `mock` variable and provide the path to where the mock is stored.
 
@@ -946,18 +1088,13 @@ In this example, the `body` field directs to the mock file located in the `mocks
 
 <br>
 
-- ### **_Tips_**
-
-```js
-cy.crud({ get: "swagger/eventos", expect: "id::id" }); // save id expect:{path: "id", as: "id"}
-cy.crud({ get: "swagger/eventos", expect: "name===Jam" }); // equal result expect:{path: "name", eq: "Jam"}
-```
-
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">hideReport</h1>
+</div>
 <br>
 
-<br>
-
-### **hideReport**
 
 ```json
 // in cypress.env.json
@@ -977,54 +1114,13 @@ cy.crud({ get: "swagger/eventos", expect: "name===Jam" }); // equal result expec
 
 <br>
 
-## config.env.json
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Tips</h1>
+</div>
+<br>
 
-```json
-{
-  "environment": "QA",
-  "QA": {
-    "endpoint": "https://restcountries.com/v3.1/translation/germany",
-    "reqres": "https://reqres.in/api/users/2",
-    "location": "https://rickandmortyapi.com/api/location",
-    "serverest": "https://serverest.dev",
-    "getUser": "https://reqres.in/api/users/2",
-    "swagger": "https://api-desafio-qa.onrender.com/",
-    "crud_base": {
-      "crud_get_post": "swagger/crud",
-      "crud_getId_delete": "swagger/crud/{id}"
-    },
-    "endpoint_mercado": "swagger/mercado/{id}/produtos"
-  },
-  "PROD": {
-    "endpoint": "https://restcountries.com/v3.1/translation/germany",
-    "reqres": "https://reqres.in/api/users/2",
-    "location": "https://rickandmortyapi.com/api/location",
-    "serverest": "https://serverest.dev",
-    "getUser": "https://reqres.in/api/users/2",
-    "swagger": "https://api-desafio-qa.onrender.com/",
-    "crud_base": {
-      "crud_get_post": "swagger/crud",
-      "crud_getId_delete": "swagger/crud/{id}"
-    },
-    "endpoint_mercado": "swagger/mercado/{id}/produtos"
-  },
-  "DEV": {
-    "endpoint": "https://restcountries.com/v3.1/translation/germany",
-    "reqres": "https://reqres.in/api/users/2",
-    "location": "https://rickandmortyapi.com/api/location",
-    "serverest": "https://serverest.dev",
-    "getUser": "https://reqres.in/api/users/2",
-    "swagger": "https://api-desafio-qa.onrender.com/",
-    "crud_base": {
-      "crud_get_post": "swagger/crud",
-      "crud_getId_delete": "swagger/crud/{id}"
-    },
-    "endpoint_mercado": "swagger/mercado/{id}/produtos"
-  }
-}
-```
-
-## Tips
 
 `br:` sempre que você efetua uma requisição, a url é salva em crudStora.save.url, então na próxima requisição você pode usar como a abaixo:
 <br>
@@ -1038,7 +1134,7 @@ cy.crud({ get: "swagger/eventos", expect: "name===Jam" }); // equal result expec
     "get": "swagger/projects", // https://api-desafio-qa.onrender.com/projects
   },
   {
-    "text": `Post in projects using data fakers`,
+    "text": "Post in projects using data fakers",
     "body": {
       "name": "faker.enterprise",
       "leader": "faker.name",
@@ -1048,27 +1144,12 @@ cy.crud({ get: "swagger/eventos", expect: "name===Jam" }); // equal result expec
     "post": "{url}", // https://api-desafio-qa.onrender.com/projects
   }
 ```
-
-```json
-
-  {
-    "text": "GET list in projects",
-    "get": "swagger/projects", // https://api-desafio-qa.onrender.com/projects
-    "save": "id===3"
-  },
-  {
-    "text": `Post in projects using data fakers`,
-    "body": {
-      "name": "faker.enterprise",
-      "leader": "faker.name",
-      "description": "faker.text",
-      "endDate": "2024-08-08",
-    },
-    "post": "{url}/{id}", // https://api-desafio-qa.onrender.com/projects/3
-  }
-```
-
-### **crudSafeData**
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">crudSafeData</h1>
+</div>
+<br>
 
 ```js
 describe(`Test cypress-crud Property search`, () => {
@@ -1131,7 +1212,12 @@ describe(`Test cypress-crud Property search`, () => {
 
 <br>
 
-## Alias
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Alias</h1>
+</div>
+<br>
 
 1. > crudStorage
 1. > crudStorage.alias
@@ -1151,8 +1237,13 @@ it("crud run", () => {
   });
 });
 ```
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">External validation</h1>
+</div>
+<br>
 
-## External validation
 
 ```json
 // response
@@ -1182,21 +1273,25 @@ it("crud run", () => {
     ]
   }
 ]
-
 ```
 
 ```js
-
-  it("Company crud", () => {
-    cy.crud({ get: "swagger/company" }).then(() => {
-      cy.findInJson("city").should("deep.equal", ["São Paulo"]);
-      cy.findInJson("productId").should("deep.equal", [1]);
-    });
+it("Company crud", () => {
+  cy.crud({ get: "swagger/company" }).then(() => {
+    cy.findInJson("city").should("deep.equal", ["São Paulo"]);
+    cy.findInJson("productId").should("deep.equal", [1]);
   });
-
+});
 ```
-## Examples:
-> 1 
+
+<br>
+<div style="display: flex; align-items: center;">
+    <img src="mini.png" alt="Rounded Image" style="border-radius: 15px; width: 30px; height: auto; margin-right: 10px;">
+    <h1 style="margin: 0;">Examples</h1>
+</div>
+<br>
+
+> 1
 
 ![alt text](image.png)
 
@@ -1231,6 +1326,7 @@ it("crud run", () => {
 > 9
 
 ![alt text](image-9.png)
+
 ## **Authors and Contributors**
 
 This project is the collaborative effort of Jameson Batista and Gabriel Lopes. We are proud to share our work with the community and hope it can inspire and assist other developers.

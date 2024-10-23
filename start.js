@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const version = '4.0.1'
+const version = '4.1.3'
 const configPath = path.resolve(__dirname, "../../");
 const jsconfigFilePath = path.join(
   configPath,
@@ -277,15 +277,15 @@ module.exports = {
     console.log("");
   
     console.log('                    Welcome cypress-crud ${version}');
-    console.log("                The best framework for API testing");
+    console.log("                  The best framework for API testing");
     console.log("");
-    console.log("--------------------------------------------------------");
-    console.log("Documentation:");
-    console.log("Visit https://github.com/JamesonBatista/cypress-crud");
-    console.log('Author: Jam Batista');
+    console.log("           ------------------------------------------------------------");
+    console.log("           Documentation:");
+    console.log("           Visit https://github.com/JamesonBatista/cypress-crud");
+    console.log('           Author: Jam Batista');
     console.log("");
-    console.log("LinkedIn: https://www.linkedin.com/in/jam-batista-98101015b/");
-    console.log("--------------------------------------------------------");
+    console.log("           LinkedIn: https://www.linkedin.com/in/jam-batista-98101015b/");
+    console.log("           ------------------------------------------------------------");
     console.log("");
     console.log("");
     console.log("");  

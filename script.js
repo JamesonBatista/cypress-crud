@@ -864,7 +864,7 @@ after(() => {
 
 `;
 
-fs.writeFileSync(snipExample, contentExample);
+// fs.writeFileSync(snipExample, contentExample);
 
 if (!fs.existsSync(vscodeFolderPathJSON)) {
   fs.mkdirSync(vscodeFolderPathJSON);

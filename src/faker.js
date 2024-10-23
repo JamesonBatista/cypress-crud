@@ -2389,6 +2389,19 @@ class FakerUse {
     ];
     return objectsIn[Math.floor(Math.random() * objectsIn.length)];
   };
+  genNum(input) {
+    // Remover parênteses da string e converter para número
+    let quantidade = parseInt(input.replace(/[()]/g, ""), 10);
+    let numeros = "";
+
+    // Gerar números aleatórios com base na quantidade
+    for (let i = 0; i < quantidade; i++) {
+      let numeroAleatorio = Math.floor(Math.random() * 10); // Gera um número de 0 a 9
+      numeros += numeroAleatorio;
+    }
+
+    return numeros;
+  }
 
   actualDate() {
     const date = new Date();

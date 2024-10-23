@@ -1,4 +1,5 @@
 const app = window.top;
+const dataDefaultStyle = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul`
 const spanElement = app.document.querySelector(
   "#unified-reporter > div > div > div.runnable-header > span"
 );
@@ -23,26 +24,26 @@ if (spanElement2) {
 
 if (!app.document.head.querySelector("[data-hover-black-crud]")) {
   const style = app.document.createElement("style");
-  let alias = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-save > div > span > div > span.command-info`;
-  let log = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-log > div > span > div > span.command-info`;
-  let aliasWrite = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-writeFile > div > span > div > span.command-info`;
-  let aliasRead = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-readFile > div > span > div > span.command-info`;
-  let valid = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-runValidation > div > span > div > span.command-info`;
-  let env = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env > div > span > div > span.command-info`;
-  let schemas = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas > div > span > div > span.command-info`;
-  let mock = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-mock > div > span > div > span.command-info`;
+  let alias = `${dataDefaultStyle} li.command.command-name-save > div > span > div > span.command-info`;
+  let log = `${dataDefaultStyle} li.command.command-name-log > div > span > div > span.command-info`;
+  let aliasWrite = `${dataDefaultStyle} li.command.command-name-writeFile > div > span > div > span.command-info`;
+  let aliasRead = `${dataDefaultStyle} li.command.command-name-readFile > div > span > div > span.command-info`;
+  let valid = `${dataDefaultStyle} li.command.command-name-runValidation > div > span > div > span.command-info`;
+  let env = `${dataDefaultStyle} li.command.command-name-env > div > span > div > span.command-info`;
+  let schemas = `${dataDefaultStyle} li.command.command-name-schemas > div > span > div > span.command-info`;
+  let mock = `${dataDefaultStyle} li.command.command-name-mock > div > span > div > span.command-info`;
   let valueColor = `span.command-message > span > strong {color: white;}`;
-  let put = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-PUT > div > span > div > span.command-info > span.command-method`;
+  let put = `${dataDefaultStyle} li.command.command-name-PUT > div > span > div > span.command-info > span.command-method`;
 
-  let wrap = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-wrap > div > span > div > span.command-info > span.command-method`;
+  let wrap = `${dataDefaultStyle} li.command.command-name-wrap > div > span > div > span.command-info > span.command-method`;
 
-  let post = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-POST > div > span > div > span.command-info > span.command-method`;
-  let deletes = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-DELETE > div > span > div > span.command-info > span.command-method`;
-  let patch = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-PATCH > div > span > div > span.command-info > span.command-method`;
-  let description = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-description > div > span > div > span.command-info`;
-  let controls = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li > div > span > div > span.command-controls`;
-  let condition = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-condition-accpet > div > span > div > span.command-info`;
-  let condition_error = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-condition-error > div > span > div > span.command-info`;
+  let post = `${dataDefaultStyle} li.command.command-name-POST > div > span > div > span.command-info > span.command-method`;
+  let deletes = `${dataDefaultStyle} li.command.command-name-DELETE > div > span > div > span.command-info > span.command-method`;
+  let patch = `${dataDefaultStyle} li.command.command-name-PATCH > div > span > div > span.command-info > span.command-method`;
+  let description = `${dataDefaultStyle} li.command.command-name-description > div > span > div > span.command-info`;
+  let controls = `${dataDefaultStyle} li > div > span > div > span.command-controls`;
+  let condition = `${dataDefaultStyle} li.command.command-name-condition-accpet > div > span > div > span.command-info`;
+  let condition_error = `${dataDefaultStyle} li.command.command-name-condition-error > div > span > div > span.command-info`;
 
 
   style.innerHTML = `
@@ -112,6 +113,12 @@ ${description}:hover span.command-message > span.command-message-text em {
   ${schemas} span.command-method > span,
   ${mock} span.command-method > span{
       background-color: #ff6700eb;
+      border-radius: 2px;
+      padding: 0px 4px 1px 4px;
+  }
+  
+  ${schemas} span.command-method > span {
+      background-color: #9f00ffeb;
       border-radius: 2px;
       padding: 0px 4px 1px 4px;
   }
@@ -257,16 +264,17 @@ if (!app.document.head.querySelector("[data-hover-black-spec]")) {
 
 if (!app.document.head.querySelector("[data-hover-black-methods-info]")) {
   const style = app.document.createElement("style");
-  let get = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-GET`;
-  let post = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-POST`;
-  let put = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-PUT`;
-  let wrap = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-wrap > div > span > div > span.command-info > span.command-method`;
+  const dataStyle = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul`
+  let get = `${dataStyle} li.command.command-name-GET`;
+  let post = `${dataStyle} li.command.command-name-POST`;
+  let put = `${dataStyle} li.command.command-name-PUT`;
+  let wrap = `${dataStyle} li.command.command-name-wrap > div > span > div > span.command-info > span.command-method`;
 
-  let deletes = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-DELETE`;
-  let save = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-save`;
-  let env = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env`;
-  let schemas = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas`;
-  let mock = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-mock`;
+  let deletes = `${dataStyle} li.command.command-name-DELETE`;
+  let save = `${dataStyle} li.command.command-name-save`;
+  let env = `${dataStyle} li.command.command-name-env`;
+  let schemas = `${dataStyle} li.command.command-name-schemas`;
+  let mock = `${dataStyle} li.command.command-name-mock`;
 
   let header = `#spec-runner-header > div > div.border`;
   let color = `div > span > div > span.command-info {background-color: rgb(100 112 243 / 1)}`;
@@ -299,11 +307,11 @@ if (!app.document.head.querySelector("[data-hover-black-methods-info]")) {
 
 if (!app.document.head.querySelector("[data-hover-black-delete-before]")) {
   const style = app.document.createElement("style");
-  let expectBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-assert`;
-  let envBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-env`;
-  let schemasBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-schemas`;
-  let mockBefore = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-mock`;
-  let save = `#unified-reporter > div > div > div.wrap > ul > li > div > div.collapsible-content.runnables-region > ul > li > div > div.collapsible-content.runnable-instruments > div > ul > li > div > div.collapsible-content.attempt-content > div > div > ul > li > div > div.collapsible-content > ul > li.command.command-name-save`;
+  let expectBefore = `${dataDefaultStyle} li.command.command-name-assert`;
+  let envBefore = `${dataDefaultStyle} li.command.command-name-env`;
+  let schemasBefore = `${dataDefaultStyle} li.command.command-name-schemas`;
+  let mockBefore = `${dataDefaultStyle} li.command.command-name-mock`;
+  let save = `${dataDefaultStyle} li.command.command-name-save`;
 
   let space = `#unified-runner`;
   let div = `div > span > div > span.command-info > span.command-method::before {content: '';}`;
