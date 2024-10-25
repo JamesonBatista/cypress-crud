@@ -6,7 +6,7 @@
 [![Npm package weekly downloads](https://badgen.net/npm/dt/cypress-crud)](https://npmjs.com/package/cypress-crud)
 
 <div style="text-align: center;">
-<img src="cypress.png" alt="Rounded Image" width="400">
+<img src="image copy.png" alt="Rounded Image" width="400">
 </div>
 
 <br>
@@ -388,7 +388,6 @@ image
 
 ![image]('../../src/images/changeenv.png)
 
-
  <div display="flex" align-items="center">
     
   <h1 style="margin: 0;">Save</h1>
@@ -435,6 +434,20 @@ Example 4, before saving, we check if the value is the same.
     "as": "user_email"
   }
 }
+{
+  "text": "salvando com variável email e alias",
+  "get": "https://reqres.in/api/users/2",
+  "save": [{
+    "path": "email",
+    "eq": "janet.weaver@reqres.in",
+    "as": "user_email"
+  },
+  {
+    "path": "id",
+  }
+
+  ]
+}
 ```
 
 > save email 1
@@ -475,6 +488,7 @@ Example 4, before saving, we check if the value is the same.
 }
 // saved name
 ```
+
 <br>
 <div display="flex" align-items="center">
     
@@ -575,6 +589,7 @@ describe("", () => {
   });
 });
 ```
+
 <br>
 <div display="flex" align-items="center">
     
@@ -602,14 +617,12 @@ describe("", () => {
 
 ![expect]('../../src/images/expect.png)
 
-
 <br>
 <div display="flex" align-items="center">
     
   <h1 style="margin: 0;">Expect equal</h1>
 </div>
 <br>
-
 
 `br:` Usando === você usará o equal para validar
 <br>
@@ -772,7 +785,6 @@ Return
 </div>
 <br>
 
-
 `br:` Usando `||` você consegue validar a possibilidade de vários valores, ideal para quando o retorno pode ser de valores diferentes.
 <br>
 
@@ -790,7 +802,6 @@ Return
 ```
 
 ![return image](./src/images/expectmultiplevalues.png)
-
 
 <br>
 <div display="flex" align-items="center">
@@ -837,6 +848,7 @@ The condition is related to the previous request, if the condition is condition-
   "get": "swagger/users"
 }
 ```
+
 <br>
 <div display="flex" align-items="center">
     
@@ -894,7 +906,6 @@ cy.crud({ get: "http...." }).expect({ path: "first_name" });
 </div>
 <br>
 
-
 ```js
 cy.crud({ get: "http...." }).save({ path: "first_name" });
 ```
@@ -905,7 +916,6 @@ cy.crud({ get: "http...." }).save({ path: "first_name" });
   <h1 style="margin: 0;">CRUD run all jsons our run all jsons in path</h1>
 </div>
 <br>
-
 
 `br:` Com o cy.crud você consegue em apenas um `it` rodas todos os jsons que estão na pasta `fixtures` ou subpastas.
 <br>
@@ -938,7 +948,6 @@ it("RUN all jsons in path fixtures", () => {
   <h1 style="margin: 0;">Schema</h1>
 </div>
 <br>
-
 
 `br:` A função `schema`. Ele garante que a resposta de uma solicitação atenda aos critérios especificados em um esquema JSON específico. Essa validação ajuda a confirmar se a estrutura e os dados retornados estão alinhados com as expectativas definidas no teste.
 <br>
@@ -1001,14 +1010,12 @@ cy.crud();
 <br>
 ```
 
-
 <br>
 <div display="flex" align-items="center">
     
   <h1 style="margin: 0;">write</h1>
 </div>
 <br>
-
 
 This function is used to write data to a JSON file in the Cypress fixtures directory. It creates a JSON file with the provided data from the specified request response. This is useful for generating simulated response files for testing purposes.
 
@@ -1026,7 +1033,6 @@ cy.crud( "token/createToken.json").write({ path: "user/getUser" });
   <h1 style="margin: 0;">read</h1>
 </div>
 <br>
-
 
 This function is used to read data from a JSON file in the Cypress fixtures directory. It reads the content of the specified JSON file and makes it available for use in the test
 
@@ -1048,7 +1054,6 @@ cy.read({ path: "user/getUser" }).then((json) => {
   <h1 style="margin: 0;">Use Mock</h1>
 </div>
 <br>
-
 
 For requests that require a mock, simply specify the `mock` variable and provide the path to where the mock is stored.
 
@@ -1094,7 +1099,6 @@ In this example, the `body` field directs to the mock file located in the `mocks
 </div>
 <br>
 
-
 ```json
 // in cypress.env.json
 
@@ -1120,7 +1124,6 @@ In this example, the `body` field directs to the mock file located in the `mocks
 </div>
 <br>
 
-
 `br:` sempre que você efetua uma requisição, a url é salva em crudStora.save.url, então na próxima requisição você pode usar como a abaixo:
 <br>
 
@@ -1143,6 +1146,7 @@ In this example, the `body` field directs to the mock file located in the `mocks
     "post": "{url}", // https://api-desafio-qa.onrender.com/projects
   }
 ```
+
 <br>
 <div display="flex" align-items="center">
     
@@ -1236,13 +1240,13 @@ it("crud run", () => {
   });
 });
 ```
+
 <br>
 <div display="flex" align-items="center">
     
   <h1 style="margin: 0;">External validation</h1>
 </div>
 <br>
-
 
 ```json
 // response
@@ -1324,7 +1328,23 @@ it("Company crud", () => {
 
 > 9
 
-![alt text](image-9.png)
+![alt text](image-11.png)
+
+> 10
+
+![alt text](image-12.png)
+
+> 11
+
+![alt text](image-13.png)
+
+> 12
+
+![alt text](image-14.png)
+
+> 13
+
+![alt text](image-15.png)
 
 ## **Authors and Contributors**
 
@@ -1334,7 +1354,5 @@ For tips, inquiries, or just to connect, follow us on LinkedIn:
 
 - LinkedIn [Jam Batista](https://www.linkedin.com/in/jam-batista-98101015b/)
 - LinkedIn [Gabriel Lopes](https://www.linkedin.com/in/gabriel-lopes-500b71269/)
-
-
 
 ![alt text](image-10.png)

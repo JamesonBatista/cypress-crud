@@ -98,11 +98,11 @@ ${condition}:hover span.command-message > span.command-message-text {
     color: white;
   }
 
-${description}:hover span.command-message > span.command-message-text em {
-  color: yellow;
-  font-weight: bold;
-  font-size: 1.2em;
-  }
+// ${description}:hover span.command-message > span.command-message-text em {
+//   color: yellow;
+//   // font-weight: bold;
+//   // font-size: 1.2em;
+//   }
 
 
 

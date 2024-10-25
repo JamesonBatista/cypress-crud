@@ -108,7 +108,7 @@ Cypress.Commands.add("supportCrud", (input) => {
     const cp = (payloadCreate.req = {});
     if (!crudStorage.organize) crudStorage.organize = {};
 
-    const methodKeys = ["get", "post", "delete", "path", "put"];
+    const methodKeys = ["get", "post", "delete", "patch", "put"];
     crudStorage.organize.url =
       payload[methodKeys.find((key) => key in payload) || "get"];
 
