@@ -6,7 +6,7 @@
 [![Npm package weekly downloads](https://badgen.net/npm/dt/cypress-crud)](https://npmjs.com/package/cypress-crud)
 
 <div style="text-align: center;">
-<img src="image copy.png" alt="Rounded Image" width="400">
+<img src="./src/images/4.1.6.webp" alt="Rounded Image" width="400">
 </div>
 
 <br>
@@ -1287,6 +1287,10 @@ it("Company crud", () => {
 });
 ```
 
+# Testes
+
+## [Repositório usado para alguns testes](https://github.com/JamesonBatista/treinamento.completo.cypress.crud)
+
 <br>
 <div display="flex" align-items="center">
     
@@ -1296,55 +1300,55 @@ it("Company crud", () => {
 
 > 1
 
-![alt text](image.png)
+![alt text](./src/images/image.png)
 
 > 2
 
-![alt text](image-2.png)
+![alt text](./src/images/image-2.png)
 
 > 3
 
-![alt text](image-3.png)
+![alt text](./src/images/image-3.png)
 
 > 4
 
-![alt text](image-4.png)
+![alt text](./src/images/image-4.png)
 
 > 5
 
-![alt text](image-5.png)
+![alt text](./src/images/image-5.png)
 
 > 6
 
-![alt text](image-6.png)
+![alt text](./src/images/image-6.png)
 
 > 7
 
-![alt text](image-7.png)
+![alt text](./src/images/image-7.png)
 
 > 8
 
-![alt text](image-8.png)
+![alt text](./src/images/image-8.png)
 
 > 9
 
-![alt text](image-11.png)
+![alt text](./src/images/image-11.png)
 
 > 10
 
-![alt text](image-12.png)
+![alt text](./src/images/image-12.png)
 
 > 11
 
-![alt text](image-13.png)
+![alt text](./src/images/image-13.png)
 
 > 12
 
-![alt text](image-14.png)
+![alt text](./src/images/image-14.png)
 
 > 13
 
-![alt text](image-15.png)
+![alt text](./src/images/image-15.png)
 
 ## **Authors and Contributors**
 
@@ -1355,4 +1359,4 @@ For tips, inquiries, or just to connect, follow us on LinkedIn:
 - LinkedIn [Jam Batista](https://www.linkedin.com/in/jam-batista-98101015b/)
 - LinkedIn [Gabriel Lopes](https://www.linkedin.com/in/gabriel-lopes-500b71269/)
 
-![alt text](image-10.png)
+![alt text](./src/images/image-10.png)

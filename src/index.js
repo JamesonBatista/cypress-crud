@@ -176,7 +176,7 @@ Cypress.Commands.add("supportCrud", (input) => {
       "text",
       "save",
       "saveRequest",
-      "request  "
+      "request",
     ];
     additionalKeys.forEach((key) => {
       if (payload[key]) payloadCreate[key] = payload[key];
@@ -267,7 +267,7 @@ Cypress.Commands.add("supportCrud", (input) => {
         };
       },
     });
-  }
+  };
   const handleEndWithEndpoint = (reqPath) => {
     let envCheck = reqPath.env
       ? Cypress.env(reqPath.env)
@@ -327,9 +327,8 @@ Cypress.Commands.add("supportCrud", (input) => {
         if (environment && !environment.startsWith("http")) {
           reqPath.url = handleEnv(environment);
         }
-        const envLog = reqPath.env ? reqPath.env : Cypress.env("environment")
-        if (envLog) logEnv(envLog)
-
+        const envLog = reqPath.env ? reqPath.env : Cypress.env("environment");
+        if (envLog) logEnv(envLog);
 
         resolve(environment);
       } catch (error) {
@@ -351,7 +350,7 @@ Cypress.Commands.add("supportCrud", (input) => {
         mock.response.headers = payload.req.headers || {};
       }
       if (payload.req.status) {
-        payload.status = payload.req.status
+        payload.status = payload.req.status;
         delete payload.req.status;
       }
       if (payload.req.body) delete payload.req.body;
@@ -415,18 +414,15 @@ Cypress.Commands.add("supportCrud", (input) => {
                     textNpxRunCypress({ type: "mock", mocks: mocks })
                   )
                   .then(() => {
-
                     expectValidations(payload);
                     return mocks;
                   });
               } else {
-
                 expectValidations(payload);
                 return mocks;
               }
             })
             .then(() => {
-
               if (payload.req.schema) payload.req.schema = payload.schema;
 
               delete payload.schema;
@@ -490,7 +486,6 @@ Cypress.Commands.add("supportCrud", (input) => {
             }
           })
           .then(() => {
-
             if (payload.req.schema) payload.req.schema = payload.schema;
 
             delete payload.schema;
@@ -630,7 +625,6 @@ Cypress.Commands.add("supportCrud", (input) => {
   }
 
   const handleRequest = (data, payload) => {
-
     if (
       payload.req.url.startsWith("undefined") ||
       payload.req.url.startsWith("nullundefined")
@@ -721,9 +715,8 @@ Cypress.Commands.add("supportCrud", (input) => {
     handleEndWithEndpoint(payload.req).then((url) => {
       payload.req.url = url;
       payload = replaceAllStrings(payload);
-    })
+    });
   }
-
 
   let req = payload.request || payload.req;
 
@@ -753,7 +746,6 @@ Cypress.Commands.add("supportCrud", (input) => {
       let verify = conditionContinueTest(payload);
       if (verify) handleRequest(data, payload);
     } else {
-
       handleRequest(data, payload);
     }
   }
@@ -772,14 +764,13 @@ function conditionContinueTest(json) {
     eqCondition = eq;
     if (path && eq) {
       if (window.save[path]) {
-        result = window.save[path]
+        result = window.save[path];
       } else {
         result = findInJson(window.alias.bodyResponse, path);
       }
 
       if (Array.isArray(result))
         for (let iteration of result) {
-
           if (eq.trim().includes("||")) {
             let splitEq = eq.split("||");
             for (let splitUse of splitEq) {
@@ -794,8 +785,7 @@ function conditionContinueTest(json) {
             condicionAccept = path;
           }
         }
-      else
-        if (result === eq) logCondition = true
+      else if (result === eq) logCondition = true;
     } else {
       result = findInJson(window.alias.bodyResponse, path);
 
@@ -806,9 +796,8 @@ function conditionContinueTest(json) {
   };
 
   if (typeof json.condition === "string") {
-
     if (window.save[json.condition]) {
-      result = window.save[json.condition]
+      result = window.save[json.condition];
     } else result = findInJson(window.alias.bodyResponse, json.condition);
 
     if (result) {
@@ -833,9 +822,14 @@ function conditionContinueTest(json) {
   }
 
   if (logCondition) {
-
-    const refactoryResult = typeof result !== 'string' && result.length && result.length > 3 ? `results contain ${result.length}` : result
-    const refactoryJsonCondition = typeof json.condition === 'string' ? json.condition : JSON.stringify(json.condition)
+    const refactoryResult =
+      typeof result !== "string" && result.length && result.length > 3
+        ? `results contain ${result.length}`
+        : result;
+    const refactoryJsonCondition =
+      typeof json.condition === "string"
+        ? json.condition
+        : JSON.stringify(json.condition);
     Cypress.log({
       name: `condition-accpet`,
       message: `previus test: [*${refactoryJsonCondition}*] return: [*${refactoryResult}*]`,
@@ -847,10 +841,15 @@ function conditionContinueTest(json) {
       }),
     });
   } else {
-    const refactoryJsonCondition = typeof json.condition === 'string' ? json.condition : JSON.stringify(json.condition)
+    const refactoryJsonCondition =
+      typeof json.condition === "string"
+        ? json.condition
+        : JSON.stringify(json.condition);
     Cypress.log({
       name: `condition-error`,
-      message: `previus test: [*${refactoryJsonCondition}*] return: [*${result ? result : 'not found'}*]`,
+      message: `previus test: [*${refactoryJsonCondition}*] return: [*${
+        result ? result : "not found"
+      }*]`,
       consoleProps: () => ({
         json: formattedJson,
         condition: refactoryJsonCondition,
@@ -890,11 +889,13 @@ function haveProperty(objeto, propriedade, reserve) {
       ] = searchValue;
       Cypress.log({
         name: "save",
-        message: `[${typeof reserve == "string" ? reserve : propriedade || "save"
-          }] = ${typeof searchValue === "object"
+        message: `[${
+          typeof reserve == "string" ? reserve : propriedade || "save"
+        }] = ${
+          typeof searchValue === "object"
             ? JSON.stringify(searchValue)
             : searchValue
-          }`,
+        }`,
         consoleProps: () => ({
           alias: typeof reserve == "string" ? reserve : propriedade || "save",
           value: searchValue,
@@ -1180,14 +1181,12 @@ function runValidation(initValid) {
         if (paths.length > 50) {
           expect(paths, `${JSON.stringify(filteredInitValid)}`).to.be.exist;
         } else if (paths.length === 1) {
-          paths = paths[0]
+          paths = paths[0];
           expect(paths, `${JSON.stringify(filteredInitValid)}`).to.be.exist;
           if (type)
-            expect(
-              paths,
-              `${JSON.stringify(filteredInitValid)}`
-            ).to.be.an(type);
-
+            expect(paths, `${JSON.stringify(filteredInitValid)}`).to.be.an(
+              type
+            );
         } else {
           for (let pathExist of paths)
             expect(pathExist, `${JSON.stringify(filteredInitValid)}`).to.be
@@ -1211,17 +1210,20 @@ function runValidation(initValid) {
           paths[position - 1]
         );
         if (useAlias) saveLog(aliasPath, paths[position - 1]);
-
       } else if (!position) {
-
         if (eq.includes("||")) {
           let found;
-          const separate = eq.trim().split("||").map(str => str.trim());
+          const separate = eq
+            .trim()
+            .split("||")
+            .map((str) => str.trim());
 
-          expect(`${JSON.stringify(separate)}`, `${JSON.stringify(filteredInitValid)}`).to.be.includes(paths[0]);
+          expect(
+            `${JSON.stringify(separate)}`,
+            `${JSON.stringify(filteredInitValid)}`
+          ).to.be.includes(paths[0]);
         }
         for (let pathEq of paths) {
-
           if (pathEq === eq) {
             expect(eq, `${JSON.stringify(filteredInitValid)}`).to.be.eq(pathEq);
             if (type)
@@ -1262,10 +1264,11 @@ function searchEq(obj, searchValue, reserve) {
       crudStorage.save[reserve] = searchValue;
       Cypress.log({
         name: "save",
-        message: `[${reserve || "save"}] = ${typeof searchValue === "object"
-          ? JSON.stringify(searchValue)
-          : searchValue
-          }`,
+        message: `[${reserve || "save"}] = ${
+          typeof searchValue === "object"
+            ? JSON.stringify(searchValue)
+            : searchValue
+        }`,
         consoleProps: () => ({
           alias: reserve || "save",
           value: searchValue,
@@ -1314,7 +1317,6 @@ Cypress.Commands.add("save", (...input) => {
   }
 });
 function save(initValid) {
-
   if (
     window.alias &&
     window.alias.bodyResponse &&
@@ -1395,7 +1397,6 @@ function save(initValid) {
       const paths = findInJson(responseAlias, splitEq[0].trim());
 
       if (!paths || paths === undefined)
-
         throw new Error(
           `${splitEq[0].trim()} not found results in JSON. ${JSON.stringify(
             responseAlias,
@@ -1557,7 +1558,8 @@ let counterResp = 0;
 Cypress.Commands.add("write", ({ path = null, log = true } = {}) => {
   counterResp += 1;
   return cy.writeFile(
-    `cypress/fixtures/${path ? `${path}` : `response/response_${counterResp}`
+    `cypress/fixtures/${
+      path ? `${path}` : `response/response_${counterResp}`
     }.json`,
     window.alias.bodyResponse,
     {
@@ -1800,12 +1802,12 @@ function replaceAllStrings(obj) {
             }
           } else {
             newObj[key] = value.replace(/\{(\w+)\}/g, (match, p1) => {
-
-              return window.save.hasOwnProperty(p1) ? window.save[p1] : `not found ${p1}`;
+              return window.save.hasOwnProperty(p1)
+                ? window.save[p1]
+                : `not found ${p1}`;
             });
           }
         } else {
-
           newObj[key] = applySubstitutions(value);
         }
       });
@@ -1874,20 +1876,24 @@ function expectValidations(obj) {
         }),
       });
     };
-    const save_req = obj.saveRequest || obj.request
+    const save_req = obj.saveRequest || obj.request;
     if (Array.isArray(save_req)) {
       save_req.forEach((item, i) => {
-        const valRequest = findInJson(window.alias.payloadReport, item)
-        if (valRequest) saveLog(`request_${item}`, valRequest.length == 1 ? valRequest[0] : valRequest)
-      })
+        const valRequest = findInJson(window.alias.payloadReport, item);
+        if (valRequest)
+          saveLog(
+            `request_${item}`,
+            valRequest.length == 1 ? valRequest[0] : valRequest
+          );
+      });
+    } else {
+      const valRequest = findInJson(window.alias.payloadReport, save_req);
+      if (valRequest)
+        saveLog(
+          `request_${save_req}`,
+          valRequest.length == 1 ? valRequest[0] : valRequest
+        );
     }
-    else {
-      const valRequest = findInJson(window.alias.payloadReport, save_req)
-      if (valRequest) saveLog(`request_${save_req}`, valRequest.length == 1 ? valRequest[0] : valRequest)
-    }
-
-
-
   }
 }
 
