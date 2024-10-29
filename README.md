@@ -6,7 +6,7 @@
 [![Npm package weekly downloads](https://badgen.net/npm/dt/cypress-crud)](https://npmjs.com/package/cypress-crud)
 
 <div style="text-align: center;">
-<img src="./src/images/4.1.6.webp" alt="Rounded Image" width="400">
+<img src="./src/images/4.1.7.webp" alt="Rounded Image" width="400">
 </div>
 
 <br>
@@ -1047,6 +1047,90 @@ cy.read({ path: "user/getUser" }).then((json) => {
 `explanation:` read json response in cypress/fixtures/user
 
 <br>
+<div display="flex" align-items="center">
+    
+  <h1 style="margin: 0;">Tag</h1>
+</div>
+<br>
+
+> Include tags in your `package.json` to only execute jsons that have this tag, or tags. No other JSON will be executed if `tag` is active in `package.json`.
+
+EX:
+
+```json
+{
+  "name": "testcrud201024",
+  "tag": "crud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cypress open",
+    "exe": "cypress run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cypress": "^13.15.1",
+    "cypress-crud": "^4.1.6"
+  }
+}
+```
+
+```js
+cy.crud({
+  text: "tag crud",
+  get: "http://localhost:3000/users",
+  tag: "crud",
+});
+```
+
+or
+
+```json
+{
+  "name": "testcrud201024",
+  "tag": "pay, crud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cypress open",
+    "exe": "cypress run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cypress": "^13.15.1",
+    "cypress-crud": "^4.1.6"
+  }
+}
+```
+
+```js
+// tags crud and pay runner
+describe("Test com tag", () => {
+  it("executando json com tag", () => {
+    cy.crud({
+      text: "tag crud",
+      get: "http://localhost:3000/users",
+      tag: "crud",
+    });
+    cy.crud({
+      text: "tag pay",
+      get: "http://localhost:3000/users",
+      tag: "pay",
+    });
+    cy.crud({
+      text: "tag pay",
+      get: "http://localhost:3000/users",
+      tag: "pall",
+    });
+  });
+});
+```
 
 <br>
 <div display="flex" align-items="center">

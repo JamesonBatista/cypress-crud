@@ -76,28 +76,45 @@ function textNpxRunCypress({
       2
     )}\n${colorNum}     -------------------- 🅵 🅸 🅽 🅰  🅻  --------------------\n\n`;
 }
-Cypress.Commands.add("crud", (input) => {
+Cypress.Commands.add('crud', (input) => {
   const processJson = (jsons) => {
     if (Array.isArray(jsons)) {
-      jsons.forEach(cy.supportCrud);
+      jsons.forEach(cy.crudRuuner);
     } else {
-      cy.supportCrud(jsons);
+      cy.crudRuuner(jsons);
     }
   };
 
   if (typeof input === "string") {
     cy.fixture(input).then(processJson);
   } else if (Array.isArray(input)) {
-    input.forEach(cy.supportCrud);
+    input.forEach(cy.crudRuuner);
   } else if (input.payload) {
     if (typeof input.payload === "string") {
       cy.fixture(input.payload).then(processJson);
     } else {
-      cy.supportCrud(input.payload);
+      cy.crudRuuner(input.payload);
     }
   } else {
-    cy.supportCrud(input);
+    cy.crudRuuner(input);
   }
+})
+
+
+Cypress.Commands.add("crudRuuner", (input) => {
+  var _package = require('../../../package.json')
+  if (_package.tag && _package.tag !== "") {
+    if(_package.tag.includes(",")){
+      const separate = _package.tag.split(",")
+      for(let sep of separate){
+        if (input.tag && input.tag === sep.trim()) cy.supportCrud(input)
+      }
+    } else  if (input.tag && input.tag === _package.tag.trim()) cy.supportCrud(input)
+
+  } else {
+    cy.supportCrud(input)
+  }
+
 });
 
 Cypress.Commands.add("supportCrud", (input) => {
@@ -847,9 +864,8 @@ function conditionContinueTest(json) {
         : JSON.stringify(json.condition);
     Cypress.log({
       name: `condition-error`,
-      message: `previus test: [*${refactoryJsonCondition}*] return: [*${
-        result ? result : "not found"
-      }*]`,
+      message: `previus test: [*${refactoryJsonCondition}*] return: [*${result ? result : "not found"
+        }*]`,
       consoleProps: () => ({
         json: formattedJson,
         condition: refactoryJsonCondition,
@@ -889,13 +905,11 @@ function haveProperty(objeto, propriedade, reserve) {
       ] = searchValue;
       Cypress.log({
         name: "save",
-        message: `[${
-          typeof reserve == "string" ? reserve : propriedade || "save"
-        }] = ${
-          typeof searchValue === "object"
+        message: `[${typeof reserve == "string" ? reserve : propriedade || "save"
+          }] = ${typeof searchValue === "object"
             ? JSON.stringify(searchValue)
             : searchValue
-        }`,
+          }`,
         consoleProps: () => ({
           alias: typeof reserve == "string" ? reserve : propriedade || "save",
           value: searchValue,
@@ -1156,6 +1170,7 @@ function runValidation(initValid) {
       return;
     }
     let paths = findInJson(responseAlias, path);
+    
 
     if (!paths || paths === undefined)
       throw new Error(
@@ -1188,9 +1203,11 @@ function runValidation(initValid) {
               type
             );
         } else {
-          for (let pathExist of paths)
-            expect(pathExist, `${JSON.stringify(filteredInitValid)}`).to.be
+
+          paths.forEach((value, index) => {
+            expect(value, `${JSON.stringify(filteredInitValid)} position: ${index + 1}`).to.be
               .exist;
+          });
         }
 
         if (useAlias) saveLog(aliasPath, paths);
@@ -1223,8 +1240,10 @@ function runValidation(initValid) {
             `${JSON.stringify(filteredInitValid)}`
           ).to.be.includes(paths[0]);
         }
+        let equals = null;
         for (let pathEq of paths) {
           if (pathEq === eq) {
+            equals = true;
             expect(eq, `${JSON.stringify(filteredInitValid)}`).to.be.eq(pathEq);
             if (type)
               expect(pathEq, `${JSON.stringify(filteredInitValid)}`).to.be.an(
@@ -1234,6 +1253,7 @@ function runValidation(initValid) {
             return false;
           }
         }
+        if(!equals) throw `${eq} not exist in response.`
       }
     }
   }
@@ -1264,11 +1284,10 @@ function searchEq(obj, searchValue, reserve) {
       crudStorage.save[reserve] = searchValue;
       Cypress.log({
         name: "save",
-        message: `[${reserve || "save"}] = ${
-          typeof searchValue === "object"
+        message: `[${reserve || "save"}] = ${typeof searchValue === "object"
             ? JSON.stringify(searchValue)
             : searchValue
-        }`,
+          }`,
         consoleProps: () => ({
           alias: reserve || "save",
           value: searchValue,
@@ -1558,8 +1577,7 @@ let counterResp = 0;
 Cypress.Commands.add("write", ({ path = null, log = true } = {}) => {
   counterResp += 1;
   return cy.writeFile(
-    `cypress/fixtures/${
-      path ? `${path}` : `response/response_${counterResp}`
+    `cypress/fixtures/${path ? `${path}` : `response/response_${counterResp}`
     }.json`,
     window.alias.bodyResponse,
     {
@@ -1676,7 +1694,6 @@ function findInJson(obj, keyToFind) {
   }
 
   traverse(obj);
-  results = [...new Set(results)];
   if (results.length === 0) {
     return undefined;
   } else {
