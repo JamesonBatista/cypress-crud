@@ -455,7 +455,7 @@ Cypress.Commands.add("supportCrud", (input) => {
                 payload.req.contract;
 
               if (verifySchema)
-                schemaValidation(verifySchema);
+                validateSchema(verifySchema);
 
               if (payload.search) {
                 searchEq(
@@ -510,7 +510,7 @@ Cypress.Commands.add("supportCrud", (input) => {
               payload.req.contract;
 
             if (verifySchema)
-              schemaValidation(verifySchema);
+              validateSchema(verifySchema);
 
             if (payload.search) {
               searchEq(
@@ -575,7 +575,7 @@ Cypress.Commands.add("supportCrud", (input) => {
       app.document.head.appendChild(style);
     }
   }
-  const schemaValidation = (schemas) => {
+  const validateSchema = (schemas) => {
     let json_response =
       window.alias.bodyResponse.body || window.alias.bodyResponse.response.body;
     if (typeof json_response === "string") {
@@ -712,7 +712,7 @@ Cypress.Commands.add("supportCrud", (input) => {
           payload.req.contract;
 
         if (verifySchema)
-          schemaValidation(verifySchema);
+          validateSchema(verifySchema);
 
         if (payload.search) {
           searchEq(
