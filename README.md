@@ -6,7 +6,7 @@
 [![Npm package weekly downloads](https://badgen.net/npm/dt/cypress-crud)](https://npmjs.com/package/cypress-crud)
 
 <div style="text-align: center;">
-<img src="./src/images/4.1.7.webp" alt="Rounded Image" width="400">
+<img src="./src/images/4.1.9.png" alt="Rounded Image" width="400">
 </div>
 
 <br>
@@ -968,6 +968,61 @@ cy.crud("json");
 
 ```javaScript
  cy.crud({ payload: "examples/json" }).schema({schema: "crud_users",});
+```
+
+```json
+{
+    "get": "local/approval",
+    "schema": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "cpf": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "required": ["id", "name", "email", "cpf", "status"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "cpf": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "required": ["id", "name", "email", "cpf", "status"]
+        }
+      ]
+    }
+  }
+
 ```
 
 ![return image](./src/images/schema.png)

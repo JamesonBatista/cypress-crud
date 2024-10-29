@@ -77,6 +77,7 @@ function textNpxRunCypress({
     )}\n${colorNum}     -------------------- 🅵 🅸 🅽 🅰  🅻  --------------------\n\n`;
 }
 Cypress.Commands.add('crud', (input) => {
+
   const processJson = (jsons) => {
     if (Array.isArray(jsons)) {
       jsons.forEach(cy.crudRuuner);
@@ -102,19 +103,22 @@ Cypress.Commands.add('crud', (input) => {
 
 
 Cypress.Commands.add("crudRuuner", (input) => {
-  var _package = require('../../../package.json')
-  if (_package.tag && _package.tag !== "") {
-    if(_package.tag.includes(",")){
-      const separate = _package.tag.split(",")
-      for(let sep of separate){
-        if (input.tag && input.tag === sep.trim()) cy.supportCrud(input)
-      }
-    } else  if (input.tag && input.tag === _package.tag.trim()) cy.supportCrud(input)
+  const metodosHttp = ["get", "post", "put", "patch", "delete"];
 
-  } else {
-    cy.supportCrud(input)
+  if (metodosHttp.some(metodo => input.hasOwnProperty(metodo))) {
+    var _package = require('../../../package.json')
+    if (_package.tag && _package.tag !== "") {
+      if (_package.tag.includes(",")) {
+        const separate = _package.tag.split(",")
+        for (let sep of separate) {
+          if (input.tag && input.tag === sep.trim()) cy.supportCrud(input)
+        }
+      } else if (input.tag && input.tag === _package.tag.trim()) cy.supportCrud(input)
+
+    } else {
+      cy.supportCrud(input)
+    }
   }
-
 });
 
 Cypress.Commands.add("supportCrud", (input) => {
@@ -162,6 +166,7 @@ Cypress.Commands.add("supportCrud", (input) => {
       header: "headers",
       schema: "schema",
       schemas: "schema",
+      contract: "schema",
       body: "body",
       payload: "body",
       qs: "qs",
@@ -440,25 +445,17 @@ Cypress.Commands.add("supportCrud", (input) => {
               }
             })
             .then(() => {
-              if (payload.req.schema) payload.req.schema = payload.schema;
+              // if (payload.req.schema) payload.req.schema = payload.schema;
 
               delete payload.schema;
-              const hasStringSchema = (payload) => {
-                const properties = ["schema", "schemas", "contract"];
-                return properties.some(
-                  (prop) =>
-                    (payload.req && typeof payload.req[prop] === "string") ||
-                    typeof payload[prop] === "string"
-                );
-              };
-              const schemaVerify = hasStringSchema(payload);
-              if (schemaVerify) {
-                const verifySchema =
-                  payload.req.schema ||
-                  payload.req.schemas ||
-                  payload.req.contract;
+
+              const verifySchema =
+                payload.req.schema ||
+                payload.req.schemas ||
+                payload.req.contract;
+
+              if (verifySchema)
                 schemaValidation(verifySchema);
-              }
 
               if (payload.search) {
                 searchEq(
@@ -503,26 +500,17 @@ Cypress.Commands.add("supportCrud", (input) => {
             }
           })
           .then(() => {
-            if (payload.req.schema) payload.req.schema = payload.schema;
+            // if (payload.req.schema) payload.req.schema = payload.schema;
 
             delete payload.schema;
 
-            const hasStringSchema = (payload) => {
-              const properties = ["schema", "schemas", "contract"];
-              return properties.some(
-                (prop) =>
-                  (payload.req && typeof payload.req[prop] === "string") ||
-                  typeof payload[prop] === "string"
-              );
-            };
-            const schemaVerify = hasStringSchema(payload);
-            if (schemaVerify) {
-              const verifySchema =
-                payload.req.schema ||
-                payload.req.schemas ||
-                payload.req.contract;
+            const verifySchema =
+              payload.req.schema ||
+              payload.req.schemas ||
+              payload.req.contract;
+
+            if (verifySchema)
               schemaValidation(verifySchema);
-            }
 
             if (payload.search) {
               searchEq(
@@ -597,33 +585,63 @@ Cypress.Commands.add("supportCrud", (input) => {
         console.error("Error converter to object:", error);
       }
     }
-    cy.fixture(`${schemas}.json`)
-      .as("dataLoader")
-      .then((schema) => {
-        const validation = validate(json_response, schema, {
-          required: true,
-          nestedErrors: true,
-        });
-        let errors = "";
-        if (!validation.valid) {
-          errors += validation.errors.map((err) => {
-            return "\n" + err.toString();
-          });
-          throw new Error("SCHEMA VALIDATION ERROR: " + errors);
-        }
-        const log = {
-          name: "schemas",
-          message: `${schemas}.json Successful JSON Schema validation ${validation.valid}`,
-          consoleProps: () => {
-            return {
-              path: `${schemas}.json`,
-              body: window.alias.bodyResponse,
-              framework: "cypress-crud",
-            };
-          },
-        };
-        Cypress.log(log);
+
+
+    if (typeof schemas === 'object') {
+      const validation = validate(json_response, schemas, {
+        required: true,
+        nestedErrors: true,
       });
+      let errors = "";
+      if (!validation.valid) {
+        errors += validation.errors.map((err) => {
+          return "\n" + err.toString();
+        });
+        throw new Error("SCHEMA VALIDATION ERROR: " + errors);
+      }
+      const log = {
+        name: "schemas",
+        message: `Successful JSON Schema validation ${validation.valid}`,
+        consoleProps: () => {
+          return {
+            path: `${schemas}.json`,
+            body: window.alias.bodyResponse,
+            framework: "cypress-crud",
+          };
+        },
+      };
+      Cypress.log(log);
+    }
+
+
+    if (typeof schemas === 'string')
+      cy.fixture(`${schemas}.json`)
+        .as("dataLoader")
+        .then((schema) => {
+          const validation = validate(json_response, schema, {
+            required: true,
+            nestedErrors: true,
+          });
+          let errors = "";
+          if (!validation.valid) {
+            errors += validation.errors.map((err) => {
+              return "\n" + err.toString();
+            });
+            throw new Error("SCHEMA VALIDATION ERROR: " + errors);
+          }
+          const log = {
+            name: "schemas",
+            message: `${schemas}.json Successful JSON Schema validation ${validation.valid}`,
+            consoleProps: () => {
+              return {
+                path: `${schemas}.json`,
+                body: window.alias.bodyResponse,
+                framework: "cypress-crud",
+              };
+            },
+          };
+          Cypress.log(log);
+        });
   };
   function removeBeforeSecondHttps(str) {
     let firstHttpsIndex = str.indexOf("https");
@@ -684,23 +702,19 @@ Cypress.Commands.add("supportCrud", (input) => {
         }
       })
       .then(() => {
-        const hasStringSchema = (payload) => {
-          const properties = ["schema", "schemas", "contract"];
-          return properties.some(
-            (prop) =>
-              (payload.req && typeof payload.req[prop] === "string") ||
-              typeof payload[prop] === "string"
-          );
-        };
-        const schemaVerify = hasStringSchema(payload);
-        if (schemaVerify) {
-          const verifySchema =
-            payload.req.schema || payload.req.schemas || payload.req.contract;
+        // if (payload.req.schema) payload.req.schema = payload.schema;
+
+        delete payload.schema;
+
+        const verifySchema =
+          payload.req.schema ||
+          payload.req.schemas ||
+          payload.req.contract;
+
+        if (verifySchema)
           schemaValidation(verifySchema);
-        }
 
         if (payload.search) {
-          ``;
           searchEq(
             window.alias.bodyResponse,
             payload.search.search,
@@ -722,13 +736,14 @@ Cypress.Commands.add("supportCrud", (input) => {
   if (!reqExist) payload = organizeJSON(payload, payloadCreate);
   window.test = {};
 
-  if (payload.req.url.endsWith("/")) {
+
+  if (payload.req && payload.req.url.endsWith("/")) {
     payload.req.url = payload.req.url.slice(0, -1);
   }
 
   payload = replaceAllStrings(payload);
 
-  if (payload.req.url && !payload.req.url.startsWith("http")) {
+  if (!payload.req.url.startsWith("http")) {
     handleEndWithEndpoint(payload.req).then((url) => {
       payload.req.url = url;
       payload = replaceAllStrings(payload);
@@ -1170,7 +1185,7 @@ function runValidation(initValid) {
       return;
     }
     let paths = findInJson(responseAlias, path);
-    
+
 
     if (!paths || paths === undefined)
       throw new Error(
@@ -1253,7 +1268,7 @@ function runValidation(initValid) {
             return false;
           }
         }
-        if(!equals) throw `${eq} not exist in response.`
+        if (!equals) throw `${eq} not exist in response.`
       }
     }
   }
@@ -1285,8 +1300,8 @@ function searchEq(obj, searchValue, reserve) {
       Cypress.log({
         name: "save",
         message: `[${reserve || "save"}] = ${typeof searchValue === "object"
-            ? JSON.stringify(searchValue)
-            : searchValue
+          ? JSON.stringify(searchValue)
+          : searchValue
           }`,
         consoleProps: () => ({
           alias: reserve || "save",
