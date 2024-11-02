@@ -389,33 +389,142 @@ Cypress.Commands.add("supportCrud", (input) => {
       delete mock.intercept.body;
       return mock;
     };
-    return cy.fixture(data.mock).then((mocks) => {
+    if (typeof data.mock === "object") {
+      var mocks = data.mock
       mockUrlandMethod(mocks, payload);
-      Cypress.log({
-        name: "mock",
-        message: `Intercept ** ${data.mock}.json ** `,
-        consoleProps: () => {
-          return {
-            mock: data.mock,
-            body: mocks,
-            framework: "cypress-crud",
-          };
-        },
-      });
-      Cypress.log({
-        name: payload.req.method,
-        message: payload.req.url,
-        consoleProps: () => {
-          return {
-            mock: data.mock,
-            body: mocks,
-            framework: "cypress-crud",
-          };
-        },
-      });
-      if (typeof mocks.response.body === "string") {
-        cy.fixture(`${mocks.response.body}`).then((json) => {
-          mocks.response.body = json;
+      return cy
+        .intercept(mocks.intercept, (req) => {
+          req.reply(mocks.response);
+        })
+        .then(() => {
+          if (!window.alias) {
+            window.alias = {};
+          }
+          window.alias[alias] = mocks;
+          window.alias["bodyResponse"] = mocks;
+          window.mock.active = true;
+          counterResponse += 1;
+          crudStorage.response[`response${counterResponse}`] = mocks;
+
+          if (!Cypress.config("isInteractive")) {
+            return cy
+              .task(
+                "crudLog",
+                textNpxRunCypress({ type: "mock", mocks: mocks })
+              )
+              .then(() => {
+                expectValidations(payload);
+                return mocks;
+              });
+          } else {
+            console.log(payload, mocks);
+
+            expectValidations(payload);
+            return mocks;
+          }
+        })
+        .then(() => {
+          // if (payload.req.schema) payload.req.schema = payload.schema;
+
+          delete payload.schema;
+
+          const verifySchema =
+            payload.req.schema ||
+            payload.req.schemas ||
+            payload.req.contract;
+
+          if (verifySchema)
+            validateSchema(verifySchema);
+
+          if (payload.search) {
+            searchEq(
+              window.alias.bodyResponse,
+              payload.search.search,
+              payload.search.as
+            );
+          }
+          removeBeforePseudoElement();
+        });
+    } else
+      return cy.fixture(data.mock).then((mocks) => {
+        mockUrlandMethod(mocks, payload);
+        Cypress.log({
+          name: "mock",
+          message: `Intercept ** ${data.mock}.json ** `,
+          consoleProps: () => {
+            return {
+              mock: data.mock,
+              body: mocks,
+              framework: "cypress-crud",
+            };
+          },
+        });
+        Cypress.log({
+          name: payload.req.method,
+          message: payload.req.url,
+          consoleProps: () => {
+            return {
+              mock: data.mock,
+              body: mocks,
+              framework: "cypress-crud",
+            };
+          },
+        });
+        if (typeof mocks.response.body === "string") {
+          cy.fixture(`${mocks.response.body}`).then((json) => {
+            mocks.response.body = json;
+            return cy
+              .intercept(mocks.intercept, (req) => {
+                req.reply(mocks.response);
+              })
+              .then(() => {
+                if (!window.alias) {
+                  window.alias = {};
+                }
+                window.alias[alias] = mocks;
+                window.alias["bodyResponse"] = mocks;
+                window.mock.active = true;
+                counterResponse += 1;
+                crudStorage.response[`response${counterResponse}`] = mocks;
+                if (!Cypress.config("isInteractive")) {
+                  return cy
+                    .task(
+                      "crudLog",
+                      textNpxRunCypress({ type: "mock", mocks: mocks })
+                    )
+                    .then(() => {
+                      expectValidations(payload);
+                      return mocks;
+                    });
+                } else {
+                  expectValidations(payload);
+                  return mocks;
+                }
+              })
+              .then(() => {
+                // if (payload.req.schema) payload.req.schema = payload.schema;
+
+                delete payload.schema;
+
+                const verifySchema =
+                  payload.req.schema ||
+                  payload.req.schemas ||
+                  payload.req.contract;
+
+                if (verifySchema)
+                  validateSchema(verifySchema);
+
+                if (payload.search) {
+                  searchEq(
+                    window.alias.bodyResponse,
+                    payload.search.search,
+                    payload.search.as
+                  );
+                }
+                removeBeforePseudoElement();
+              });
+          });
+        } else {
           return cy
             .intercept(mocks.intercept, (req) => {
               req.reply(mocks.response);
@@ -429,6 +538,7 @@ Cypress.Commands.add("supportCrud", (input) => {
               window.mock.active = true;
               counterResponse += 1;
               crudStorage.response[`response${counterResponse}`] = mocks;
+
               if (!Cypress.config("isInteractive")) {
                 return cy
                   .task(
@@ -440,6 +550,8 @@ Cypress.Commands.add("supportCrud", (input) => {
                     return mocks;
                   });
               } else {
+                console.log(payload, mocks);
+
                 expectValidations(payload);
                 return mocks;
               }
@@ -466,63 +578,8 @@ Cypress.Commands.add("supportCrud", (input) => {
               }
               removeBeforePseudoElement();
             });
-        });
-      } else {
-        return cy
-          .intercept(mocks.intercept, (req) => {
-            req.reply(mocks.response);
-          })
-          .then(() => {
-            if (!window.alias) {
-              window.alias = {};
-            }
-            window.alias[alias] = mocks;
-            window.alias["bodyResponse"] = mocks;
-            window.mock.active = true;
-            counterResponse += 1;
-            crudStorage.response[`response${counterResponse}`] = mocks;
-
-            if (!Cypress.config("isInteractive")) {
-              return cy
-                .task(
-                  "crudLog",
-                  textNpxRunCypress({ type: "mock", mocks: mocks })
-                )
-                .then(() => {
-                  expectValidations(payload);
-                  return mocks;
-                });
-            } else {
-              console.log(payload, mocks);
-
-              expectValidations(payload);
-              return mocks;
-            }
-          })
-          .then(() => {
-            // if (payload.req.schema) payload.req.schema = payload.schema;
-
-            delete payload.schema;
-
-            const verifySchema =
-              payload.req.schema ||
-              payload.req.schemas ||
-              payload.req.contract;
-
-            if (verifySchema)
-              validateSchema(verifySchema);
-
-            if (payload.search) {
-              searchEq(
-                window.alias.bodyResponse,
-                payload.search.search,
-                payload.search.as
-              );
-            }
-            removeBeforePseudoElement();
-          });
-      }
-    });
+        }
+      });
   };
 
   function removeBeforePseudoElement() {
@@ -969,16 +1026,14 @@ function runValidation(initValid) {
       }),
     });
   };
-  if (typeof initValid === "string") {
-    // expect: "name:::product_name>7",
-    //
+  const stringValidation = (stringValue) => {
     if (
-      initValid.trim().includes("===") &&
-      !initValid.trim().includes(":::") &&
-      !initValid.trim().includes(">")
+      stringValue.trim().includes("===") &&
+      !stringValue.trim().includes(":::") &&
+      !stringValue.trim().includes(">")
     ) {
       let validation = false;
-      const splitEq = initValid.trim().split("===");
+      const splitEq = stringValue.trim().split("===");
       const splitSave = splitEq[1].trim();
       useEq = splitSave;
       const paths = findInJson(responseAlias, splitEq[0].trim());
@@ -1011,12 +1066,12 @@ function runValidation(initValid) {
       }
       return;
     } else if (
-      initValid.trim().includes("===") &&
-      initValid.trim().includes(":::") &&
-      !initValid.trim().includes(">")
+      stringValue.trim().includes("===") &&
+      stringValue.trim().includes(":::") &&
+      !stringValue.trim().includes(">")
     ) {
       let validation = false;
-      const splitEq = initValid.trim().split("===");
+      const splitEq = stringValue.trim().split("===");
       const splitSave = splitEq[1].trim().split(":::");
       useEq = splitSave[0];
       const paths = findInJson(responseAlias, splitEq[0].trim());
@@ -1052,11 +1107,11 @@ function runValidation(initValid) {
         expect(`error validation eqls not found ${useEq}`, true).to.be.false;
       }
     } else if (
-      initValid.trim().includes(":::") &&
-      !initValid.trim().includes("===") &&
-      !initValid.trim().includes(">")
+      stringValue.trim().includes(":::") &&
+      !stringValue.trim().includes("===") &&
+      !stringValue.trim().includes(">")
     ) {
-      const sliptSave = initValid.trim().split(":::");
+      const sliptSave = stringValue.trim().split(":::");
       const paths = findInJson(responseAlias, sliptSave[0].trim());
 
       if (!paths || paths === undefined)
@@ -1073,11 +1128,11 @@ function runValidation(initValid) {
         : sliptSave[0].trim();
       saveLog(saveName, paths.length === 1 ? paths[0] : paths);
     } else if (
-      initValid.trim().includes(":::") &&
-      initValid.trim().includes(">") &&
-      !initValid.trim().includes("===")
+      stringValue.trim().includes(":::") &&
+      stringValue.trim().includes(">") &&
+      !stringValue.trim().includes("===")
     ) {
-      const sliptSave = initValid.trim().split(":::");
+      const sliptSave = stringValue.trim().split(":::");
       const splitPostition = sliptSave[1].trim().split(">");
 
       const paths = findInJson(responseAlias, sliptSave[0].trim());
@@ -1101,15 +1156,15 @@ function runValidation(initValid) {
         splitPostition[1] ? paths[splitPostition[1] - 1] : paths
       );
     } else {
-      const paths = findInJson(responseAlias, initValid);
+      const paths = findInJson(responseAlias, stringValue);
 
       if (paths && paths.length === 1) {
         for (let pathExist of paths) {
-          expect(pathExist, initValid).to.be.exist;
+          expect(pathExist, stringValue).to.be.exist;
         }
       } else {
-        if (initValid.includes(">")) {
-          const splitPostition = initValid.trim().split(">");
+        if (stringValue.includes(">")) {
+          const splitPostition = stringValue.trim().split(">");
           const pathsPosition = findInJson(
             responseAlias,
             splitPostition[0].trim()
@@ -1121,7 +1176,7 @@ function runValidation(initValid) {
         } else {
           if (!paths || paths === undefined)
             throw new Error(
-              `${initValid} not found results in JSON. ${JSON.stringify(
+              `${stringValue} not found results in JSON. ${JSON.stringify(
                 responseAlias,
                 null,
                 2
@@ -1129,10 +1184,10 @@ function runValidation(initValid) {
             );
 
           if (paths.length > 50) {
-            expect(paths, `[${initValid}]`).to.be.exist;
+            expect(paths, `[${stringValue}]`).to.be.exist;
           } else {
             paths.forEach((value, index) => {
-              expect(value, `[${initValid}] position: ${index + 1}`).to.be
+              expect(value, `[${stringValue}] position: ${index + 1}`).to.be
                 .exist;
             });
           }
@@ -1140,6 +1195,13 @@ function runValidation(initValid) {
       }
       return false;
     }
+  }
+  if (typeof initValid === "string") {
+
+    if (initValid.includes(",")) {
+      const separate = initValid.split(",")
+      for (const s of separate) stringValidation(s.trim())
+    } else stringValidation(initValid)
   } else {
     const {
       path,
@@ -1351,6 +1413,8 @@ Cypress.Commands.add("save", (...input) => {
   }
 });
 function save(initValid) {
+
+
   if (
     window.alias &&
     window.alias.bodyResponse &&
@@ -1379,15 +1443,14 @@ function save(initValid) {
       }),
     });
   };
-  //  const paths = findInJson(window.alias.bodyResponse, path_and_key);
-  if (typeof initValid === "string") {
+  const stringValidation = (stringValue) => {
     if (
-      initValid.trim().includes("===") &&
-      !initValid.trim().includes(":::") &&
-      !initValid.trim().includes(">")
+      stringValue.trim().includes("===") &&
+      !stringValue.trim().includes(":::") &&
+      !stringValue.trim().includes(">")
     ) {
       let validation = false;
-      const splitEq = initValid.trim().split("===");
+      const splitEq = stringValue.trim().split("===");
       const splitSave = splitEq[1].trim();
       useEq = splitSave;
       const paths = findInJson(responseAlias, splitEq[0].trim());
@@ -1415,17 +1478,22 @@ function save(initValid) {
         }
       }
       if (!validation) {
-        expect(`error validation eqls not found ${useEq} in ${paths}`, true).to
-          .be.false;
+        Cypress.log({
+          name: "save",
+          message: `Not found, data not save`,
+          consoleProps: () => ({
+            framework: "cypress-crud",
+          }),
+        });
       }
       return;
     } else if (
-      initValid.trim().includes("===") &&
-      initValid.trim().includes(":::") &&
-      !initValid.trim().includes(">")
+      stringValue.trim().includes("===") &&
+      stringValue.trim().includes(":::") &&
+      !stringValue.trim().includes(">")
     ) {
       let validation = false;
-      const splitEq = initValid.trim().split("===");
+      const splitEq = stringValue.trim().split("===");
       const splitSave = splitEq[1].trim().split(":::");
       useEq = splitSave[0];
       const paths = findInJson(responseAlias, splitEq[0].trim());
@@ -1457,14 +1525,20 @@ function save(initValid) {
         }
       }
       if (!validation) {
-        expect(`error validation eqls not found ${useEq}`, true).to.be.false;
+        Cypress.log({
+          name: "save",
+          message: `Not found, data not save`,
+          consoleProps: () => ({
+            framework: "cypress-crud",
+          }),
+        });
       }
     } else if (
-      initValid.trim().includes(":::") &&
-      !initValid.trim().includes("===") &&
-      !initValid.trim().includes(">")
+      stringValue.trim().includes(":::") &&
+      !stringValue.trim().includes("===") &&
+      !stringValue.trim().includes(">")
     ) {
-      const sliptSave = initValid.trim().split(":::");
+      const sliptSave = stringValue.trim().split(":::");
       const paths = findInJson(responseAlias, sliptSave[0].trim());
 
       if (!paths || paths === undefined)
@@ -1481,11 +1555,13 @@ function save(initValid) {
         : sliptSave[0].trim();
       saveLog(saveName, paths.length === 1 ? paths[0] : paths);
     } else if (
-      initValid.trim().includes(":::") &&
-      !initValid.trim().includes("===") &&
-      initValid.trim().includes(">")
+      stringValue.trim().includes(":::") &&
+      stringValue.trim().includes(">") &&
+      !stringValue.trim().includes("===")
+
     ) {
-      const sliptSave = initValid.trim().split(":::");
+
+      const sliptSave = stringValue.trim().split(":::");
       const splitPostition = sliptSave[1].trim().split(">");
 
       const paths = findInJson(responseAlias, sliptSave[0].trim());
@@ -1509,21 +1585,29 @@ function save(initValid) {
         splitPostition[1] ? paths[splitPostition[1] - 1] : paths
       );
     } else {
-      const paths = findInJson(responseAlias, initValid);
+      const paths = findInJson(responseAlias, stringValue);
 
       if (!paths || paths === undefined)
         throw new Error(
-          `${initValid} not found results in JSON. ${JSON.stringify(
+          `${stringValue} not found results in JSON. ${JSON.stringify(
             responseAlias,
             null,
             2
           )}`
         );
 
-      saveLog(initValid, paths.length === 1 ? paths[0] : paths);
+      saveLog(stringValue, paths.length === 1 ? paths[0] : paths);
 
       return false;
     }
+  }
+  //  const paths = findInJson(window.alias.bodyResponse, path_and_key);
+  if (typeof initValid === "string") {
+
+    if (initValid.includes(",")) {
+      const separate = initValid.split(",")
+      for (const s of separate) stringValidation(s.trim())
+    } else stringValidation(initValid)
   }
 
   if (typeof initValid === "object") {
