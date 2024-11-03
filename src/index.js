@@ -1290,6 +1290,8 @@ function runValidation(initValid) {
         if (useAlias) saveLog(aliasPath, paths);
       }
     } else if (eq) {
+      let equals = null;
+
       if (position && type) {
         expect(eq, `${JSON.stringify(filteredInitValid)}`).to.eq(
           paths[position - 1]
@@ -1306,7 +1308,7 @@ function runValidation(initValid) {
         if (useAlias) saveLog(aliasPath, paths[position - 1]);
       } else if (!position) {
         if (eq.includes("||")) {
-          let found;
+         equals = true;
           const separate = eq
             .trim()
             .split("||")
@@ -1314,10 +1316,8 @@ function runValidation(initValid) {
 
           expect(
             `${JSON.stringify(separate)}`,
-            `${JSON.stringify(filteredInitValid)}`
           ).to.be.includes(paths[0]);
         }
-        let equals = null;
         for (let pathEq of paths) {
           if (pathEq === eq) {
             equals = true;
