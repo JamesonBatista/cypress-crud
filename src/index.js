@@ -126,6 +126,7 @@ Cypress.Commands.add("supportCrud", (input) => {
   cy.clearAllLocalStorage({ log: false });
 
   const organizeJSON = (payload, payloadCreate = {}) => {
+    
     const cp = (payloadCreate.req = {});
     if (!crudStorage.organize) crudStorage.organize = {};
 
@@ -160,6 +161,7 @@ Cypress.Commands.add("supportCrud", (input) => {
 
     const mapPayloadToCp = {
       form: "form",
+      auth: "auth",
       status: "status",
       statusCode: "status",
       headers: "headers",
@@ -179,23 +181,31 @@ Cypress.Commands.add("supportCrud", (input) => {
       encoding: "encoding",
       gzip: "gzip",
       retryOnStatusCodeFailure: "retryOnStatusCodeFailure",
-      retryOnNetworkFailure: "retryOnNetworkFailure",
+      retryOnNetworkFailure: "retryOnNetworkFailure"
     };
 
     Object.keys(mapPayloadToCp).forEach((key) => {
-      if (payload[key]) cp[mapPayloadToCp[key]] = payload[key];
+      
+      if (payload['form']) {
+        
+        cp['form'] = true
+        cp['body'] = payload['form']
+      }
+      else if (payload[key]) cp[mapPayloadToCp[key]] = payload[key];
     });
+
+    
 
     cp.failOnStatusCode =
       payload.failOnStatusCode !== undefined ? payload.failOnStatusCode : false;
     cp.timeout = payload.timeout || 180000;
 
     const additionalKeys = [
+      "text",
       "search",
       "auth",
       "followRedirect",
       "condition",
-      "text",
       "save",
       "saveRequest",
       "request",
@@ -224,6 +234,28 @@ Cypress.Commands.add("supportCrud", (input) => {
     ];
     const validate = validateKeys.find((key) => payload[key]);
     if (validate) payloadCreate.expect = payload[validate];
+
+    if (payloadCreate.req && payloadCreate.req.url) {
+      let pc = payloadCreate.req
+      let finalUrl;
+      if (pc.url.includes("/")) {
+        const s_url = pc.url.split("/");
+        for (const url_ of s_url) {
+          let get_ = findInJson(Cypress.env(Cypress.env('environment')), url_)
+          finalUrl ? finalUrl += get_ ? `${get_[0]}/` : `${url_}/` : finalUrl = get_ ? `${get_[0]}/` : `${url_}/`
+
+        }
+
+        if (finalUrl && String(finalUrl).endsWith("/")) finalUrl = finalUrl.slice(0, -1)
+
+      } else {
+        finalUrl = findInJson(Cypress.env(Cypress.env('environment')), pc.url) ? findInJson(Cypress.env(Cypress.env('environment')), pc.url)[0] : pc.url
+      }
+
+      payloadCreate.req.url = finalUrl
+
+
+    }
 
     return payloadCreate;
   };
@@ -793,11 +825,6 @@ Cypress.Commands.add("supportCrud", (input) => {
   if (!reqExist) payload = organizeJSON(payload, payloadCreate);
   window.test = {};
 
-
-  if (payload.req && payload.req.url.endsWith("/")) {
-    payload.req.url = payload.req.url.slice(0, -1);
-  }
-
   payload = replaceAllStrings(payload);
 
   if (!payload.req.url.startsWith("http")) {
@@ -1169,6 +1196,9 @@ function runValidation(initValid) {
             responseAlias,
             splitPostition[0].trim()
           );
+          if (pathsPosition) {
+            expect(pathsPosition[splitPostition[1] - 1], splitPostition[0].trim()).to.be.exist;
+          }
           saveLog(
             splitPostition[0].trim(),
             pathsPosition[splitPostition[1] - 1]
@@ -1308,7 +1338,7 @@ function runValidation(initValid) {
         if (useAlias) saveLog(aliasPath, paths[position - 1]);
       } else if (!position) {
         if (eq.includes("||")) {
-         equals = true;
+          equals = true;
           const separate = eq
             .trim()
             .split("||")

@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const version = '4.2.3'
+const version = "4.2.4";
 const configPath = path.resolve(__dirname, "../../");
 const jsconfigFilePath = path.join(
   configPath,
@@ -280,11 +280,12 @@ module.exports = {
     console.log("                  The best framework for API testing");
     console.log("");
     console.log("           ------------------------------------------------------------");
+    console.log("");
     console.log("           Documentation:");
     console.log("           Visit https://github.com/JamesonBatista/cypress-crud");
+    console.log("           Documentation https://jamesonbatista.github.io/doc.cypress.crud/");
     console.log('           Author: Jam Batista');
     console.log("");
-    console.log("           LinkedIn: https://www.linkedin.com/in/jam-batista-98101015b/");
     console.log("           ------------------------------------------------------------");
     console.log("");
     console.log("");
@@ -323,7 +324,6 @@ module.exports = {
 
 // change steps
 fs.writeFile(`${changeCypressLog}/run.js`, newText, "utf8", (err) => {});
-
 
 const newOpenCypress = `
 "use strict";
@@ -403,18 +403,20 @@ module.exports = {
     console.log("");
   
     console.log('                    Welcome cypress-crud ${version}');
-    console.log("                The best framework for API testing");
+    console.log("                  The best framework for API testing");
     console.log("");
-    console.log("--------------------------------------------------------");
-    console.log("Documentation:");
-    console.log("Visit https://github.com/JamesonBatista/cypress-crud");
-    console.log('Author: Jam Batista');
+    console.log("           ------------------------------------------------------------");
     console.log("");
-    console.log("LinkedIn: https://www.linkedin.com/in/jam-batista-98101015b/");
-    console.log("--------------------------------------------------------");
+    console.log("           Documentation:");
+    console.log("           Visit https://github.com/JamesonBatista/cypress-crud");
+    console.log("           Documentation https://jamesonbatista.github.io/doc.cypress.crud/");
+    console.log('           Author: Jam Batista');
+    console.log("");
+    console.log("           ------------------------------------------------------------");
     console.log("");
     console.log("");
     console.log("");  
+
     function open() {
       try {
         const args = processOpenOptions(options);
@@ -436,6 +438,11 @@ module.exports = {
   }
 };
 
-`
+`;
 
-fs.writeFile(`${changeCypressLog}/open.js`, newOpenCypress, "utf8", (err) => {});
+fs.writeFile(
+  `${changeCypressLog}/open.js`,
+  newOpenCypress,
+  "utf8",
+  (err) => {}
+);
