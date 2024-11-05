@@ -35,14 +35,6 @@ NodeJS must be installed and Cypress must be version 10 or higher for this packa
 To install the package in your Cypress project, use the command
 
 ```brash
-npm i cypress
-
-npx cypress open
-
-and
-
-configure cypress
-
 npm i cypress-crud
 ```
 
