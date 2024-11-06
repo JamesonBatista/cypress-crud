@@ -163,7 +163,7 @@ Cypress.Commands.add("supportCrud", (input) => {
       form: "form", //f
       f: "form",
       auth: "auth", //au
-      au:"auth",
+      au: "auth",
       status: "status", //st
       statusCode: "status",//stc
       st: "status",
@@ -226,12 +226,12 @@ Cypress.Commands.add("supportCrud", (input) => {
       save: "save",//s
       s: "save",
       saveRequest: "saveRequest",//sr
-      sr:"saveRequest",
+      sr: "saveRequest",
       request: "request",//r
     };
 
     Object.keys(additionalKeys).forEach((key) => {
-      
+
       if (payload[key]) payloadCreate[additionalKeys[key]] = payload[key];
     });
 
@@ -257,6 +257,14 @@ Cypress.Commands.add("supportCrud", (input) => {
     ];
     const validate = validateKeys.find((key) => payload[key]);
     if (validate) payloadCreate.expect = payload[validate];
+
+    if (payloadCreate.req && payloadCreate.req.url && payloadCreate.req.url.startsWith("/")) {
+      const urlbase = ["base", "baseUrl"]
+      for (const u of urlbase) {
+        const base = findInJson(Cypress.env(Cypress.env('environment')), u)
+        if (base) payloadCreate.req.url = `${base[0]}${payloadCreate.req.url}`
+      }
+    }
 
     if (payloadCreate.req && payloadCreate.req.url) {
       let pc = payloadCreate.req
