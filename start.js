@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const version = "4.3.0";
+const version = "4.3.1";
 const configPath = path.resolve(__dirname, "../../");
 const jsconfigFilePath = path.join(
   configPath,
@@ -284,7 +284,6 @@ module.exports = {
     console.log("           Documentation:");
     console.log("           Visit https://github.com/JamesonBatista/cypress-crud");
     console.log("           Documentation https://jamesonbatista.github.io/doc.cypress.crud/");
-    console.log('           Author: Jam Batista');
     console.log("");
     console.log("           ------------------------------------------------------------");
     console.log("");
@@ -410,7 +409,6 @@ module.exports = {
     console.log("           Documentation:");
     console.log("           Visit https://github.com/JamesonBatista/cypress-crud");
     console.log("           Documentation https://jamesonbatista.github.io/doc.cypress.crud/");
-    console.log('           Author: Jam Batista');
     console.log("");
     console.log("           ------------------------------------------------------------");
     console.log("");

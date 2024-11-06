@@ -103,7 +103,7 @@ Cypress.Commands.add('crud', (input) => {
 
 
 Cypress.Commands.add("crudRuuner", (input) => {
-  const metodosHttp = ["get", "post", "put", "patch", "delete"];
+  const metodosHttp = ["get", "post", "delete", "patch", "put", "g", "p", "d", "pa", "pu"];
 
   if (metodosHttp.some(metodo => input.hasOwnProperty(metodo))) {
     var _package = require('../../../package.json')
@@ -126,14 +126,9 @@ Cypress.Commands.add("supportCrud", (input) => {
   cy.clearAllLocalStorage({ log: false });
 
   const organizeJSON = (payload, payloadCreate = {}) => {
-    
+
     const cp = (payloadCreate.req = {});
     if (!crudStorage.organize) crudStorage.organize = {};
-
-    const methodKeys = ["get", "post", "delete", "patch", "put"];
-    crudStorage.organize.url =
-      payload[methodKeys.find((key) => key in payload) || "get"];
-
     if (payload.method) cp.method = payload.method;
 
     const methodMap = {
@@ -142,6 +137,11 @@ Cypress.Commands.add("supportCrud", (input) => {
       delete: "DELETE",
       get: "GET",
       patch: "PATCH",
+      g: "GET",
+      p: "POST",
+      d: "DELETE",
+      pa: "PATCH",
+      pu: "PUT"
     };
 
     Object.keys(methodMap).forEach((key) => {
@@ -160,62 +160,83 @@ Cypress.Commands.add("supportCrud", (input) => {
     }
 
     const mapPayloadToCp = {
-      form: "form",
-      auth: "auth",
-      status: "status",
-      statusCode: "status",
-      headers: "headers",
-      header: "headers",
-      schema: "schema",
-      schemas: "schema",
-      contract: "schema",
-      body: "body",
-      payload: "body",
+      form: "form", //f
+      f: "form",
+      auth: "auth", //au
+      au:"auth",
+      status: "status", //st
+      statusCode: "status",//stc
+      st: "status",
+      stc: "status",
+      stc: "status",
+      headers: "headers", //hs
+      header: "headers",//h
+      hs: "headers",
+      h: "header",
+      schema: "schema",//sc
+      schemas: "schema",//scs
+      sc: "schema",
+      contract: "schema",//ct
+      body: "body",//b
+      payload: "body",//pl
+      b: "body",
+      pl: "body",
       qs: "qs",
       param: "qs",
       params: "qs",
-      mock: "mock",
+      mock: "mock",//m
+      m: "mock",
       failOnStatusCode: "failOnStatusCode",
+      fs: "failOnStatusCode",
       env: "env",
       timeout: "timeout",
+      tt: "timeout",
       encoding: "encoding",
+      en: "encoding",
       gzip: "gzip",
       retryOnStatusCodeFailure: "retryOnStatusCodeFailure",
-      retryOnNetworkFailure: "retryOnNetworkFailure"
+      rsc: "retryOnStatusCodeFailure",
+      retryOnNetworkFailure: "retryOnNetworkFailure",
+      rnf: "retryOnNetworkFailure",
+      followRedirect: "followRedirect",
+      fd: "followRedirect",
     };
 
     Object.keys(mapPayloadToCp).forEach((key) => {
-      
+
       if (payload['form']) {
-        
+
         cp['form'] = true
         cp['body'] = payload['form']
       }
       else if (payload[key]) cp[mapPayloadToCp[key]] = payload[key];
     });
 
-    
-
     cp.failOnStatusCode =
       payload.failOnStatusCode !== undefined ? payload.failOnStatusCode : false;
     cp.timeout = payload.timeout || 180000;
 
-    const additionalKeys = [
-      "text",
-      "search",
-      "auth",
-      "followRedirect",
-      "condition",
-      "save",
-      "saveRequest",
-      "request",
-    ];
-    additionalKeys.forEach((key) => {
-      if (payload[key]) payloadCreate[key] = payload[key];
+    const additionalKeys = {
+      text: "text", //t
+      t: "text",
+      search: "search",
+      sh: "search",
+      condition: "condition",//c
+      c: "condition",
+      save: "save",//s
+      s: "save",
+      saveRequest: "saveRequest",//sr
+      sr:"saveRequest",
+      request: "request",//r
+    };
+
+    Object.keys(additionalKeys).forEach((key) => {
+      
+      if (payload[key]) payloadCreate[additionalKeys[key]] = payload[key];
     });
 
-    if (payload.text) {
-      payloadCreate.text = formatText(payload.text);
+    if (payload.text || payload.t) {
+      payloadCreate.text = formatText(payload.text || payload.t);
     }
 
     // Validação e expectativas
@@ -231,6 +252,8 @@ Cypress.Commands.add("supportCrud", (input) => {
       "validate",
       "should",
       "exist",
+      "ex",
+      "e"
     ];
     const validate = validateKeys.find((key) => payload[key]);
     if (validate) payloadCreate.expect = payload[validate];

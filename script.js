@@ -82,9 +82,7 @@ if (!fs.existsSync(folderCypress)) {
 const folderE2E = path.join(folderCypress, "e2e");
 if (!fs.existsSync(folderE2E)) {
   fs.mkdirSync(folderE2E);
-  const co = path.join(folderE2E, "test.cy.js");
-  const cot = ``;
-  fs.writeFileSync(co, cot);
+
 }
 const folderFixtures = path.join(folderCypress, "fixtures");
 if (!fs.existsSync(folderFixtures)) {
@@ -318,12 +316,6 @@ if (!fs.existsSync(vscodeFolderPath)) {
       "it('', function () {});});",
       "",
       "",
-      "function rescue_save(params) {",
-      " if (params) {",
-      "return crudStorage.save[params];",
-      " }",
-      "return JSON.stringify(crudStorage.save);",
-      "  }",
     ],
     "description": "generate full test describes its"
   },
@@ -337,12 +329,6 @@ if (!fs.existsSync(vscodeFolderPath)) {
       "it('$1', () => {    });  });",
       "",
       "",
-      "function rescue_save(params) {",
-      " if (params) {",
-      "return crudStorage.save[params];",
-      " }",
-      "return JSON.stringify(crudStorage.save);",
-      "  }",
     ],
     "description": "generate full test describes its text"
   }
@@ -405,3 +391,115 @@ module.exports = defineConfig({
 `;
 
 fs.writeFileSync(env_qa, contentEnv);
+
+const co = path.join(folderE2E, "examples-cypress-crud.cy.js");
+const cot = `
+import { faker, clone, crudStorage } from "../support/e2e";
+describe("First test whit cypress-crud", () => {
+  /*
+The tests below can be carried out using JSONs,
+just create them in the fixtures folder
+or within subfolders of the fixtures folder
+*/
+  it("Test simple /get", () => {
+    cy.crud({ get: "https://reqres.in/api/users/2" });
+  });
+  it("Test simple /get whit description", () => {
+    cy.crud({ text: "/get user 2", get: "https://reqres.in/api/users/2" });
+  });
+  it("Test simple /get whit description validation", () => {
+    cy.crud({
+      text: "/get user 2",
+      get: "https://reqres.in/api/users/2",
+      expect: "email",
+    });
+  });
+  it("Test simple /get whit description several validation", () => {
+    cy.crud({
+      text: "/get user 2",
+      get: "https://reqres.in/api/users/2",
+      expect: "email, first_name",
+    });
+  });
+  it("Test equal", () => {
+    cy.crud({
+      text: "/get user 2",
+      get: "https://reqres.in/api/users/2",
+      expect: "first_name === Janet",
+    });
+    cy.crud({
+      text: "/get user 2",
+      get: "https://reqres.in/api/users/2",
+      expect: "id === 2",
+    });
+  });
+  it("get variable cypress.env.json", () => {
+    cy.crud({ get: "reqres_all" });
+
+    cy.crud({ get: "reqres_all/7" });
+    cy.crud({
+      get: "reqres_all/7",
+      schema: {
+        $schema: "http://json-schema.org/draft-04/schema#",
+        type: "object",
+        properties: {
+          data: {
+            type: "object",
+            properties: {
+              id: {
+                type: "integer",
+              },
+              email: {
+                type: "string",
+              },
+              first_name: {
+                type: "string",
+              },
+              last_name: {
+                type: "string",
+              },
+              avatar: {
+                type: "string",
+              },
+            },
+            required: ["id", "email", "first_name", "last_name", "avatar"],
+          },
+          support: {
+            type: "object",
+            properties: {
+              url: {
+                type: "string",
+              },
+              text: {
+                type: "string",
+              },
+            },
+            required: ["url", "text"],
+          },
+        },
+        required: ["data", "support"],
+      },
+    });
+  });
+  it("/POST tips", () => {
+    // visit https://jamesonbatista.github.io/doc.cypress.crud/examplesTest.html to learn how to use it this way
+    cy.crud({
+      t: "testamdp",
+      p: "reqres_all",
+      b: {
+        name: "faker.name",
+        job: "faker.professional",
+        email: "faker.email",
+      },
+      e: "id, name, job, email",
+      s: "id",
+    });
+  });
+  it('/GET tips easy', () => {
+      cy.crud({g:"reqres"})
+      
+  });
+});
+
+`;
+fs.writeFileSync(co, cot);
