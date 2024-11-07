@@ -82,7 +82,6 @@ if (!fs.existsSync(folderCypress)) {
 const folderE2E = path.join(folderCypress, "e2e");
 if (!fs.existsSync(folderE2E)) {
   fs.mkdirSync(folderE2E);
-
 }
 const folderFixtures = path.join(folderCypress, "fixtures");
 if (!fs.existsSync(folderFixtures)) {
@@ -503,3 +502,77 @@ or within subfolders of the fixtures folder
 
 `;
 fs.writeFileSync(co, cot);
+
+// create example fixtures
+const ex = path.join(folderFixtures, "tips.json");
+const json6 = `{
+  "c": "POST",
+  "r": "GET",
+  "u": "PUT",
+  "d": "DELETE",
+  "post": "POST",
+  "p": "POST",
+  "put": "PUT",
+  "pu": "PUT",
+  "delete": "DELETE",
+  "d": "DELETE",
+  "get": "GET",
+  "g": "GET",
+  "patch": "PATCH",
+  "pa": "PATCH",
+  "form": "form",
+  "f": "form",
+  "auth": "auth",
+  "au": "auth",
+  "status": "status",
+  "statusCode": "status",
+  "st": "status",
+  "stc": "status",
+  "headers": "headers",
+  "header": "headers",
+  "hs": "headers",
+  "h": "headers",
+  "schema": "schema",
+  "schemas": "schema",
+  "sc": "schema",
+  "contract": "schema",
+  "body": "body",
+  "payload": "body",
+  "b": "body",
+  "pl": "body",
+  "qs": "qs",
+  "param": "qs",
+  "params": "qs",
+  "mock": "mock",
+  "m": "mock",
+  "failOnStatusCode": "failOnStatusCode",
+  "fs": "failOnStatusCode",
+  "env": "env",
+  "timeout": "timeout",
+  "tt": "timeout",
+  "encoding": "encoding",
+  "en": "encoding",
+  "gzip": "gzip",
+  "retryOnStatusCodeFailure": "retryOnStatusCodeFailure",
+  "rsc": "retryOnStatusCodeFailure",
+  "retryOnNetworkFailure": "retryOnNetworkFailure",
+  "rnf": "retryOnNetworkFailure",
+  "followRedirect": "followRedirect",
+  "fd": "followRedirect",
+  "text": "text",
+  "t": "text",
+  "search": "search",
+  "sh": "search",
+  "condition": "condition",
+  "cdt": "condition",
+  "save": "save",
+  "s": "save",
+  "saveRequest": "saveRequest",
+  "sr": "saveRequest",
+  "request": "request",
+  "rq": "request",
+  "e": "expect",
+  "ex": "expect"
+}
+`;
+fs.writeFileSync(ex, json6);
