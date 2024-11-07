@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const version = "4.3.3";
+const version = "4.3.4";
 const configPath = path.resolve(__dirname, "../../");
 const jsconfigFilePath = path.join(
   configPath,

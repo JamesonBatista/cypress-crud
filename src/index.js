@@ -112,6 +112,9 @@ Cypress.Commands.add("crudRuuner", (input) => {
     "d",
     "pa",
     "pu",
+    "c",
+    "r",
+    "u"
   ];
 
   if (metodosHttp.some((metodo) => input.hasOwnProperty(metodo))) {
