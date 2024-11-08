@@ -34,7 +34,7 @@
   "bugs": {
     "url": "https://github.com/JamesonBatista/cypress-crud/issues"
   },
-  "homepage": "https://github.com/JamesonBatista/cypress-crud#readme",
+  "homepage": "https://jamesonbatista.github.io/doc.cypress.crud/",
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
     "chai": "*",
