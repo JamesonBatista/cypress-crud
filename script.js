@@ -498,6 +498,45 @@ or within subfolders of the fixtures folder
       cy.crud({g:"reqres"})
       
   });
+    it("complete crud tips cypress-crud", () => {
+    /*
+    format crud
+    POST = create =  c
+    GET = read =     r
+    PUT = uptade =   u
+    DELETE = delete= d
+    */
+    cy.crud([
+      // GET read
+      {
+        r: "https://fakestoreapi.com/products",
+      },
+      // POST created
+      {
+        c: "{url}", // {url} use the previous url https://fakestoreapi.com/products
+        b: {
+          title: "faker.name",
+          price: 13.5,
+          description: "faker.text",
+          image: "https://i.pravatar.cc",
+          category: "faker.professional",
+        },
+        st: 200,
+        s: "id",
+      },
+      // GET read id
+      { r: "{url}/{id}" },
+      // PUT update
+      {
+        u: "{url}", // {url} use the previous url https://fakestoreapi.com/products/21
+        b: {
+          title: "faker.name",
+        },
+      },
+      // DELETE delete
+      { d: "{url}" },
+    ]);
+  });
 });
 
 `;
@@ -572,7 +611,47 @@ const json6 = `{
   "request": "request",
   "rq": "request",
   "e": "expect",
-  "ex": "expect"
+  "ex": "expect",
+  "cookies": "cookies",
+  "ck": "cookies",
 }
 `;
 fs.writeFileSync(ex, json6);
+
+// tips fakers
+const t_fakers = path.join(folderFixtures, "fakers.json");
+const j_fakers = `
+{
+        "name": "faker.name", // faker.nome
+        "email": "faker.email",
+        "enterprise": "faker.enterpriseName", // faker.empresaNome faker.entrerprise
+        "state": "faker.state", // faker.estado
+        "city": "faker.city", // faker.cidade
+        "country": "faker.country", //faker.pais
+        "street": "faker.street", // faker.endereco // faker.address // faker.rua
+        "phoneNumber": "faker.phoneNumber", // faker.numeroTelefone
+        "cep": "faker.cep",
+        "cpf": "faker.cpf",
+        "cnpj": "faker.cnpj",
+        "passwords": "faker.password", //faker.senha
+        "uuid": "faker.uuid",
+        "birthdate": "faker.birthdate", // faker.aniversario
+        "avatar": "faker.avatar",
+        "professional": "faker.professional", // faker.profissao
+        "product": "faker.product", // faker.produto
+        "imagem": "faker.image", // faker.imagem
+        "text": "faker.text", // faker.texto
+        "title": "faker.title", // faker.titulo
+        "actualDate": "faker.actualDate", // faker.dataAtual
+        "futureDate": "faker.futureDate", // faker.dataFutura
+        "fruta": "faker.fruta",
+        "fruit": "faker.fruit",
+        "object": "faker.object", // faker.objeto
+        "num": "faker.number(12)", // 123484218445
+        "number": "faker.number(7)", // 9713187
+
+
+      }
+
+`;
+fs.writeFileSync(t_fakers, j_fakers);

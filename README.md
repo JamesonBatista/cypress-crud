@@ -8,7 +8,6 @@
 [![Npm package weekly downloads](https://badgen.net/npm/dt/cypress-crud)](https://npmjs.com/package/cypress-crud)
 
 <div style="text-align: center;">
-<img src="./src/images/4.3.4.png" alt="Rounded Image" width="400">
 </div>
 
 <br>

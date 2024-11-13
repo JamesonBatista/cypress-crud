@@ -114,7 +114,7 @@ Cypress.Commands.add("crudRuuner", (input) => {
     "pu",
     "c",
     "r",
-    "u"
+    "u",
   ];
 
   if (metodosHttp.some((metodo) => input.hasOwnProperty(metodo))) {
@@ -137,7 +137,28 @@ Cypress.Commands.add("supportCrud", (input) => {
   cy.clearAllCookies({ log: false });
   cy.clearAllLocalStorage({ log: false });
 
+  /**
+   * @function organizeJSON
+   * @description Organize a JSON object that can receive any key
+   * that is not a key of the Cypress request. It will be organized
+   * into a JSON object with the following format:
+   * {
+   *   req: {
+   *     method: string,
+   *     url: string,
+   *     [key: string]: any
+   *   },
+   *   expect: any,
+   *   [key: string]: any
+   * }
+   * @param {Object} payload - JSON object with any key
+   * @param {Object} [payloadCreate={}] - JSON object to be organized
+   * @returns {Object} - The organized JSON object
+   */
   const organizeJSON = (payload, payloadCreate = {}) => {
+    /**
+     * @type {{method?: string}}
+     */
     const cp = (payloadCreate.req = {});
     if (!crudStorage.organize) crudStorage.organize = {};
     if (payload.method) cp.method = payload.method;
@@ -165,13 +186,9 @@ Cypress.Commands.add("supportCrud", (input) => {
       }
     });
 
-    if (!payload.status) {
-      if (cp.method === "GET") {
-        payload.status = 200;
-      } else if (cp.method === "POST") {
-        payload.status = 201;
-      }
-    }
+    if (!payload.status)
+      if (cp.method === "GET") payload.status = 200;
+      else if (cp.method === "POST") payload.status = 201;
 
     const mapPayloadToCp = {
       form: "form", //f
@@ -214,12 +231,15 @@ Cypress.Commands.add("supportCrud", (input) => {
       rnf: "retryOnNetworkFailure",
       followRedirect: "followRedirect",
       fd: "followRedirect",
+      cookies: "cookies",
+      ck: "cookies",
     };
 
     Object.keys(mapPayloadToCp).forEach((key) => {
       if (payload["form"]) {
         cp["form"] = true;
         cp["body"] = payload["form"];
+        cp["headers"] = { "Content-Type": "application/x-www-form-urlencoded" };
       } else if (payload[key]) cp[mapPayloadToCp[key]] = payload[key];
     });
 
@@ -239,6 +259,9 @@ Cypress.Commands.add("supportCrud", (input) => {
       saveRequest: "saveRequest", //sr
       sr: "saveRequest",
       request: "request", //r
+      rq: "request",
+      length: "length",
+      l: "length",
     };
 
     Object.keys(additionalKeys).forEach((key) => {
@@ -280,11 +303,10 @@ Cypress.Commands.add("supportCrud", (input) => {
       }
     }
 
-    if (payloadCreate.req && payloadCreate.req.url) {
-      let pc = payloadCreate.req;
+    if (cp.url) {
       let finalUrl;
-      if (pc.url.includes("/")) {
-        const s_url = pc.url.split("/");
+      if (cp.url.includes("/")) {
+        const s_url = cp.url.split("/");
         for (const url_ of s_url) {
           let get_ = findInJson(Cypress.env(Cypress.env("environment")), url_);
           finalUrl
@@ -295,9 +317,8 @@ Cypress.Commands.add("supportCrud", (input) => {
         if (finalUrl && String(finalUrl).endsWith("/"))
           finalUrl = finalUrl.slice(0, -1);
       } else {
-        finalUrl = findInJson(Cypress.env(Cypress.env("environment")), pc.url)
-          ? findInJson(Cypress.env(Cypress.env("environment")), pc.url)[0]
-          : pc.url;
+        finalUrl = findInJson(Cypress.env(Cypress.env("environment")), cp.url);
+        finalUrl = finalUrl ? finalUrl[0] : cp.url;
       }
 
       payloadCreate.req.url = finalUrl;
@@ -495,8 +516,6 @@ Cypress.Commands.add("supportCrud", (input) => {
                 return mocks;
               });
           } else {
-            console.log(payload, mocks);
-
             expectValidations(payload);
             return mocks;
           }
@@ -624,8 +643,6 @@ Cypress.Commands.add("supportCrud", (input) => {
                     return mocks;
                   });
               } else {
-                console.log(payload, mocks);
-
                 expectValidations(payload);
                 return mocks;
               }
@@ -906,8 +923,6 @@ Cypress.Commands.add("supportCrud", (input) => {
 function conditionContinueTest(json) {
   const formattedJson = JSON.stringify(json, null, 2);
 
-  let condicionAccept = null;
-  let eqCondition = null;
   let logCondition = false;
   let result = null;
   const handleCondition = (json) => {
@@ -1378,7 +1393,7 @@ function runValidation(initValid) {
         );
         if (useAlias) saveLog(aliasPath, paths[position - 1]);
       } else if (!position) {
-        if (eq.includes("||")) {
+        if (typeof eq === "string" && eq.includes("||")) {
           equals = true;
           const separate = eq
             .trim()
@@ -2075,6 +2090,18 @@ function expectValidations(obj) {
           `request_${save_req}`,
           valRequest.length == 1 ? valRequest[0] : valRequest
         );
+    }
+  }
+
+  if (obj.length || obj.l) {
+    const len = obj.length || obj.l;
+
+    if (typeof len === "number") {
+      const length = window.alias.bodyResponse.body.length;
+      expect(length, `${randonItens()}length::`).to.eq(obj.length || obj.l);
+    } else if (typeof len === "object") {
+      const length = findInJson(window.alias.bodyResponse.body, len.path);
+      expect(length[0].length, `${randonItens()}length::`).to.eq(len.eq);
     }
   }
 }

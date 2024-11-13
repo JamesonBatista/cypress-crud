@@ -1,6 +1,6 @@
 {
   "name": "cypress-crud",
-  "version": "4.3.4",
+  "version": "4.3.7",
   "description": "cy.crud is a project that aims to have a new framework to make cy.api and cy.request easier",
   "main": "src",
   "peerDependencies": {
@@ -36,7 +36,7 @@
   },
   "homepage": "https://jamesonbatista.github.io/doc.cypress.crud/",
   "dependencies": {
-    "@faker-js/faker": "^8.4.1",
+    "@faker-js/faker": "*",
     "chai": "*",
     "chalk": "^5.3.0",
     "cy-spok": "^1.6.2",
@@ -44,7 +44,7 @@
     "cypress-plugin-api": "^2.11.1",
     "cypress-plugin-steps": "^1.1.1",
     "figlet": "^1.7.0",
-    "generate-datafaker": "^1.0.2",
+    "generate-datafaker": "*",
     "jsonschema": "^1.4.0",
     "mocha": "*",
     "mochawesome": "7.1.3",
