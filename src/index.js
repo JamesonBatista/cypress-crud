@@ -157,7 +157,7 @@ Cypress.Commands.add("supportCrud", (input) => {
    */
   const organizeJSON = (payload, payloadCreate = {}) => {
     /**
-     * @type {{method?: string}}
+     * @type {{method?: string, url?: string}}
      */
     const cp = (payloadCreate.req = {});
     if (!crudStorage.organize) crudStorage.organize = {};
@@ -215,6 +215,7 @@ Cypress.Commands.add("supportCrud", (input) => {
       qs: "qs",
       param: "qs",
       params: "qs",
+      pr: "qs",
       mock: "mock", //m
       m: "mock",
       failOnStatusCode: "failOnStatusCode",
@@ -239,7 +240,6 @@ Cypress.Commands.add("supportCrud", (input) => {
       if (payload["form"]) {
         cp["form"] = true;
         cp["body"] = payload["form"];
-        cp["headers"] = { "Content-Type": "application/x-www-form-urlencoded" };
       } else if (payload[key]) cp[mapPayloadToCp[key]] = payload[key];
     });
 
@@ -275,6 +275,8 @@ Cypress.Commands.add("supportCrud", (input) => {
     // Validação e expectativas
     const validateKeys = [
       "expect",
+      "valid",
+      "validation",
       "expects",
       "check",
       "checks",
@@ -287,14 +289,15 @@ Cypress.Commands.add("supportCrud", (input) => {
       "exist",
       "ex",
       "e",
+      "sh",
     ];
     const validate = validateKeys.find((key) => payload[key]);
     if (validate) payloadCreate.expect = payload[validate];
 
     if (
       payloadCreate.req &&
-      payloadCreate.req.url &&
-      payloadCreate.req.url.startsWith("/")
+      cp.url &&
+      cp.url.startsWith("/")
     ) {
       const urlbase = ["base", "baseUrl"];
       for (const u of urlbase) {
@@ -303,9 +306,9 @@ Cypress.Commands.add("supportCrud", (input) => {
       }
     }
 
-    if (cp.url) {
+    if (!cp.url.startsWith("http") && cp.url) {
       let finalUrl;
-      if (cp.url.includes("/")) {
+      if (!cp.url.startsWith("/") && cp.url.includes("/")) {
         const s_url = cp.url.split("/");
         for (const url_ of s_url) {
           let get_ = findInJson(Cypress.env(Cypress.env("environment")), url_);
@@ -1014,9 +1017,8 @@ function conditionContinueTest(json) {
         : JSON.stringify(json.condition);
     Cypress.log({
       name: `condition-error`,
-      message: `previus test: [*${refactoryJsonCondition}*] return: [*${
-        result ? result : "not found"
-      }*]`,
+      message: `previus test: [*${refactoryJsonCondition}*] return: [*${result ? result : "not found"
+        }*]`,
       consoleProps: () => ({
         json: formattedJson,
         condition: refactoryJsonCondition,
@@ -1026,51 +1028,6 @@ function conditionContinueTest(json) {
     });
   }
   return logCondition;
-}
-
-function haveProperty(objeto, propriedade, reserve) {
-  let found = false;
-
-  function searchProperty(obj) {
-    if (Array.isArray(obj)) {
-      obj.forEach((item) => searchProperty(item));
-    } else if (typeof obj === "object" && obj !== null) {
-      if (obj.hasOwnProperty(propriedade)) {
-        expect(obj).to.have.property(propriedade);
-        found = true;
-      }
-      Object.values(obj).forEach((valor) => searchProperty(valor));
-    }
-  }
-
-  searchProperty(objeto);
-
-  if (!found) {
-    throw new Error(`Property '${propriedade}' not found.`);
-  }
-  if (reserve) {
-    if (reserve) {
-      let searchValue = findInJson(window.alias.bodyResponse, propriedade);
-      crudStorage.save[
-        typeof reserve == "string" ? reserve : propriedade || propriedade
-      ] = searchValue;
-      Cypress.log({
-        name: "save",
-        message: `[${
-          typeof reserve == "string" ? reserve : propriedade || "save"
-        }] = ${
-          typeof searchValue === "object"
-            ? JSON.stringify(searchValue)
-            : searchValue
-        }`,
-        consoleProps: () => ({
-          alias: typeof reserve == "string" ? reserve : propriedade || "save",
-          value: searchValue,
-          framework: "cypress-crud",
-        }),
-      });
-    }
-  }
 }
 
 function runValidation(initValid) {
@@ -1332,6 +1289,7 @@ function runValidation(initValid) {
       searchEq(window.alias.bodyResponse, search, aliasPath);
       return;
     }
+
     let paths = findInJson(responseAlias, path);
 
     if (!paths || paths === undefined)
@@ -1445,11 +1403,10 @@ function searchEq(obj, searchValue, reserve) {
       crudStorage.save[reserve] = searchValue;
       Cypress.log({
         name: "save",
-        message: `[${reserve || "save"}] = ${
-          typeof searchValue === "object"
+        message: `[${reserve || "save"}] = ${typeof searchValue === "object"
             ? JSON.stringify(searchValue)
             : searchValue
-        }`,
+          }`,
         consoleProps: () => ({
           alias: reserve || "save",
           value: searchValue,
@@ -1466,20 +1423,28 @@ Cypress.Commands.add("runValidation", (validations) => {
   return runValidation(validations);
 });
 
-Cypress.Commands.add("bodyResponse", (...args) => {
-  ExpectHandle(args);
+Cypress.Commands.add("bodyResponse", (validations) => {
+  if (Array.isArray(validations)) {
+    for (const item of validations) return runValidation(item)
+  } else return runValidation(validations);
 });
 
-Cypress.Commands.add("response", (...args) => {
-  ExpectHandle(args);
+Cypress.Commands.add("response", (validations) => {
+  if (Array.isArray(validations)) {
+    for (const item of validations) return runValidation(item)
+  } else return runValidation(validations);
 });
 
-Cypress.Commands.add("res", (...args) => {
-  ExpectHandle(args);
+Cypress.Commands.add("res", (validations) => {
+  if (Array.isArray(validations)) {
+    for (const item of validations) return runValidation(item)
+  } else return runValidation(validations);
 });
 
-Cypress.Commands.add("expects", (...args) => {
-  ExpectHandle(args);
+Cypress.Commands.add("expects", (validations) => {
+  if (Array.isArray(validations)) {
+    for (const item of validations) return runValidation(item)
+  } else return runValidation(validations);
 });
 
 Cypress.Commands.add("save", (...input) => {
@@ -1756,8 +1721,7 @@ let counterResp = 0;
 Cypress.Commands.add("write", ({ path = null, log = true } = {}) => {
   counterResp += 1;
   return cy.writeFile(
-    `cypress/fixtures/${
-      path ? `${path}` : `response/response_${counterResp}`
+    `cypress/fixtures/${path ? `${path}` : `response/response_${counterResp}`
     }.json`,
     window.alias.bodyResponse,
     {
@@ -2113,93 +2077,7 @@ function randonItens() {
 
   return computerItemEmojis[randomIndex];
 }
-function ExpectHandle(args) {
-  args = replaceAllStrings(args);
-  let valueDuplicate;
-  if (!args[0].path) {
-    args.forEach((item) => {
-      args = null;
-      args = [
-        {
-          path: item,
-        },
-      ];
-    });
-  }
 
-  args.forEach(({ path, eq, type, search, alias, as, property, key }) => {
-    const key_property = property || key;
-    if (!path && !eq && !type && search) {
-      let aliasPath = as || alias;
-      searchEq(window.alias.bodyResponse, search, aliasPath);
-    } else if (key_property) {
-      let aliasPath = as || alias;
-      haveProperty(window.alias.bodyResponse, key_property, aliasPath);
-    } else {
-      let paths = findInJson(window.alias.bodyResponse, path);
-      if (!Array.isArray(paths)) {
-        paths = [paths];
-      }
-      let valueFound = false;
-      paths.forEach((item) => {
-        const checkValue = (value) => {
-          if (path && !eq) {
-            expect(value, `${randonItens()}${path}::`).to.exist;
-          }
-          if (String(eq).trim().includes("||")) {
-            eq.split("||").map((item) => {
-              if (value.trim() === item.trim() && valueDuplicate !== eq) {
-                expect(value, `${randonItens()}${path}::`).to.eq(item.trim());
-                valueDuplicate = eq;
-                valueFound = true;
-              }
-            });
-          } else {
-            if (eq && value === eq && valueDuplicate !== eq) {
-              expect(value, `${randonItens()}${path}::`).to.eq(eq);
-              valueDuplicate = eq;
-              valueFound = true;
-            }
-          }
-          if (type && typeof value !== type) {
-            throw new Error(
-              `Expected type '${type}' but found '${typeof value}' for path '${path}'`
-            );
-          }
-          if (type) {
-            expect(value, `Type check for path '${path}':`).to.be.a(type);
-          }
-        };
-
-        if (Array.isArray(item)) {
-          item.forEach(checkValue);
-        } else {
-          checkValue(item);
-        }
-      });
-
-      if (eq && !valueFound) {
-        const log = {
-          name: "expect",
-          message: `Expected value '${eq}' not found for path '${path}'`,
-          consoleProps: () => {
-            return {
-              found: paths,
-              expected: eq,
-              type: type,
-              framework: "cypress-crud",
-            };
-          },
-        };
-        Cypress.log(log);
-        expect(
-          valueFound,
-          `Expected value '${eq}' not found for path '${path}'`
-        ).to.be.true;
-      }
-    }
-  });
-}
 Cypress.Commands.add("crudSafeData", (token) => {
   const base64UrlDecode = (input) => {
     let str = input.replace(/-/g, "+").replace(/_/g, "/");
@@ -2224,12 +2102,8 @@ Cypress.Commands.add("crudSafeData", (token) => {
 Cypress.Commands.add("runFixtures", (path = null) => {
   return cy.task("runFixtures", { folderPath: path || "" }).then((fixtures) => {
     fixtures.forEach((item) => {
-      if (path) {
-        const replaceItem = `${path}/${item.fileName}`;
-        cy.crud(replaceItem);
-      } else {
-        cy.crud(item.fileName);
-      }
+      if (path) cy.crud(`${path}/${item.fileName}`);
+      else cy.crud(item.fileName);
     });
   });
 });

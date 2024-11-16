@@ -122,24 +122,30 @@ if (!fs.existsSync(env)) {
 	{
 	  "environment": "QA",
 	  "QA": {
-		"endpoint": "https://restcountries.com/v3.1/translation/germany",
 		"reqres": "https://reqres.in/api/users/2",
+      "glitch_config": {
+      "users": "https://api-qas-trainings.glitch.me/users"
+    }
 		"base_reqres": {
 		  "reqres_all": "https://reqres.in/api/users",
 		  "reqres_id": "https://reqres.in/api/users/{id}"
 		}
 	  },
 	  "PROD": {
-		"endpoint": "https://restcountries.com/v3.1/translation/germany",
 		"reqres": "https://reqres.in/api/users/2",
+      "glitch_config": {
+      "users": "https://api-qas-trainings.glitch.me/users"
+    }
 		"base_reqres": {
 		  "reqres_all": "https://reqres.in/api/users",
 		  "reqres_id": "https://reqres.in/api/users/{id}"
 		}
 	  },
 	  "DEV": {
-		"endpoint": "https://restcountries.com/v3.1/translation/germany",
 		"reqres": "https://reqres.in/api/users/2",
+      "glitch_config": {
+      "users": "https://api-qas-trainings.glitch.me/users"
+    }
 		"base_reqres": {
 		  "reqres_all": "https://reqres.in/api/users",
 		  "reqres_id": "https://reqres.in/api/users/{id}"
